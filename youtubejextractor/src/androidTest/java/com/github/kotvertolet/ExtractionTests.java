@@ -10,6 +10,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -32,7 +36,6 @@ public class ExtractionTests {
             responseBody = youtubeSiteNetwork.getStream(streamItem.getUrl());
             assertThat(responseBody.isSuccessful(), is(true));
         }
-
     }
 
     @Test
@@ -42,7 +45,6 @@ public class ExtractionTests {
             responseBody = youtubeSiteNetwork.getStream(streamItem.getUrl());
             assertThat(responseBody.isSuccessful(), is(true));
         }
-
     }
 
     @Test

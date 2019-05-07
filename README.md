@@ -8,14 +8,18 @@ from any youtube video, along with some other data such as a video title,
 
 WIP, library is fully functional but not well tested and documented
 
+## How to install
+[![](https://jitpack.io/v/kotvertolet/YoutubeJExtractor.svg)](https://jitpack.io/#kotvertolet/YoutubeJExtractor)
+
+
 ## How to use
 
 ```java
     YoutubeJExtractor = new YoutubeJExtractor();
     YoutubeVideoData videoData = youtubeJExtractor.extract(videoId);
 ``` 
-YoutubeVideoData is object that contains all the data for the requested 
-video split across two objects: VideoDetails and StreamingData.
+**YoutubeVideoData** is object that contains all the data for the requested 
+video split across two objects: **VideoDetails** and **StreamingData**.
 
 * **VideoDetails** contains video title, description, author, rating, view count, etc.
 * **StreamingData** contains list of streams (both video and audio) and ***expiresInSeconds***
