@@ -39,3 +39,7 @@ The minimum SDK level is limited to 16 due to third-party library limitation
 
 [Youtube-dl](https://github.com/ytdl-org/youtube-dl) - the idea and a part
  of implementation were influenced by this project
+ 
+## License
+
+ Distributed under the GPL v2 License. See [LICENSE.md](https://github.com/kotvertolet/YoutubeJExtractor/blob/master/LICENSE) for terms and conditions.
