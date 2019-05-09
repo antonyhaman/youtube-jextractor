@@ -34,8 +34,7 @@ public class StreamItem {
             size = map.get("size");
             qualityLabel = map.get("quality_label");
             projectionType = Integer.valueOf(map.get("projection_type"));
-        }
-        else {
+        } else {
             audioChannels = Integer.valueOf(map.get("audio_channels"));
             audioSampleRate = Integer.valueOf(map.get("audio_sample_rate"));
         }
@@ -87,8 +86,11 @@ public class StreamItem {
     }
 
     public String getUrl() {
-        if (isStreamEncrypted) {
-            return url + "&signature=" + signature;
+        if (isStreamEncrypted && !url.contains("signature")) {
+            url = url + "&signature=" + signature;
+        }
+        if (!url.contains("ratebypass")) {
+            url = url + "&ratebypass=yes";
         }
         return url;
     }

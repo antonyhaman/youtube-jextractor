@@ -12,10 +12,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class YoutubeSiteNetwork {
 
+    private final static String YOUTUBE_SITE_URL = "https://www.youtube.com/";
+    private static YoutubeSiteNetwork instance;
     private Retrofit retrofit;
     private YoutubeSiteApi youtubeSiteApi;
-    private static YoutubeSiteNetwork instance;
-    private final static String YOUTUBE_SITE_URL = "https://www.youtube.com/";
 
     private YoutubeSiteNetwork() {
         Gson gson = new GsonBuilder()

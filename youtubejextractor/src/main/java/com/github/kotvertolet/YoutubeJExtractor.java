@@ -28,6 +28,9 @@ public class YoutubeJExtractor {
     private YoutubeSiteNetwork youtubeSiteNetwork;
     private String embeddedVideoPageHtml;
 
+    // Temp workaround.
+    private int retryLimit = 0;
+
     public YoutubeJExtractor() {
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
     }
@@ -36,7 +39,20 @@ public class YoutubeJExtractor {
         YoutubeVideoData youtubeVideoData = getYoutubeVideoData(videoId);
         List<StreamItem> streamItemList = youtubeVideoData.getStreamingData().getStreamItems();
 
-        if (streamItemList.get(0).isStreamEncrypted()) {
+        StreamItem exampleStream = streamItemList.get(0);
+        if (exampleStream.isStreamEncrypted()) {
+            /*
+                Temp workaround. Check if signature has proper format or else try again,
+                usually takes 1-2 attempts to get a proper signature
+            */
+            if (!exampleStream.getSignature().contains(".")) {
+                if (retryLimit < 4) {
+                    retryLimit++;
+                    return extract(videoId);
+                } else
+                    throw new IllegalStateException("Extraction reached it's retry limit but still fails");
+            }
+
             String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(embeddedVideoPageHtml);
             ExtractionUtils extractionUtils = new ExtractionUtils();
             String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);

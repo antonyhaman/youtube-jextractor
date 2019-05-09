@@ -15,12 +15,12 @@ public class StreamingData {
     @Expose
     private List<StreamItem> streamItems;
 
-    public void setExpiresInSeconds(String expiresInSeconds) {
-        this.expiresInSeconds = expiresInSeconds;
-    }
-
     public String getExpiresInSeconds() {
         return expiresInSeconds;
+    }
+
+    public void setExpiresInSeconds(String expiresInSeconds) {
+        this.expiresInSeconds = expiresInSeconds;
     }
 
     public List<StreamItem> getStreamItems() {

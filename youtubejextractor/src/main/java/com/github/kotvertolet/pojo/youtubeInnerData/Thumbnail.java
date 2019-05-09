@@ -10,12 +10,12 @@ public class Thumbnail {
     @SerializedName("thumbnails")
     private List<ThumbnailsItem> thumbnails;
 
-    public void setThumbnails(List<ThumbnailsItem> thumbnails) {
-        this.thumbnails = thumbnails;
-    }
-
     public List<ThumbnailsItem> getThumbnails() {
         return thumbnails;
+    }
+
+    public void setThumbnails(List<ThumbnailsItem> thumbnails) {
+        this.thumbnails = thumbnails;
     }
 
     @Override

@@ -55,132 +55,132 @@ public class VideoDetails {
     @SerializedName("channelId")
     private String channelId;
 
-    public void setIsOwnerViewing(boolean isOwnerViewing) {
-        this.isOwnerViewing = isOwnerViewing;
-    }
-
     public boolean isIsOwnerViewing() {
         return isOwnerViewing;
     }
 
-    public void setThumbnail(Thumbnail thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setIsOwnerViewing(boolean isOwnerViewing) {
+        this.isOwnerViewing = isOwnerViewing;
     }
 
     public Thumbnail getThumbnail() {
         return thumbnail;
     }
 
-    public void setIsLiveContent(boolean isLiveContent) {
-        this.isLiveContent = isLiveContent;
+    public void setThumbnail(Thumbnail thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public boolean isIsLiveContent() {
         return isLiveContent;
     }
 
-    public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
+    public void setIsLiveContent(boolean isLiveContent) {
+        this.isLiveContent = isLiveContent;
     }
 
     public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
     }
 
     public String getAuthor() {
         return author;
     }
 
-    public void setLengthSeconds(String lengthSeconds) {
-        this.lengthSeconds = lengthSeconds;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getLengthSeconds() {
         return lengthSeconds;
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    public void setLengthSeconds(String lengthSeconds) {
+        this.lengthSeconds = lengthSeconds;
     }
 
     public String getVideoId() {
         return videoId;
     }
 
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
     }
 
     public String getShortDescription() {
         return shortDescription;
     }
 
-    public void setIsPrivate(boolean isPrivate) {
-        this.isPrivate = isPrivate;
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public boolean isIsPrivate() {
         return isPrivate;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setIsPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setIsCrawlable(boolean isCrawlable) {
-        this.isCrawlable = isCrawlable;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public boolean isIsCrawlable() {
         return isCrawlable;
     }
 
-    public void setAverageRating(double averageRating) {
-        this.averageRating = averageRating;
+    public void setIsCrawlable(boolean isCrawlable) {
+        this.isCrawlable = isCrawlable;
     }
 
     public double getAverageRating() {
         return averageRating;
     }
 
-    public void setIsUnpluggedCorpus(boolean isUnpluggedCorpus) {
-        this.isUnpluggedCorpus = isUnpluggedCorpus;
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
     }
 
     public boolean isIsUnpluggedCorpus() {
         return isUnpluggedCorpus;
     }
 
-    public void setAllowRatings(boolean allowRatings) {
-        this.allowRatings = allowRatings;
+    public void setIsUnpluggedCorpus(boolean isUnpluggedCorpus) {
+        this.isUnpluggedCorpus = isUnpluggedCorpus;
     }
 
     public boolean isAllowRatings() {
         return allowRatings;
     }
 
-    public void setViewCount(String viewCount) {
-        this.viewCount = viewCount;
+    public void setAllowRatings(boolean allowRatings) {
+        this.allowRatings = allowRatings;
     }
 
     public String getViewCount() {
         return viewCount;
     }
 
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+    public void setViewCount(String viewCount) {
+        this.viewCount = viewCount;
     }
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 
     @Override

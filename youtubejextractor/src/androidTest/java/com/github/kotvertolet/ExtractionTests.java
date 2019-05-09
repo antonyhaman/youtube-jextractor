@@ -34,7 +34,8 @@ public class ExtractionTests {
         videoData = youtubeJExtractor.extract("kJQP7kiw5Fk");
         for (StreamItem streamItem : videoData.getStreamingData().getStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(streamItem.getUrl());
-            assertThat(responseBody.isSuccessful(), is(true));
+            assertThat(String.format("Stream wasn't processed correctly, stream details:\n %s",
+                    streamItem.toString()), responseBody.isSuccessful(), is(true));
         }
     }
 
@@ -43,7 +44,8 @@ public class ExtractionTests {
         videoData = youtubeJExtractor.extract("jNQXAC9IVRw");
         for (StreamItem streamItem : videoData.getStreamingData().getStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(streamItem.getUrl());
-            assertThat(responseBody.isSuccessful(), is(true));
+            assertThat(String.format("Stream wasn't processed correctly, stream details:\n %s",
+                    streamItem.toString()), responseBody.isSuccessful(), is(true));
         }
     }
 
@@ -52,7 +54,18 @@ public class ExtractionTests {
         videoData = youtubeJExtractor.extract("h3yFGoSkgk8");
         for (StreamItem streamItem : videoData.getStreamingData().getStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(streamItem.getUrl());
-            assertThat(responseBody.isSuccessful(), is(true));
+            assertThat(String.format("Stream wasn't processed correctly, stream details:\n %s",
+                    streamItem.toString()), responseBody.isSuccessful(), is(true));
+        }
+    }
+
+    @Test
+    public void checkVeryLongVideo() throws IOException {
+        videoData = youtubeJExtractor.extract("85bkCmaOh4o");
+        for (StreamItem streamItem : videoData.getStreamingData().getStreamItems()) {
+            responseBody = youtubeSiteNetwork.getStream(streamItem.getUrl());
+            assertThat(String.format("Stream wasn't processed correctly, stream details:\n %s",
+                    streamItem.toString()), responseBody.isSuccessful(), is(true));
         }
     }
 }

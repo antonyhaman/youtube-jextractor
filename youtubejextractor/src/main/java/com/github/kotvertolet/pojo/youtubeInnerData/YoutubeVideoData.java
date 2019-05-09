@@ -11,22 +11,21 @@ public class YoutubeVideoData {
     @SerializedName("streamingData")
     private StreamingData streamingData;
 
-    public void setVideoDetails(VideoDetails videoDetails) {
-        this.videoDetails = videoDetails;
-    }
-
     public VideoDetails getVideoDetails() {
         return videoDetails;
     }
 
-    public void setStreamingData(StreamingData streamingData) {
-        this.streamingData = streamingData;
+    public void setVideoDetails(VideoDetails videoDetails) {
+        this.videoDetails = videoDetails;
     }
 
     public StreamingData getStreamingData() {
         return streamingData;
     }
 
+    public void setStreamingData(StreamingData streamingData) {
+        this.streamingData = streamingData;
+    }
 
     @Override
     public String toString() {

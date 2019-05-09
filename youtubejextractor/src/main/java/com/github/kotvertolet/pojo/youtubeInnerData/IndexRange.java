@@ -11,20 +11,20 @@ public class IndexRange {
     @SerializedName("end")
     private String end;
 
-    public void setStart(String start) {
-        this.start = start;
-    }
-
     public String getStart() {
         return start;
     }
 
-    public void setEnd(String end) {
-        this.end = end;
+    public void setStart(String start) {
+        this.start = start;
     }
 
     public String getEnd() {
         return end;
+    }
+
+    public void setEnd(String end) {
+        this.end = end;
     }
 
     @Override

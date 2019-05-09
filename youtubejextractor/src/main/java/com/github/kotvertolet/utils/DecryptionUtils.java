@@ -28,7 +28,7 @@ public class DecryptionUtils {
         jsDecryptFunctionBody = extractFunctionBody(rawExtractedFunction);
         List<String> jsDecryptFunctionArgumentsNames = extractFunctionArgs(rawExtractedFunction);
         jsObjects = extractJsObjectsIfAny(jsDecryptFunctionBody, jsDecryptFunctionArgumentsNames);
-        jsContext = prepareJsContex(jsObjects, jsDecryptFunction);
+        jsContext = prepareJsContext(jsObjects, jsDecryptFunction);
     }
 
     public String decryptSignature(String encryptedSignature) {
@@ -42,7 +42,7 @@ public class DecryptionUtils {
         }
     }
 
-    private JSContext prepareJsContex(List<String> jsObjects, String jsDecryptFunction) {
+    private JSContext prepareJsContext(List<String> jsObjects, String jsDecryptFunction) {
         JSContext context = new JSContext();
         for (String jsObject : jsObjects) {
             context.evaluateScript(jsObject);
@@ -51,6 +51,13 @@ public class DecryptionUtils {
         return context;
     }
 
+    /**
+     * Extracts decryption js function from youtube player code, later it is used to extract
+     * it's arguments names, function body, etc
+     *
+     * @param funcName name of the function to extract
+     * @return matcher that points to the required function
+     */
     private Matcher extractJsFunction(String funcName) {
         String escapedFuncName = StringUtils.escapeRegExSpecialCharacters(funcName);
         String regex = String.format("(?x)(?:function\\s+%s|[{;,]\\s*%s\\s*=\\s*function|var" +
@@ -65,6 +72,12 @@ public class DecryptionUtils {
         }
     }
 
+    /**
+     * Extracts whole function, including it's assignment and body
+     *
+     * @param matcher matcher that point to the function
+     * @return returns function with it's assignment, for example: var a = function(b) {...}
+     */
     private String extractFunctionWithAssignment(Matcher matcher) {
         String extractedFunction = matcher.group();
         if (extractedFunction.startsWith(";\n")) {
@@ -73,10 +86,22 @@ public class DecryptionUtils {
         return extractedFunction;
     }
 
+    /**
+     * Extracts arguments names from the function
+     *
+     * @param matcher matcher that point to the function
+     * @return returns list with args names
+     */
     private List<String> extractFunctionArgs(Matcher matcher) {
         return Arrays.asList(matcher.group("args").split(","));
     }
 
+    /**
+     * Extracts function body (everything inside of {})
+     *
+     * @param matcher matcher that point to the function
+     * @return function body
+     */
     private String extractFunctionBody(Matcher matcher) {
         return matcher.group("code");
     }
@@ -120,6 +145,7 @@ public class DecryptionUtils {
 
     /**
      * Extracts js object by it's name from player code
+     *
      * @param objectName name of the object to extract
      * @return map where key is object's field name and value is field's value
      */
