@@ -45,13 +45,13 @@ public class YoutubeJExtractor {
                 Temp workaround. Check if signature has proper format or else try again,
                 usually takes 1-2 attempts to get a proper signature
             */
-            if (!exampleStream.getSignature().contains(".")) {
-                if (retryLimit < 4) {
-                    retryLimit++;
-                    return extract(videoId);
-                } else
-                    throw new IllegalStateException("Extraction reached it's retry limit but still fails");
-            }
+//            if (!exampleStream.getSignature().contains(".")) {
+//                if (retryLimit < 4) {
+//                    retryLimit++;
+//                    return extract(videoId);
+//                } else
+//                    throw new IllegalStateException("Extraction reached it's retry limit but still fails");
+//            }
 
             String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(embeddedVideoPageHtml);
             ExtractionUtils extractionUtils = new ExtractionUtils();

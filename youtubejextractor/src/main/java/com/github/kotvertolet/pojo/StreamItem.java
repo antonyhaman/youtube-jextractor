@@ -9,6 +9,7 @@ public class StreamItem {
     private String codec;
     private int bitrate;
     private String signature;
+    private String sp;
     private int iTag;
     private String url;
     private boolean isStreamEncrypted;
@@ -39,6 +40,7 @@ public class StreamItem {
             audioSampleRate = Integer.valueOf(map.get("audio_sample_rate"));
         }
         signature = map.get("s");
+        sp = map.get("sp");
         isStreamEncrypted = signature != null;
         iTag = Integer.valueOf(map.get("itag"));
         url = map.get("url");
@@ -77,6 +79,14 @@ public class StreamItem {
         this.signature = signature;
     }
 
+    public String getSp() {
+        return sp;
+    }
+
+    public void setSp(String sp) {
+        this.sp = sp;
+    }
+
     public int getiTag() {
         return iTag;
     }
@@ -86,11 +96,13 @@ public class StreamItem {
     }
 
     public String getUrl() {
-        if (isStreamEncrypted && !url.contains("signature")) {
-            url = url + "&signature=" + signature;
-        }
-        if (!url.contains("ratebypass")) {
-            url = url + "&ratebypass=yes";
+        if (isStreamEncrypted) {
+            isStreamEncrypted = false;
+            url = String.format("%s&%s=%s", url, sp, signature);
+            if (!url.contains("ratebypass")) {
+                url = url + "&ratebypass=yes";
+            }
+            isStreamEncrypted = false;
         }
         return url;
     }
