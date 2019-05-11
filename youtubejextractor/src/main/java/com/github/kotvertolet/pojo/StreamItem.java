@@ -1,10 +1,12 @@
 package com.github.kotvertolet.pojo;
 
+import com.github.kotvertolet.utils.StreamType;
+
 import java.util.Map;
 
 public class StreamItem {
 
-    private String type;
+    private StreamType streamType;
     private String extension;
     private String codec;
     private int bitrate;
@@ -27,10 +29,11 @@ public class StreamItem {
     public StreamItem(Map<String, String> map) {
         String[] tempArr = map.get("type").split(";");
         String[] typeArr = tempArr[0].split("/");
-        type = typeArr[0];
+
+        streamType = typeArr[0].equals(StreamType.VIDEO.toString()) ? StreamType.VIDEO : StreamType.AUDIO;
         extension = typeArr[1];
         codec = tempArr[1].split("=")[1].replaceAll("\"", "");
-        if (type.contains("video")) {
+        if (streamType.equals(StreamType.VIDEO)) {
             fps = Integer.valueOf(map.get("fps"));
             size = map.get("size");
             qualityLabel = map.get("quality_label");
@@ -47,12 +50,12 @@ public class StreamItem {
         bitrate = Integer.valueOf(map.get("bitrate"));
     }
 
-    public String getType() {
-        return type;
+    public StreamType getStreamType() {
+        return streamType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setStreamType(StreamType streamType) {
+        this.streamType = streamType;
     }
 
     public String getExtension() {
@@ -189,12 +192,13 @@ public class StreamItem {
         if (projectionType != that.projectionType) return false;
         if (audioChannels != that.audioChannels) return false;
         if (audioSampleRate != that.audioSampleRate) return false;
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (streamType != that.streamType) return false;
         if (extension != null ? !extension.equals(that.extension) : that.extension != null)
             return false;
         if (codec != null ? !codec.equals(that.codec) : that.codec != null) return false;
         if (signature != null ? !signature.equals(that.signature) : that.signature != null)
             return false;
+        if (sp != null ? !sp.equals(that.sp) : that.sp != null) return false;
         if (url != null ? !url.equals(that.url) : that.url != null) return false;
         if (size != null ? !size.equals(that.size) : that.size != null) return false;
         return qualityLabel != null ? qualityLabel.equals(that.qualityLabel) : that.qualityLabel == null;
@@ -202,11 +206,12 @@ public class StreamItem {
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
+        int result = streamType != null ? streamType.hashCode() : 0;
         result = 31 * result + (extension != null ? extension.hashCode() : 0);
         result = 31 * result + (codec != null ? codec.hashCode() : 0);
         result = 31 * result + bitrate;
         result = 31 * result + (signature != null ? signature.hashCode() : 0);
+        result = 31 * result + (sp != null ? sp.hashCode() : 0);
         result = 31 * result + iTag;
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (isStreamEncrypted ? 1 : 0);
@@ -222,11 +227,12 @@ public class StreamItem {
     @Override
     public String toString() {
         return "StreamItem{" +
-                "type='" + type + '\'' +
+                "streamType=" + streamType +
                 ", extension='" + extension + '\'' +
                 ", codec='" + codec + '\'' +
                 ", bitrate=" + bitrate +
                 ", signature='" + signature + '\'' +
+                ", sp='" + sp + '\'' +
                 ", iTag=" + iTag +
                 ", url='" + url + '\'' +
                 ", isStreamEncrypted=" + isStreamEncrypted +
