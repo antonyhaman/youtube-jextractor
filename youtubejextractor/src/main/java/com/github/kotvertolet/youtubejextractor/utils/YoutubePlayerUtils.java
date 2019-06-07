@@ -1,6 +1,6 @@
-package com.github.kotvertolet.utils;
+package com.github.kotvertolet.youtubejextractor.utils;
 
-import com.github.kotvertolet.network.YoutubeSiteNetwork;
+import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 
 import java.io.IOException;
 import java.util.regex.Matcher;

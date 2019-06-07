@@ -1,4 +1,4 @@
-package com.github.kotvertolet.network;
+package com.github.kotvertolet.youtubejextractor.network;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

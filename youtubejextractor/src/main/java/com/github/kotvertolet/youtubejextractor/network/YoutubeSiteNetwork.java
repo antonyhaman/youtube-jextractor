@@ -1,4 +1,4 @@
-package com.github.kotvertolet.network;
+package com.github.kotvertolet.youtubejextractor.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

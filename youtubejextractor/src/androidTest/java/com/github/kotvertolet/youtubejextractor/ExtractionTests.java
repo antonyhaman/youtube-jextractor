@@ -1,19 +1,16 @@
-package com.github.kotvertolet;
+package com.github.kotvertolet.youtubejextractor;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.github.kotvertolet.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.pojo.StreamItem;
-import com.github.kotvertolet.pojo.youtubeInnerData.YoutubeVideoData;
+import com.github.kotvertolet.youtubejextractor.YoutubeJExtractor;
+import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
+import com.github.kotvertolet.youtubejextractor.pojo.StreamItem;
+import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.YoutubeVideoData;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;

@@ -1,12 +1,16 @@
-package com.github.kotvertolet.pojo;
+package com.github.kotvertolet.youtubejextractor.pojo;
+
+import com.github.kotvertolet.youtubejextractor.pojo.enums.Codec;
+import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
+import com.github.kotvertolet.youtubejextractor.pojo.enums.StreamType;
 
 import java.util.Map;
 
 public class StreamItem {
 
-    private String type;
-    private String extension;
-    private String codec;
+    private StreamType streamType;
+    private Extension extension;
+    private Codec codec;
     private int bitrate;
     private String signature;
     private String sp;
@@ -27,10 +31,11 @@ public class StreamItem {
     public StreamItem(Map<String, String> map) {
         String[] tempArr = map.get("type").split(";");
         String[] typeArr = tempArr[0].split("/");
-        type = typeArr[0];
-        extension = typeArr[1];
-        codec = tempArr[1].split("=")[1].replaceAll("\"", "");
-        if (type.contains("video")) {
+
+        streamType = typeArr[0].equals(StreamType.VIDEO.toString()) ? StreamType.VIDEO : StreamType.AUDIO;
+        extension = extractExtension(typeArr[1]);
+        codec = extractCodec(tempArr[1]);
+        if (streamType.equals(StreamType.VIDEO)) {
             fps = Integer.valueOf(map.get("fps"));
             size = map.get("size");
             qualityLabel = map.get("quality_label");
@@ -47,27 +52,27 @@ public class StreamItem {
         bitrate = Integer.valueOf(map.get("bitrate"));
     }
 
-    public String getType() {
-        return type;
+    public StreamType getStreamType() {
+        return streamType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setStreamType(StreamType streamType) {
+        this.streamType = streamType;
     }
 
-    public String getExtension() {
+    public Extension getExtension() {
         return extension;
     }
 
-    public void setExtension(String extension) {
+    public void setExtension(Extension extension) {
         this.extension = extension;
     }
 
-    public String getCodec() {
+    public Codec getCodec() {
         return codec;
     }
 
-    public void setCodec(String codec) {
+    public void setCodec(Codec codec) {
         this.codec = codec;
     }
 
@@ -189,12 +194,13 @@ public class StreamItem {
         if (projectionType != that.projectionType) return false;
         if (audioChannels != that.audioChannels) return false;
         if (audioSampleRate != that.audioSampleRate) return false;
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (streamType != that.streamType) return false;
         if (extension != null ? !extension.equals(that.extension) : that.extension != null)
             return false;
         if (codec != null ? !codec.equals(that.codec) : that.codec != null) return false;
         if (signature != null ? !signature.equals(that.signature) : that.signature != null)
             return false;
+        if (sp != null ? !sp.equals(that.sp) : that.sp != null) return false;
         if (url != null ? !url.equals(that.url) : that.url != null) return false;
         if (size != null ? !size.equals(that.size) : that.size != null) return false;
         return qualityLabel != null ? qualityLabel.equals(that.qualityLabel) : that.qualityLabel == null;
@@ -202,11 +208,12 @@ public class StreamItem {
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
+        int result = streamType != null ? streamType.hashCode() : 0;
         result = 31 * result + (extension != null ? extension.hashCode() : 0);
         result = 31 * result + (codec != null ? codec.hashCode() : 0);
         result = 31 * result + bitrate;
         result = 31 * result + (signature != null ? signature.hashCode() : 0);
+        result = 31 * result + (sp != null ? sp.hashCode() : 0);
         result = 31 * result + iTag;
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (isStreamEncrypted ? 1 : 0);
@@ -222,11 +229,12 @@ public class StreamItem {
     @Override
     public String toString() {
         return "StreamItem{" +
-                "type='" + type + '\'' +
+                "streamType=" + streamType +
                 ", extension='" + extension + '\'' +
                 ", codec='" + codec + '\'' +
                 ", bitrate=" + bitrate +
                 ", signature='" + signature + '\'' +
+                ", sp='" + sp + '\'' +
                 ", iTag=" + iTag +
                 ", url='" + url + '\'' +
                 ", isStreamEncrypted=" + isStreamEncrypted +
@@ -237,5 +245,71 @@ public class StreamItem {
                 ", audioChannels=" + audioChannels +
                 ", audioSampleRate=" + audioSampleRate +
                 '}';
+    }
+
+    private Codec extractCodec(String rawCodec) {
+        rawCodec = rawCodec.split("=")[1].replaceAll("\"", "");
+        if (rawCodec.contains(".")) {
+            rawCodec = rawCodec.split("\\.")[0];
+        }
+
+        if (Codec.H263.toString().contains(rawCodec)) {
+            return Codec.H263;
+        }
+        else if (Codec.H264.toString().contains(rawCodec)) {
+            return Codec.H264;
+        }
+        else if (rawCodec.contains(Codec.VP8.toString())) {
+            return Codec.VP8;
+        }
+        else if (rawCodec.contains(Codec.VP9.toString())) {
+            return Codec.VP9;
+        }
+        else if (rawCodec.contains(Codec.AV1.toString())) {
+            return Codec.AV1;
+        }
+        else if (rawCodec.contains(Codec.MP3.toString())) {
+            return Codec.MP3;
+        }
+        else if (rawCodec.contains(Codec.MP4A.toString())) {
+            return Codec.MP4A;
+        }
+        else if (rawCodec.contains(Codec.AAC.toString())) {
+            return Codec.AAC;
+        }
+        else if (rawCodec.contains(Codec.VORBIS.toString())) {
+            return Codec.VORBIS;
+        }
+        else if (rawCodec.contains(Codec.DTSE.toString())) {
+            return Codec.DTSE;
+        }
+        else if (rawCodec.contains(Codec.AC3.toString())) {
+            return Codec.AC3;
+        }
+        else if (rawCodec.contains(Codec.OPUS.toString())) {
+            return Codec.OPUS;
+        }
+        else throw new IllegalArgumentException("Unknown codec found: " + rawCodec);
+    }
+
+    private Extension extractExtension(String rawExtension) {
+        if (rawExtension.equals(Extension.WEBM.toString())) {
+            return Extension.WEBM;
+        }
+        else if (rawExtension.equals(Extension.GPP.toString())) {
+            return Extension.GPP;
+        }
+        else if (rawExtension.equals(Extension.FLV.toString())) {
+            return Extension.FLV;
+        }
+        else if (rawExtension.equals(Extension.M4A.toString())) {
+            return Extension.M4A;
+        }
+        else if (rawExtension.equals(Extension.MP4.toString())) {
+            return Extension.MP4;
+        }
+        else {
+            throw new IllegalArgumentException("Unknown extension found: " + rawExtension);
+        }
     }
 }
