@@ -1,11 +1,11 @@
-package com.github.kotvertolet;
+package com.github.kotvertolet.youtubejextractor;
 
-import com.github.kotvertolet.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.pojo.StreamItem;
-import com.github.kotvertolet.pojo.youtubeInnerData.YoutubeVideoData;
-import com.github.kotvertolet.utils.DecryptionUtils;
-import com.github.kotvertolet.utils.ExtractionUtils;
-import com.github.kotvertolet.utils.YoutubePlayerUtils;
+import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
+import com.github.kotvertolet.youtubejextractor.pojo.StreamItem;
+import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.YoutubeVideoData;
+import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
+import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
+import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 import com.google.gson.Gson;
@@ -21,15 +21,12 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-import static com.github.kotvertolet.utils.StringUtils.splitUrlParams;
+import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
 
 public class YoutubeJExtractor {
 
     private YoutubeSiteNetwork youtubeSiteNetwork;
     private String embeddedVideoPageHtml;
-
-    // Temp workaround.
-    private int retryLimit = 0;
 
     public YoutubeJExtractor() {
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
@@ -41,18 +38,6 @@ public class YoutubeJExtractor {
 
         StreamItem exampleStream = streamItemList.get(0);
         if (exampleStream.isStreamEncrypted()) {
-            /*
-                Temp workaround. Check if signature has proper format or else try again,
-                usually takes 1-2 attempts to get a proper signature
-            */
-//            if (!exampleStream.getSignature().contains(".")) {
-//                if (retryLimit < 4) {
-//                    retryLimit++;
-//                    return extract(videoId);
-//                } else
-//                    throw new IllegalStateException("Extraction reached it's retry limit but still fails");
-//            }
-
             String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(embeddedVideoPageHtml);
             ExtractionUtils extractionUtils = new ExtractionUtils();
             String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);

@@ -1,4 +1,4 @@
-package com.github.kotvertolet.utils;
+package com.github.kotvertolet.youtubejextractor.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;

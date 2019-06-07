@@ -1,9 +1,9 @@
-package com.github.kotvertolet.utils;
+package com.github.kotvertolet.youtubejextractor.pojo.enums;
 
 public enum Extension {
 
     FLV("flv"),
-    _3GPP("3gpp"),
+    GPP("3gpp"),
     MP4("mp4"),
     WEBM("webm"),
     M4A("m4a");

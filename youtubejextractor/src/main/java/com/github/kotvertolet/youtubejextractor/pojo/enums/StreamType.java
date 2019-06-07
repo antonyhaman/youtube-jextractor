@@ -1,4 +1,4 @@
-package com.github.kotvertolet.utils;
+package com.github.kotvertolet.youtubejextractor.pojo.enums;
 
 public enum StreamType {
 

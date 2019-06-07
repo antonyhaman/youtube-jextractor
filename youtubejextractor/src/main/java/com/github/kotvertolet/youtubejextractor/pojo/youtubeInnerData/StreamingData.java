@@ -1,6 +1,6 @@
-package com.github.kotvertolet.pojo.youtubeInnerData;
+package com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData;
 
-import com.github.kotvertolet.pojo.StreamItem;
+import com.github.kotvertolet.youtubejextractor.pojo.StreamItem;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

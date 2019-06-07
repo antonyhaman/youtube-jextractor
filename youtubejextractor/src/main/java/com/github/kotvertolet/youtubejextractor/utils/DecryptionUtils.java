@@ -1,4 +1,4 @@
-package com.github.kotvertolet.utils;
+package com.github.kotvertolet.youtubejextractor.utils;
 
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
