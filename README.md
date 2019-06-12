@@ -8,6 +8,11 @@ from any youtube video along with some other data such as a video title,
 
 WIP, library is functional but not well tested and documented. 
 
+#### TODO
+1. Live streams support (dash, hls, etc)
+2. Workaround for region restricted videos
+3. Add more tests
+
 ## How to install
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 
@@ -21,7 +26,7 @@ WIP, library is functional but not well tested and documented.
 **YoutubeVideoData** is an object that contains data for the requested 
 video split across two main objects: **VideoDetails** and **StreamingData**.
 
-* **VideoDetails** contains varioud video data such as title, description, author, rating, view count, etc.
+* **VideoDetails** contains various video data such as title, description, author, rating, view count, etc.
 * **StreamingData** contains list of streams (both video and audio) and ***expiresInSeconds***
 field which indicated how long links will be alive.
  
