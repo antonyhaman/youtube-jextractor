@@ -1,12 +1,13 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
 public class ExtractionUtils {
 
-    public String extractYoutubeVideoPlayerCode(String playerUrl) {
+    public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeNetworkCallException {
         playerUrl = preparePlayerUrl(playerUrl);
 
         Pattern pattern = Pattern.compile("([a-z]+)$");

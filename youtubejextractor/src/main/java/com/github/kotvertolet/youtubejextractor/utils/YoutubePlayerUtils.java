@@ -1,5 +1,7 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
+import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ public class YoutubePlayerUtils {
      * @param embeddedVideoPageHtml embedded youtube page
      * @return returns player ulr (like this one - 'https://www.youtube.com/yts/jsbin/player-vflkwPKV5/en_US/base.js')
      */
-    public static String getJsPlayerUrl(String embeddedVideoPageHtml) {
+    public static String getJsPlayerUrl(String embeddedVideoPageHtml) throws ExtractionException {
         Pattern pattern = Pattern.compile("\"assets\":.+?\"js\":\\s*(\"[^\"]+\")");
         Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
 
@@ -28,7 +30,7 @@ public class YoutubePlayerUtils {
             // Removing leading and trailing quotes
             return match.replaceAll("^\"|\"$", "");
         } else
-            throw new IllegalStateException("No encrypted signature found");
+            throw new ExtractionException("No encrypted signature found");
     }
 
     /**
@@ -37,12 +39,12 @@ public class YoutubePlayerUtils {
      * @param playerUrl player url
      * @return js code of the player
      */
-    public static String downloadJsPlayer(String playerUrl) {
+    public static String downloadJsPlayer(String playerUrl) throws YoutubeNetworkCallException {
         try {
             Response<ResponseBody> responseBody = YoutubeSiteNetwork.getInstance().downloadWebpage(playerUrl);
             return responseBody.body().string();
         } catch (IOException | NullPointerException e) {
-            throw new IllegalStateException("Error while downloading js player", e);
+            throw new YoutubeNetworkCallException("Error while downloading youtube js video player", e);
         }
     }
 }
