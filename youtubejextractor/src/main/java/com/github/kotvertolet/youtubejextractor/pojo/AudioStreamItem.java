@@ -1,7 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.pojo;
 
 import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
-import com.github.kotvertolet.youtubejextractor.pojo.enums.StreamType;
 
 import java.util.Map;
 
@@ -32,14 +31,6 @@ public class AudioStreamItem extends StreamItem {
 
     public void setAudioSampleRate(int audioSampleRate) {
         this.audioSampleRate = audioSampleRate;
-    }
-
-    public StreamType getStreamType() {
-        return streamType;
-    }
-
-    public void setStreamType(StreamType streamType) {
-        this.streamType = streamType;
     }
 
     public Extension getExtension() {
@@ -114,7 +105,6 @@ public class AudioStreamItem extends StreamItem {
         if (bitrate != that.bitrate) return false;
         if (iTag != that.iTag) return false;
         if (isStreamEncrypted != that.isStreamEncrypted) return false;
-        if (streamType != that.streamType) return false;
         if (extension != that.extension) return false;
         if (codec != that.codec) return false;
         if (signature != null ? !signature.equals(that.signature) : that.signature != null)
@@ -127,7 +117,6 @@ public class AudioStreamItem extends StreamItem {
     public int hashCode() {
         int result = audioChannels;
         result = 31 * result + audioSampleRate;
-        result = 31 * result + streamType.hashCode();
         result = 31 * result + (extension != null ? extension.hashCode() : 0);
         result = 31 * result + (codec != null ? codec.hashCode() : 0);
         result = 31 * result + bitrate;
@@ -144,7 +133,6 @@ public class AudioStreamItem extends StreamItem {
         return "AudioStreamItem{" +
                 "audioChannels=" + audioChannels +
                 ", audioSampleRate=" + audioSampleRate +
-                ", streamType=" + streamType +
                 ", extension=" + extension +
                 ", codec=" + codec +
                 ", bitrate=" + bitrate +

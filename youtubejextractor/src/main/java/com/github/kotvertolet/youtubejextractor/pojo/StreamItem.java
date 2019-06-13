@@ -1,7 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.pojo;
 
 import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
-import com.github.kotvertolet.youtubejextractor.pojo.enums.StreamType;
 
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.extract
 
 public abstract class StreamItem {
 
-    protected StreamType streamType;
     protected Extension extension;
     protected String codec;
     protected int bitrate;
@@ -22,8 +20,6 @@ public abstract class StreamItem {
     public StreamItem(Map<String, String> map) {
         String[] tempArr = map.get("type").split(";");
         String[] typeArr = tempArr[0].split("/");
-
-        streamType = typeArr[0].equals(StreamType.VIDEO.toString()) ? StreamType.VIDEO : StreamType.AUDIO;
         extension = extractExtension(typeArr[1]);
         codec = tempArr[1].split("=")[1].replaceAll("\"", "");
         signature = map.get("s");

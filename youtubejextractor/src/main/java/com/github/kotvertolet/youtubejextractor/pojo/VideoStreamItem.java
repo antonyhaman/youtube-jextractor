@@ -1,7 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.pojo;
 
 import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
-import com.github.kotvertolet.youtubejextractor.pojo.enums.StreamType;
 
 import java.util.Map;
 
@@ -52,14 +51,6 @@ public class VideoStreamItem extends StreamItem {
 
     public void setProjectionType(int projectionType) {
         this.projectionType = projectionType;
-    }
-
-    public StreamType getStreamType() {
-        return streamType;
-    }
-
-    public void setStreamType(StreamType streamType) {
-        this.streamType = streamType;
     }
 
     public Extension getExtension() {
@@ -137,7 +128,6 @@ public class VideoStreamItem extends StreamItem {
         if (size != null ? !size.equals(that.size) : that.size != null) return false;
         if (qualityLabel != null ? !qualityLabel.equals(that.qualityLabel) : that.qualityLabel != null)
             return false;
-        if (streamType != that.streamType) return false;
         if (extension != that.extension) return false;
         if (codec != that.codec) return false;
         if (signature != null ? !signature.equals(that.signature) : that.signature != null)
@@ -152,7 +142,6 @@ public class VideoStreamItem extends StreamItem {
         result = 31 * result + (size != null ? size.hashCode() : 0);
         result = 31 * result + (qualityLabel != null ? qualityLabel.hashCode() : 0);
         result = 31 * result + projectionType;
-        result = 31 * result + (streamType != null ? streamType.hashCode() : 0);
         result = 31 * result + (extension != null ? extension.hashCode() : 0);
         result = 31 * result + (codec != null ? codec.hashCode() : 0);
         result = 31 * result + bitrate;
@@ -171,7 +160,6 @@ public class VideoStreamItem extends StreamItem {
                 ", size='" + size + '\'' +
                 ", qualityLabel='" + qualityLabel + '\'' +
                 ", projectionType=" + projectionType +
-                ", streamType=" + streamType +
                 ", extension=" + extension +
                 ", codec=" + codec +
                 ", bitrate=" + bitrate +
