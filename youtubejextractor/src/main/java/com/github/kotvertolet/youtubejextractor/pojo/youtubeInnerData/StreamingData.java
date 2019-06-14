@@ -1,19 +1,20 @@
 package com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData;
 
-import com.github.kotvertolet.youtubejextractor.pojo.StreamItem;
+import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
+import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-
 public class StreamingData {
 
     @SerializedName("expiresInSeconds")
     private String expiresInSeconds;
-
     @Expose
-    private List<StreamItem> streamItems;
+    private List<AudioStreamItem> audioStreamItems;
+    @Expose
+    private List<VideoStreamItem> videoStreamItems;
 
     public String getExpiresInSeconds() {
         return expiresInSeconds;
@@ -23,12 +24,20 @@ public class StreamingData {
         this.expiresInSeconds = expiresInSeconds;
     }
 
-    public List<StreamItem> getStreamItems() {
-        return streamItems;
+    public List<AudioStreamItem> getAudioStreamItems() {
+        return audioStreamItems;
     }
 
-    public void setStreamItems(List<StreamItem> streamItems) {
-        this.streamItems = streamItems;
+    public void setAudioStreamItems(List<AudioStreamItem> audioStreamItems) {
+        this.audioStreamItems = audioStreamItems;
+    }
+
+    public List<VideoStreamItem> getVideoStreamItems() {
+        return videoStreamItems;
+    }
+
+    public void setVideoStreamItems(List<VideoStreamItem> videoStreamItems) {
+        this.videoStreamItems = videoStreamItems;
     }
 
     @Override
@@ -40,13 +49,16 @@ public class StreamingData {
 
         if (expiresInSeconds != null ? !expiresInSeconds.equals(that.expiresInSeconds) : that.expiresInSeconds != null)
             return false;
-        return streamItems != null ? streamItems.equals(that.streamItems) : that.streamItems == null;
+        if (audioStreamItems != null ? !audioStreamItems.equals(that.audioStreamItems) : that.audioStreamItems != null)
+            return false;
+        return videoStreamItems != null ? videoStreamItems.equals(that.videoStreamItems) : that.videoStreamItems == null;
     }
 
     @Override
     public int hashCode() {
         int result = expiresInSeconds != null ? expiresInSeconds.hashCode() : 0;
-        result = 31 * result + (streamItems != null ? streamItems.hashCode() : 0);
+        result = 31 * result + (audioStreamItems != null ? audioStreamItems.hashCode() : 0);
+        result = 31 * result + (videoStreamItems != null ? videoStreamItems.hashCode() : 0);
         return result;
     }
 
@@ -54,7 +66,8 @@ public class StreamingData {
     public String toString() {
         return "StreamingData{" +
                 "expiresInSeconds='" + expiresInSeconds + '\'' +
-                ", streamItems=" + streamItems +
+                ", audioStreamItems=" + audioStreamItems +
+                ", videoStreamItems=" + videoStreamItems +
                 '}';
     }
 }
