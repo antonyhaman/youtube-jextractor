@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class YoutubeJExtractor {
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
     }
 
-    public YoutubeVideoData extract(String videoId) throws IOException, SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
+    public YoutubeVideoData extract(String videoId) throws SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
         YoutubeVideoData youtubeVideoData = getYoutubeVideoData(videoId);
         List<VideoStreamItem> videoStreamItems = youtubeVideoData.getStreamingData().getVideoStreamItems();
         List<AudioStreamItem> audioStreamItems = youtubeVideoData.getStreamingData().getAudioStreamItems();
@@ -66,10 +66,15 @@ public class YoutubeJExtractor {
         return youtubeVideoData;
     }
 
-    private YoutubeVideoData getYoutubeVideoData(String videoId) throws IOException, ExtractionException, YoutubeNetworkCallException {
+    private YoutubeVideoData getYoutubeVideoData(String videoId) throws ExtractionException, YoutubeNetworkCallException {
         String allInfo = getVideoInfo(videoId);
         // Necessary to split url params correctly
-        URL url = new URL("http://youtube.con/v?" + allInfo);
+        URL url;
+        try {
+            url = new URL("http://youtube.con/v?" + allInfo);
+        } catch (MalformedURLException e) {
+            throw new ExtractionException(e);
+        }
         Map<String, String> infoMap = splitUrlParams(url);
         List<Map<String, String>> adaptiveFormatsData = extractAdaptiveFormatsData(infoMap);
         Gson gson = new Gson();
@@ -80,7 +85,7 @@ public class YoutubeJExtractor {
         return youtubeVideoData;
     }
 
-    private List<Map<String, String>> extractAdaptiveFormatsData(Map<String, String> infoMap) throws UnsupportedEncodingException, ExtractionException {
+    private List<Map<String, String>> extractAdaptiveFormatsData(Map<String, String> infoMap) throws ExtractionException {
         List<Map<String, String>> adaptiveFormatsDataList = new ArrayList<>();
         String adaptiveFormats = infoMap.get("adaptive_fmts");
         String[] streamDataQueryStringList;
@@ -95,7 +100,7 @@ public class YoutubeJExtractor {
     }
 
     private StreamingData extractAudioAndVideoStreams(StreamingData streamingData,
-                                                      List<Map<String, String>> adaptiveFormatsList) throws ExtractionException {
+                                                      List<Map<String, String>> adaptiveFormatsList) {
         List<VideoStreamItem> videoStreamItems = new ArrayList<>();
         List<AudioStreamItem> audioStreamItems = new ArrayList<>();
         for (int i = 0; i < adaptiveFormatsList.size(); i++) {
@@ -118,12 +123,20 @@ public class YoutubeJExtractor {
         return streamingData;
     }
 
-    private String getVideoInfo(String videoId) throws IOException, ExtractionException {
-        embeddedVideoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedWebpage(videoId).body().string();
+    private String getVideoInfo(String videoId) throws ExtractionException, YoutubeNetworkCallException {
+        try {
+            embeddedVideoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedWebpage(videoId).body().string();
+        } catch (IOException e) {
+            throw new ExtractionException(e);
+        }
         String sts = extractStsFromEmbeddedVideoPage(embeddedVideoPageHtml);
         String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
         Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
-        return videoInfoResponse.body().string();
+        try {
+            return videoInfoResponse.body().string();
+        } catch (IOException e) {
+            throw new ExtractionException(e);
+        }
     }
 
     private String extractStsFromEmbeddedVideoPage(String embeddedVideoPageHtml) throws ExtractionException {

@@ -6,7 +6,8 @@ public enum Extension {
     GPP("3gpp"),
     MP4("mp4"),
     WEBM("webm"),
-    M4A("m4a");
+    M4A("m4a"),
+    UNKNOWN("unknown");
 
     private final String extension;
 

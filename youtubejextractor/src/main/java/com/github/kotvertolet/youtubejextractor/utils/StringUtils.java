@@ -1,5 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
+import android.util.Log;
+
+import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
 
 import java.io.UnsupportedEncodingException;
@@ -21,12 +24,12 @@ public class StringUtils {
         return inputString;
     }
 
-    public static Map<String, String> splitUrlParams(String url) throws UnsupportedEncodingException {
+    public static Map<String, String> splitUrlParams(String url) throws ExtractionException {
         final String[] queryParams = url.split("&");
         return splitUrlParams(queryParams);
     }
 
-    public static Map<String, String> splitUrlParams(URL url) throws UnsupportedEncodingException {
+    public static Map<String, String> splitUrlParams(URL url) throws ExtractionException {
         final String[] queryParams = url.getQuery().split("&");
         return splitUrlParams(queryParams);
     }
@@ -43,19 +46,24 @@ public class StringUtils {
         } else if (rawExtension.equals(Extension.MP4.toString())) {
             return Extension.MP4;
         } else {
-            throw new IllegalArgumentException("Unknown extension found: " + rawExtension);
+            Log.e(StringUtils.class.getSimpleName(), "Unknown extension found: " + rawExtension);
+            return Extension.UNKNOWN;
         }
     }
 
-    private static Map<String, String> splitUrlParams(String[] queryParamsArr) throws UnsupportedEncodingException {
+    private static Map<String, String> splitUrlParams(String[] queryParamsArr) throws ExtractionException {
         final Map<String, String> queryPairs = new LinkedHashMap<>();
         for (String queryParam : queryParamsArr) {
             final int idx = queryParam.indexOf("=");
-            final String key = idx > 0 ? URLDecoder.decode(queryParam.substring(0, idx), "UTF-8") : queryParam;
-            if (!queryPairs.containsKey(key)) {
-                final String value = idx > 0 && queryParam.length() > idx + 1
-                        ? URLDecoder.decode(queryParam.substring(idx + 1), "UTF-8") : null;
-                queryPairs.put(key, value);
+            try {
+                final String key = idx > 0 ? URLDecoder.decode(queryParam.substring(0, idx), "UTF-8") : queryParam;
+                if (!queryPairs.containsKey(key)) {
+                    final String value = idx > 0 && queryParam.length() > idx + 1
+                            ? URLDecoder.decode(queryParam.substring(idx + 1), "UTF-8") : null;
+                    queryPairs.put(key, value);
+                }
+            } catch (UnsupportedEncodingException e) {
+                throw new ExtractionException(e);
             }
         }
         return queryPairs;

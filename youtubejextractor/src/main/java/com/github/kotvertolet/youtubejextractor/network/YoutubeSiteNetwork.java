@@ -1,11 +1,13 @@
 package com.github.kotvertolet.youtubejextractor.network;
 
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
 import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -16,6 +18,7 @@ public class YoutubeSiteNetwork {
     private static YoutubeSiteNetwork instance;
     private Retrofit retrofit;
     private YoutubeSiteApi youtubeSiteApi;
+    private int attemptsCounter = 0;
 
     private YoutubeSiteNetwork() {
         Gson gson = new GsonBuilder()
@@ -34,23 +37,47 @@ public class YoutubeSiteNetwork {
         } else return instance;
     }
 
-    public Response<ResponseBody> getYoutubeVideoInfo(String videoId, String eUrl) throws IOException {
-        return youtubeSiteApi.getVideoInfo(videoId, eUrl).execute();
+    public Response<ResponseBody> getYoutubeVideoInfo(String videoId, String eUrl) throws YoutubeNetworkCallException {
+        return executeWithRetry(youtubeSiteApi.getVideoInfo(videoId, eUrl));
     }
 
-    public Response<ResponseBody> getYoutubeEmbeddedWebpage(String videoId) throws IOException {
-        return youtubeSiteApi.getEmbeddedWebPage(videoId).execute();
+    public Response<ResponseBody> getYoutubeEmbeddedWebpage(String videoId) throws YoutubeNetworkCallException {
+        return executeWithRetry(youtubeSiteApi.getEmbeddedWebPage(videoId));
     }
 
-    public Response<ResponseBody> getYoutubeEmbeddedWebpage() throws IOException {
-        return youtubeSiteApi.getEmbeddedWebPage().execute();
+    public Response<ResponseBody> getYoutubeEmbeddedWebpage() throws YoutubeNetworkCallException {
+        return executeWithRetry(youtubeSiteApi.getEmbeddedWebPage());
     }
 
-    public Response<ResponseBody> downloadWebpage(String url) throws IOException {
-        return youtubeSiteApi.getWebPage(url).execute();
+    public Response<ResponseBody> downloadWebpage(String url) throws YoutubeNetworkCallException {
+        return executeWithRetry(youtubeSiteApi.getWebPage(url));
     }
 
-    public Response<ResponseBody> getStream(String url) throws IOException {
-        return youtubeSiteApi.getStream(url).execute();
+    public Response<ResponseBody> getStream(String url) throws YoutubeNetworkCallException {
+        return executeWithRetry(youtubeSiteApi.getStream(url));
+    }
+
+    private Response<ResponseBody> executeWithRetry(Call<ResponseBody> httpCall) throws YoutubeNetworkCallException {
+        Response<ResponseBody> response;
+        try {
+            response = httpCall.execute();
+            while (!response.isSuccessful() && attemptsCounter <= 2) {
+                response = httpCall.clone().execute();
+                attemptsCounter++;
+            }
+            if (!response.isSuccessful()) {
+                String url = httpCall.request().url().toString();
+                int code = response.code();
+                throw new IOException(
+                        String.format("Could not receive successful response after 3 attempts," +
+                                " http code was: '%s', url: '%s'", code, url));
+            } else {
+                attemptsCounter = 0;
+                return response;
+            }
+        } catch (IOException e) {
+            attemptsCounter = 0;
+            throw new YoutubeNetworkCallException(e);
+        }
     }
 }

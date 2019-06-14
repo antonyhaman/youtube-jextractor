@@ -1,19 +1,21 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 
+import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
+import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
 public class ExtractionUtils {
 
-    public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeNetworkCallException {
+    public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeNetworkCallException, ExtractionException, SignatureDecryptException {
         playerUrl = preparePlayerUrl(playerUrl);
 
         Pattern pattern = Pattern.compile("([a-z]+)$");
         Matcher matcher = pattern.matcher(playerUrl);
         if (!matcher.find()) {
-            throw new IllegalStateException("Cannot identify player by url: " + playerUrl);
+            throw new ExtractionException("Cannot identify player type by url: " + playerUrl);
         }
 
         String playerType = matcher.group();
@@ -28,7 +30,7 @@ public class ExtractionUtils {
         }
     }
 
-    public String extractDecryptFunctionName(String playerCode) {
+    public String extractDecryptFunctionName(String playerCode) throws ExtractionException {
         Pattern pattern1 = Pattern.compile("([\"\\'])signature\\1\\s*,\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern pattern2 = Pattern.compile("\\.sig\\|\\|(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern pattern3 = Pattern.compile("yt\\.akamaized\\.net/\\)\\s*\\|\\|\\s*.*?\\s*c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?(?<sig>[a-zA-Z0-9$]+)\\(");
@@ -47,16 +49,17 @@ public class ExtractionUtils {
             matcher = pattern4.matcher(playerCode);
         } else if (pattern5.matcher(playerCode).find()) {
             matcher = pattern5.matcher(playerCode);
-        } else throw new IllegalStateException("Can't find required JS function in JS player code");
+        } else
+            throw new ExtractionException("Cannot find required JS function in JS video player code");
         // Restarting the search
         matcher.find(0);
         signatureDecryptFunctionName = matcher.group(1);
         return signatureDecryptFunctionName;
     }
 
-    private String preparePlayerUrl(String playerUrl) {
+    private String preparePlayerUrl(String playerUrl) throws SignatureDecryptException {
         if (playerUrl.isEmpty()) {
-            throw new IllegalArgumentException("Cannot decrypt signature without player_url");
+            throw new SignatureDecryptException("Cannot decrypt signature without player_url!");
         }
         if (playerUrl.startsWith("//")) {
             playerUrl = "https:" + playerUrl;
@@ -66,7 +69,7 @@ public class ExtractionUtils {
         if (!matcher.matches()) {
             playerUrl = "https://www.youtube.com" + playerUrl;
         } else
-            throw new IllegalStateException("Can't create proper player url with url: " + playerUrl);
+            throw new SignatureDecryptException("Cannot create proper player url with url: " + playerUrl);
         return playerUrl;
     }
 }
