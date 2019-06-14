@@ -1,4 +1,4 @@
-package com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData;
+package com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData;
 
 import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
