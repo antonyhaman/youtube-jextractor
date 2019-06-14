@@ -2,14 +2,14 @@ package com.github.kotvertolet.youtubejextractor.utils;
 
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
-import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptException;
-import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
+import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
 public class ExtractionUtils {
 
-    public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeNetworkCallException, ExtractionException, SignatureDecryptException {
+    public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeRequestException, ExtractionException, SignatureDecryptionException {
         playerUrl = preparePlayerUrl(playerUrl);
 
         Pattern pattern = Pattern.compile("([a-z]+)$");
@@ -57,9 +57,9 @@ public class ExtractionUtils {
         return signatureDecryptFunctionName;
     }
 
-    private String preparePlayerUrl(String playerUrl) throws SignatureDecryptException {
+    private String preparePlayerUrl(String playerUrl) throws SignatureDecryptionException {
         if (playerUrl.isEmpty()) {
-            throw new SignatureDecryptException("Cannot decrypt signature without player_url!");
+            throw new SignatureDecryptionException("Cannot decrypt signature without player_url!");
         }
         if (playerUrl.startsWith("//")) {
             playerUrl = "https:" + playerUrl;
@@ -69,7 +69,7 @@ public class ExtractionUtils {
         if (!matcher.matches()) {
             playerUrl = "https://www.youtube.com" + playerUrl;
         } else
-            throw new SignatureDecryptException("Cannot create proper player url with url: " + playerUrl);
+            throw new SignatureDecryptionException("Cannot create proper player url with url: " + playerUrl);
         return playerUrl;
     }
 }

@@ -1,6 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
-import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptException;
+import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
@@ -22,7 +22,7 @@ public class DecryptionUtils {
     private String playerJsCode;
     private JSContext jsContext;
 
-    public DecryptionUtils(String playerJsCode, String functionNameToExtract) throws SignatureDecryptException {
+    public DecryptionUtils(String playerJsCode, String functionNameToExtract) throws SignatureDecryptionException {
         this.playerJsCode = playerJsCode;
         Matcher rawExtractedFunction = extractJsFunction(functionNameToExtract);
         jsDecryptFunction = extractFunctionWithAssignment(rawExtractedFunction);
@@ -32,12 +32,12 @@ public class DecryptionUtils {
         jsContext = prepareJsContext(jsObjects, jsDecryptFunction);
     }
 
-    public String decryptSignature(String encryptedSignature) throws SignatureDecryptException {
+    public String decryptSignature(String encryptedSignature) throws SignatureDecryptionException {
         JSValue jsValue = jsContext.evaluateScript(String.format("%s('%s')", jsDecryptFunction, encryptedSignature));
         if (jsValue != null && jsValue.isString()) {
             return jsValue.toString();
         } else {
-            throw new SignatureDecryptException("Decryption function returned no result, function was: \n"
+            throw new SignatureDecryptionException("Decryption function returned no result, function was: \n"
                     + jsDecryptFunction + "\n parameter was: " + encryptedSignature + "\n"
                     + "js objects were: " + jsObjects.toString());
         }
@@ -59,7 +59,7 @@ public class DecryptionUtils {
      * @param funcName name of the function to extract
      * @return matcher that points to the required function
      */
-    private Matcher extractJsFunction(String funcName) throws SignatureDecryptException {
+    private Matcher extractJsFunction(String funcName) throws SignatureDecryptionException {
         String escapedFuncName = StringUtils.escapeRegExSpecialCharacters(funcName);
         String regex = String.format("(?x)(?:function\\s+%s|[{;,]\\s*%s\\s*=\\s*function|var" +
                         "\\s+%s\\s*=\\s*function)\\s*\\((?<args>[^)]*)\\)\\s*\\{(?<code>[^}]+)\\}",
@@ -67,7 +67,7 @@ public class DecryptionUtils {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(playerJsCode);
         if (!matcher.find()) {
-            throw new SignatureDecryptException("Could not find JS function with name " + funcName);
+            throw new SignatureDecryptionException("Could not find JS function with name " + funcName);
         } else {
             return matcher;
         }
@@ -115,7 +115,7 @@ public class DecryptionUtils {
      * @param argNames     Decrypt function args names
      * @return List of extracted object
      */
-    private ArrayList<String> extractJsObjectsIfAny(String functionCode, List<String> argNames) throws SignatureDecryptException {
+    private ArrayList<String> extractJsObjectsIfAny(String functionCode, List<String> argNames) throws SignatureDecryptionException {
         Pattern pattern;
         Matcher matcher;
         String[] expressionsArr = functionCode.split(";");
@@ -150,7 +150,7 @@ public class DecryptionUtils {
      * @param objectName name of the object to extract
      * @return map where key is object's field name and value is field's value
      */
-    private HashMap<String, String> extractJsObject(String objectName) throws SignatureDecryptException {
+    private HashMap<String, String> extractJsObject(String objectName) throws SignatureDecryptionException {
         HashMap<String, String> obj = new HashMap<>();
         jsObjects = new ArrayList<>();
         String funcNamePattern = "(?:[a-zA-Z$0-9]+|\"[a-zA-Z$0-9]+\"|'[a-zA-Z$0-9]+')";
@@ -169,7 +169,7 @@ public class DecryptionUtils {
             }
             return obj;
         } else {
-            throw new SignatureDecryptException(String.format("Js object with name '%s' wasn't found", objectName));
+            throw new SignatureDecryptionException(String.format("Js object with name '%s' wasn't found", objectName));
         }
     }
 }

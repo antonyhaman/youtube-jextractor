@@ -1,7 +1,7 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
-import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 
 import java.io.IOException;
@@ -39,12 +39,12 @@ public class YoutubePlayerUtils {
      * @param playerUrl player url
      * @return js code of the player
      */
-    public static String downloadJsPlayer(String playerUrl) throws YoutubeNetworkCallException {
+    public static String downloadJsPlayer(String playerUrl) throws YoutubeRequestException {
         try {
             Response<ResponseBody> responseBody = YoutubeSiteNetwork.getInstance().downloadWebpage(playerUrl);
             return responseBody.body().string();
         } catch (IOException | NullPointerException e) {
-            throw new YoutubeNetworkCallException("Error while downloading youtube js video player", e);
+            throw new YoutubeRequestException("Error while downloading youtube js video player", e);
         }
     }
 }

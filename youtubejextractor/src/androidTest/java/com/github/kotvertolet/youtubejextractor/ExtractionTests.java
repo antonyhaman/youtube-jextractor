@@ -3,8 +3,8 @@ package com.github.kotvertolet.youtubejextractor;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
-import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptException;
-import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
+import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
@@ -12,8 +12,6 @@ import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.YoutubeVid
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.IOException;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -33,7 +31,7 @@ public class ExtractionTests {
     private String errorMask = "Stream wasn't processed correctly, stream details:\\n %s";
 
     @Test
-    public void checkVideoWithEncryptedSignature() throws IOException, SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
+    public void checkVideoWithEncryptedSignature() throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("kJQP7kiw5Fk");
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
@@ -48,7 +46,7 @@ public class ExtractionTests {
     }
 
     @Test
-    public void checkVideoWithoutEncryptedSignature() throws IOException, SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
+    public void checkVideoWithoutEncryptedSignature() throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("jNQXAC9IVRw");
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
@@ -63,7 +61,7 @@ public class ExtractionTests {
     }
 
     @Test
-    public void checkVideoWithAgeCheck() throws IOException, SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
+    public void checkVideoWithAgeCheck() throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("h3yFGoSkgk8");
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
@@ -78,7 +76,7 @@ public class ExtractionTests {
     }
 
     @Test
-    public void checkVeryLongVideo() throws IOException, SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
+    public void checkVeryLongVideo() throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("85bkCmaOh4o");
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());

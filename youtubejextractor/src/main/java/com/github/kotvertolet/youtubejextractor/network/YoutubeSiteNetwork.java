@@ -1,6 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.network;
 
-import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -37,27 +37,27 @@ public class YoutubeSiteNetwork {
         } else return instance;
     }
 
-    public Response<ResponseBody> getYoutubeVideoInfo(String videoId, String eUrl) throws YoutubeNetworkCallException {
+    public Response<ResponseBody> getYoutubeVideoInfo(String videoId, String eUrl) throws YoutubeRequestException {
         return executeWithRetry(youtubeSiteApi.getVideoInfo(videoId, eUrl));
     }
 
-    public Response<ResponseBody> getYoutubeEmbeddedWebpage(String videoId) throws YoutubeNetworkCallException {
+    public Response<ResponseBody> getYoutubeEmbeddedWebpage(String videoId) throws YoutubeRequestException {
         return executeWithRetry(youtubeSiteApi.getEmbeddedWebPage(videoId));
     }
 
-    public Response<ResponseBody> getYoutubeEmbeddedWebpage() throws YoutubeNetworkCallException {
+    public Response<ResponseBody> getYoutubeEmbeddedWebpage() throws YoutubeRequestException {
         return executeWithRetry(youtubeSiteApi.getEmbeddedWebPage());
     }
 
-    public Response<ResponseBody> downloadWebpage(String url) throws YoutubeNetworkCallException {
+    public Response<ResponseBody> downloadWebpage(String url) throws YoutubeRequestException {
         return executeWithRetry(youtubeSiteApi.getWebPage(url));
     }
 
-    public Response<ResponseBody> getStream(String url) throws YoutubeNetworkCallException {
+    public Response<ResponseBody> getStream(String url) throws YoutubeRequestException {
         return executeWithRetry(youtubeSiteApi.getStream(url));
     }
 
-    private Response<ResponseBody> executeWithRetry(Call<ResponseBody> httpCall) throws YoutubeNetworkCallException {
+    private Response<ResponseBody> executeWithRetry(Call<ResponseBody> httpCall) throws YoutubeRequestException {
         Response<ResponseBody> response;
         try {
             response = httpCall.execute();
@@ -77,7 +77,7 @@ public class YoutubeSiteNetwork {
             }
         } catch (IOException e) {
             attemptsCounter = 0;
-            throw new YoutubeNetworkCallException(e);
+            throw new YoutubeRequestException(e);
         }
     }
 }

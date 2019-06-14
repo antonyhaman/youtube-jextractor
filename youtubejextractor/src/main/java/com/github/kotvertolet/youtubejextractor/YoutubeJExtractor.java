@@ -3,8 +3,8 @@ package com.github.kotvertolet.youtubejextractor;
 import android.util.Log;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
-import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptException;
-import com.github.kotvertolet.youtubejextractor.exception.YoutubeNetworkCallException;
+import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
+import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
@@ -39,7 +39,7 @@ public class YoutubeJExtractor {
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
     }
 
-    public YoutubeVideoData extract(String videoId) throws SignatureDecryptException, ExtractionException, YoutubeNetworkCallException {
+    public YoutubeVideoData extract(String videoId) throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         YoutubeVideoData youtubeVideoData = getYoutubeVideoData(videoId);
         List<VideoStreamItem> videoStreamItems = youtubeVideoData.getStreamingData().getVideoStreamItems();
         List<AudioStreamItem> audioStreamItems = youtubeVideoData.getStreamingData().getAudioStreamItems();
@@ -66,7 +66,7 @@ public class YoutubeJExtractor {
         return youtubeVideoData;
     }
 
-    private YoutubeVideoData getYoutubeVideoData(String videoId) throws ExtractionException, YoutubeNetworkCallException {
+    private YoutubeVideoData getYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
         String allInfo = getVideoInfo(videoId);
         // Necessary to split url params correctly
         URL url;
@@ -123,10 +123,10 @@ public class YoutubeJExtractor {
         return streamingData;
     }
 
-    private String getVideoInfo(String videoId) throws ExtractionException, YoutubeNetworkCallException {
+    private String getVideoInfo(String videoId) throws ExtractionException, YoutubeRequestException {
         try {
             embeddedVideoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedWebpage(videoId).body().string();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             throw new ExtractionException(e);
         }
         String sts = extractStsFromEmbeddedVideoPage(embeddedVideoPageHtml);
@@ -134,7 +134,7 @@ public class YoutubeJExtractor {
         Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
         try {
             return videoInfoResponse.body().string();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             throw new ExtractionException(e);
         }
     }
