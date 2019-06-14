@@ -10,6 +10,7 @@ import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.YoutubeVideoData;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -78,6 +79,37 @@ public class ExtractionTests {
     @Test
     public void checkVeryLongVideo() throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("85bkCmaOh4o");
+        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
+            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
+            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
+            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
+        }
+        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
+            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
+            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
+            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
+        }
+    }
+
+    @Ignore
+    @Test
+    public void checkVideoWithRestrictedEmbedding() throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
+        videoData = youtubeJExtractor.extract("XcicOBS9mBU");
+        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
+            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
+            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
+            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
+        }
+        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
+            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
+            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
+            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
+        }
+    }
+
+    @Test
+    public void checkAgeRestrictedVideo() throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
+        videoData = youtubeJExtractor.extract("V_7CLYGdkps");
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
             assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));

@@ -32,10 +32,12 @@ import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUr
 
 public class YoutubeJExtractor {
 
+    private final String TAG;
     private YoutubeSiteNetwork youtubeSiteNetwork;
-    private String embeddedVideoPageHtml;
+    private String videoPageHtml;
 
     public YoutubeJExtractor() {
+        TAG = getClass().getSimpleName();
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
     }
 
@@ -46,7 +48,7 @@ public class YoutubeJExtractor {
         // If a single stream is encrypted means they all are
         VideoStreamItem exampleStream = videoStreamItems.get(0);
         if (exampleStream.isStreamEncrypted()) {
-            String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(embeddedVideoPageHtml);
+            String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(videoPageHtml);
             ExtractionUtils extractionUtils = new ExtractionUtils();
             String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);
             String decryptFunctionName = extractionUtils.extractDecryptFunctionName(youtubeVideoPlayerCode);
@@ -107,14 +109,14 @@ public class YoutubeJExtractor {
             Map<String, String> adaptiveFormatDataMap = adaptiveFormatsList.get(i);
             String streamType = adaptiveFormatDataMap.get("type");
             if (streamType == null || streamType.isEmpty()) {
-                Log.e(getClass().getSimpleName(), "Null or empty stream type found");
+                Log.e(TAG, "Null or empty stream type found");
             } else {
                 if (streamType.contains("video")) {
                     videoStreamItems.add(new VideoStreamItem(adaptiveFormatDataMap));
                 } else if (streamType.contains("audio")) {
                     audioStreamItems.add(new AudioStreamItem(adaptiveFormatDataMap));
                 } else {
-                    Log.e(getClass().getSimpleName(), "Unknown stream type found: " + streamType);
+                    Log.e(TAG, "Unknown stream type found: " + streamType);
                 }
             }
         }
@@ -125,11 +127,15 @@ public class YoutubeJExtractor {
 
     private String getVideoInfo(String videoId) throws ExtractionException, YoutubeRequestException {
         try {
-            embeddedVideoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedWebpage(videoId).body().string();
+            videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
+            if (videoPageHtml.contains("player-age-gate-content\">")) {
+                Log.i(TAG, "Age restricted video detected, videoId: " + videoId);
+                this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
+            }
         } catch (IOException | NullPointerException e) {
             throw new ExtractionException(e);
         }
-        String sts = extractStsFromEmbeddedVideoPage(embeddedVideoPageHtml);
+        String sts = extractStsFromEmbeddedVideoPage(this.videoPageHtml);
         String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
         Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
         try {

@@ -14,10 +14,11 @@ public interface YoutubeSiteApi {
     Call<ResponseBody> getVideoInfo(@Query("video_id") String videoId, @Query("eurl") String eurl);
 
     @GET("embed/{videoId}")
-    Call<ResponseBody> getEmbeddedWebPage(@Path("videoId") String videoId);
+    Call<ResponseBody> getEmbeddedVideoPage(@Path("videoId") String videoId);
 
-    @GET("embed/%s")
-    Call<ResponseBody> getEmbeddedWebPage();
+    @GET("watch")
+    Call<ResponseBody> getVideoPage(@Query("v") String videoId, @Query("gl") String locale,
+                                    @Query("has_verified") int hasVerified, @Query("bpctr") String bpctr);
 
     @GET
     Call<ResponseBody> getWebPage(@Url String url);

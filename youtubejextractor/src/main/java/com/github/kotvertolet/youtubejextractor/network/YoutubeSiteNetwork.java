@@ -41,12 +41,12 @@ public class YoutubeSiteNetwork {
         return executeWithRetry(youtubeSiteApi.getVideoInfo(videoId, eUrl));
     }
 
-    public Response<ResponseBody> getYoutubeEmbeddedWebpage(String videoId) throws YoutubeRequestException {
-        return executeWithRetry(youtubeSiteApi.getEmbeddedWebPage(videoId));
+    public Response<ResponseBody> getYoutubeEmbeddedVideoPage(String videoId) throws YoutubeRequestException {
+        return executeWithRetry(youtubeSiteApi.getEmbeddedVideoPage(videoId));
     }
 
-    public Response<ResponseBody> getYoutubeEmbeddedWebpage() throws YoutubeRequestException {
-        return executeWithRetry(youtubeSiteApi.getEmbeddedWebPage());
+    public Response<ResponseBody> getYoutubeVideoPage(String videoId) throws YoutubeRequestException {
+        return executeWithRetry(youtubeSiteApi.getVideoPage(videoId, "US", 1, "9999999999"));
     }
 
     public Response<ResponseBody> downloadWebpage(String url) throws YoutubeRequestException {
