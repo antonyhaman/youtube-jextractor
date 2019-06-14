@@ -8,9 +8,8 @@ import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestExceptio
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
-import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.YoutubeVideoData;
+import com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData.YoutubeVideoData;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -91,7 +90,6 @@ public class ExtractionTests {
         }
     }
 
-    @Ignore
     @Test
     public void checkVideoWithRestrictedEmbedding() throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
         videoData = youtubeJExtractor.extract("XcicOBS9mBU");

@@ -9,6 +9,19 @@ import com.google.code.regexp.Pattern;
 
 public class ExtractionUtils {
 
+    public static boolean isVideoAgeRestricted(String videoPageHtml) {
+        return videoPageHtml.contains("player-age-gate-content\">");
+    }
+
+    public static String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) throws ExtractionException {
+        Pattern pattern = Pattern.compile("sts\"\\s*:\\s*(\\d+)");
+        Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else
+            throw new ExtractionException("Sts param wasn't found in the embedded player webpage code");
+    }
+
     public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeRequestException, ExtractionException, SignatureDecryptionException {
         playerUrl = preparePlayerUrl(playerUrl);
 
@@ -72,4 +85,5 @@ public class ExtractionUtils {
             throw new SignatureDecryptionException("Cannot create proper player url with url: " + playerUrl);
         return playerUrl;
     }
+
 }

@@ -1,4 +1,4 @@
-package com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData;
+package com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData;
 
 import com.google.gson.annotations.SerializedName;
 

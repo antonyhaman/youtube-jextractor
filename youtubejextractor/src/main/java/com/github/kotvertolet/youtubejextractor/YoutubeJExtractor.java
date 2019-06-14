@@ -8,8 +8,9 @@ import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestExceptio
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
-import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.StreamingData;
-import com.github.kotvertolet.youtubejextractor.pojo.youtubeInnerData.YoutubeVideoData;
+import com.github.kotvertolet.youtubejextractor.pojo.youtube.playerConfig.VideoPlayerConfig;
+import com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData.StreamingData;
+import com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
@@ -19,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,8 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
+import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.extractStsFromVideoPageHtml;
+import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.isVideoAgeRestricted;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
 
 public class YoutubeJExtractor {
@@ -35,16 +37,22 @@ public class YoutubeJExtractor {
     private final String TAG;
     private YoutubeSiteNetwork youtubeSiteNetwork;
     private String videoPageHtml;
+    private Gson gson;
 
     public YoutubeJExtractor() {
         TAG = getClass().getSimpleName();
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
+        gson = new Gson();
     }
 
     public YoutubeVideoData extract(String videoId) throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
         YoutubeVideoData youtubeVideoData = getYoutubeVideoData(videoId);
         List<VideoStreamItem> videoStreamItems = youtubeVideoData.getStreamingData().getVideoStreamItems();
         List<AudioStreamItem> audioStreamItems = youtubeVideoData.getStreamingData().getAudioStreamItems();
+
+        if (videoStreamItems.size() == 0 || audioStreamItems.size() == 0) {
+            throw new ExtractionException("No streams were extracted successfully");
+        }
         // If a single stream is encrypted means they all are
         VideoStreamItem exampleStream = videoStreamItems.get(0);
         if (exampleStream.isStreamEncrypted()) {
@@ -69,20 +77,33 @@ public class YoutubeJExtractor {
     }
 
     private YoutubeVideoData getYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
-        String allInfo = getVideoInfo(videoId);
-        // Necessary to split url params correctly
         URL url;
+        List<Map<String, String>> adaptiveFormatsData = new ArrayList<>();
+        String rawYoutubeVideoData;
+
         try {
-            url = new URL("http://youtube.con/v?" + allInfo);
-        } catch (MalformedURLException e) {
+            videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
+            if (isVideoAgeRestricted(videoPageHtml)) {
+                String videoInfo = getVideoInfoForAgeRestrictedVideo(videoId);
+                //Protocol and domain are necessary to split url params correctly
+                url = new URL("http://youtube.con/v?" + videoInfo);
+                Map<String, String> infoMap = splitUrlParams(url);
+                adaptiveFormatsData = extractAdaptiveFormatsData(infoMap);
+                rawYoutubeVideoData = infoMap.get("player_response");
+            } else {
+                VideoPlayerConfig youtubePlayerConfig = extractYoutubePlayerConfig(videoId);
+                String[] arr = youtubePlayerConfig.getArgs().getAdaptiveFmts().split(",");
+                for (String st : arr) {
+                    url = new URL("http://youtube.con/v?" + st);
+                    adaptiveFormatsData.add(splitUrlParams(url));
+                }
+                rawYoutubeVideoData = youtubePlayerConfig.getArgs().getPlayerResponse();
+            }
+        } catch (IOException e) {
             throw new ExtractionException(e);
         }
-        Map<String, String> infoMap = splitUrlParams(url);
-        List<Map<String, String>> adaptiveFormatsData = extractAdaptiveFormatsData(infoMap);
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(infoMap.get("player_response"), JsonObject.class);
+        JsonObject jsonObject = gson.fromJson(rawYoutubeVideoData, JsonObject.class);
         YoutubeVideoData youtubeVideoData = gson.fromJson(jsonObject, YoutubeVideoData.class);
-
         extractAudioAndVideoStreams(youtubeVideoData.getStreamingData(), adaptiveFormatsData);
         return youtubeVideoData;
     }
@@ -99,6 +120,18 @@ public class YoutubeJExtractor {
             }
         }
         return adaptiveFormatsDataList;
+    }
+
+    private VideoPlayerConfig extractYoutubePlayerConfig(String videoId) throws ExtractionException {
+        Pattern pattern = Pattern.compile("ytplayer\\.config\\s*=\\s*(\\{.+?\\})\\;ytplayer");
+        Matcher matcher = pattern.matcher(videoPageHtml);
+        String rawPlayerConfig;
+        if (matcher.find()) {
+            rawPlayerConfig = matcher.group(1);
+            return gson.fromJson(rawPlayerConfig, VideoPlayerConfig.class);
+        } else {
+            throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
+        }
     }
 
     private StreamingData extractAudioAndVideoStreams(StreamingData streamingData,
@@ -125,32 +158,16 @@ public class YoutubeJExtractor {
         return streamingData;
     }
 
-    private String getVideoInfo(String videoId) throws ExtractionException, YoutubeRequestException {
+    private String getVideoInfoForAgeRestrictedVideo(String videoId) throws ExtractionException {
         try {
-            videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
-            if (videoPageHtml.contains("player-age-gate-content\">")) {
-                Log.i(TAG, "Age restricted video detected, videoId: " + videoId);
-                this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
-            }
-        } catch (IOException | NullPointerException e) {
-            throw new ExtractionException(e);
-        }
-        String sts = extractStsFromEmbeddedVideoPage(this.videoPageHtml);
-        String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
-        Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
-        try {
+            Log.i(TAG, "Age restricted video detected, videoId: " + videoId);
+            this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
+            String sts = extractStsFromVideoPageHtml(this.videoPageHtml);
+            String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
+            Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
             return videoInfoResponse.body().string();
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException | NullPointerException | ExtractionException | YoutubeRequestException e) {
             throw new ExtractionException(e);
         }
-    }
-
-    private String extractStsFromEmbeddedVideoPage(String embeddedVideoPageHtml) throws ExtractionException {
-        Pattern pattern = Pattern.compile("sts\"\\s*:\\s*(\\d+)");
-        Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else
-            throw new ExtractionException("Sts param wasn't found in the embedded player webpage code");
     }
 }
