@@ -27,18 +27,18 @@ WIP, library is functional but not well tested and documented.
 video split across two main objects: **VideoDetails** and **StreamingData**.
 
 * **VideoDetails** contains various video data such as title, description, author, rating, view count, etc.
-* **StreamingData** contains list of streams (both video and audio) and ***expiresInSeconds***
+* **StreamingData** contains two fields with the lists of streams (both video and audio) and ***expiresInSeconds***
 field which indicated how long links will be alive.
  
-To get all the streams:
+To get all video streams:
 ```java
-    List<StreamItem> streamItems = videoData.getStreamingData().getStreamItems()
+    List<VideoStreamItem> videoStreamsList = videoData.getStreamingData().getVideoStreamItems()
 ``` 
 
 Each StreamItem object contains fields that describe the stream such as
- it's ***type*** (video or audio),  ***extension*** (like mp4, ogg, etc),
+ it's ***extension*** (like mp4, ogg, etc),
  ***codec***, ***bitrate***, ***url*** and many others. 
- Check *StreamItem.class* for the details.
+ Check *VideoStreamItem.class* and *AudioStreamItem.class* for the details.
 
 ## Requirements
 
