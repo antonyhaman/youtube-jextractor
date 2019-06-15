@@ -43,6 +43,13 @@ public class DecryptionUtils {
         }
     }
 
+    /**
+     * Creates JS context with all objects and functions to execute decryption function in future
+     *
+     * @param jsObjects js objects that are referenced in decryption function
+     * @param jsDecryptFunction js function to decrypt the stream signature
+     * @return JS context with all objects and functions to execute decryption function
+     */
     private JSContext prepareJsContext(List<String> jsObjects, String jsDecryptFunction) {
         JSContext context = new JSContext();
         for (String jsObject : jsObjects) {

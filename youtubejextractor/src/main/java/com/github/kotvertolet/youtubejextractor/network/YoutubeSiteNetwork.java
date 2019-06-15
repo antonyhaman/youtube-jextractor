@@ -16,14 +16,13 @@ public class YoutubeSiteNetwork {
 
     private final static String YOUTUBE_SITE_URL = "https://www.youtube.com/";
     private static YoutubeSiteNetwork instance;
-    private Retrofit retrofit;
     private YoutubeSiteApi youtubeSiteApi;
     private int attemptsCounter = 0;
 
     private YoutubeSiteNetwork() {
         Gson gson = new GsonBuilder()
                 .create();
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_SITE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();

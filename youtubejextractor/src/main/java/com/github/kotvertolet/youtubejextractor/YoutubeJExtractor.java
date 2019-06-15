@@ -46,55 +46,32 @@ public class YoutubeJExtractor {
     }
 
     public YoutubeVideoData extract(String videoId) throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
-        YoutubeVideoData youtubeVideoData = getYoutubeVideoData(videoId);
-        List<VideoStreamItem> videoStreamItems = youtubeVideoData.getStreamingData().getVideoStreamItems();
-        List<AudioStreamItem> audioStreamItems = youtubeVideoData.getStreamingData().getAudioStreamItems();
-
-        if (videoStreamItems.size() == 0 || audioStreamItems.size() == 0) {
-            throw new ExtractionException("No streams were extracted successfully");
-        }
-        // If a single stream is encrypted means they all are
-        VideoStreamItem exampleStream = videoStreamItems.get(0);
-        if (exampleStream.isStreamEncrypted()) {
-            String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(videoPageHtml);
-            ExtractionUtils extractionUtils = new ExtractionUtils();
-            String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);
-            String decryptFunctionName = extractionUtils.extractDecryptFunctionName(youtubeVideoPlayerCode);
-            DecryptionUtils decryptionUtils = new DecryptionUtils(youtubeVideoPlayerCode, decryptFunctionName);
-
-            for (int i = 0; i < videoStreamItems.size(); i++) {
-                String encryptedSignature = videoStreamItems.get(i).getSignature();
-                String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
-                videoStreamItems.get(i).setSignature(decryptedSignature);
-            }
-            for (int i = 0; i < audioStreamItems.size(); i++) {
-                String encryptedSignature = audioStreamItems.get(i).getSignature();
-                String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
-                audioStreamItems.get(i).setSignature(decryptedSignature);
-            }
+        YoutubeVideoData youtubeVideoData = extractYoutubeVideoData(videoId);
+        if (areStreamsAreEncrypted(youtubeVideoData)) {
+            return decryptYoutubeStreams(youtubeVideoData);
         }
         return youtubeVideoData;
     }
 
-    private YoutubeVideoData getYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
+    private YoutubeVideoData extractYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
         URL url;
         List<Map<String, String>> adaptiveFormatsData = new ArrayList<>();
         String rawYoutubeVideoData;
-
         try {
             videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
+            //Protocol and domain are necessary to split url params correctly
+            String urlProtocolAndDomain = "http://youtube.con/v?";
             if (isVideoAgeRestricted(videoPageHtml)) {
                 String videoInfo = getVideoInfoForAgeRestrictedVideo(videoId);
-                //Protocol and domain are necessary to split url params correctly
-                url = new URL("http://youtube.con/v?" + videoInfo);
+                url = new URL(urlProtocolAndDomain + videoInfo);
                 Map<String, String> infoMap = splitUrlParams(url);
                 adaptiveFormatsData = extractAdaptiveFormatsData(infoMap);
                 rawYoutubeVideoData = infoMap.get("player_response");
             } else {
                 VideoPlayerConfig youtubePlayerConfig = extractYoutubePlayerConfig(videoId);
-                String[] arr = youtubePlayerConfig.getArgs().getAdaptiveFmts().split(",");
-                for (String st : arr) {
-                    url = new URL("http://youtube.con/v?" + st);
+                String[] rawAdaptimeFormatsArr = youtubePlayerConfig.getArgs().getAdaptiveFmts().split(",");
+                for (String rawAdaptiveFormat : rawAdaptimeFormatsArr) {
+                    url = new URL(urlProtocolAndDomain + rawAdaptiveFormat);
                     adaptiveFormatsData.add(splitUrlParams(url));
                 }
                 rawYoutubeVideoData = youtubePlayerConfig.getArgs().getPlayerResponse();
@@ -162,12 +139,39 @@ public class YoutubeJExtractor {
         try {
             Log.i(TAG, "Age restricted video detected, videoId: " + videoId);
             this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
-            String sts = extractStsFromVideoPageHtml(this.videoPageHtml);
+            String sts = extractStsFromVideoPageHtml(videoPageHtml);
             String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
             Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
             return videoInfoResponse.body().string();
         } catch (IOException | NullPointerException | ExtractionException | YoutubeRequestException e) {
             throw new ExtractionException(e);
         }
+    }
+
+    private boolean areStreamsAreEncrypted(YoutubeVideoData youtubeVideoData) {
+        // If a single stream is encrypted means they all are
+        return youtubeVideoData.getStreamingData().getVideoStreamItems().get(0).isStreamEncrypted();
+    }
+
+    private YoutubeVideoData decryptYoutubeStreams(YoutubeVideoData youtubeVideoData) throws ExtractionException, SignatureDecryptionException, YoutubeRequestException {
+        List<VideoStreamItem> videoStreamItems = youtubeVideoData.getStreamingData().getVideoStreamItems();
+        List<AudioStreamItem> audioStreamItems = youtubeVideoData.getStreamingData().getAudioStreamItems();
+
+        String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(videoPageHtml);
+        ExtractionUtils extractionUtils = new ExtractionUtils();
+        String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);
+        String decryptFunctionName = extractionUtils.extractDecryptFunctionName(youtubeVideoPlayerCode);
+        DecryptionUtils decryptionUtils = new DecryptionUtils(youtubeVideoPlayerCode, decryptFunctionName);
+        for (int i = 0; i < videoStreamItems.size(); i++) {
+            String encryptedSignature = videoStreamItems.get(i).getSignature();
+            String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
+            videoStreamItems.get(i).setSignature(decryptedSignature);
+        }
+        for (int i = 0; i < audioStreamItems.size(); i++) {
+            String encryptedSignature = audioStreamItems.get(i).getSignature();
+            String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
+            audioStreamItems.get(i).setSignature(decryptedSignature);
+        }
+        return youtubeVideoData;
     }
 }
