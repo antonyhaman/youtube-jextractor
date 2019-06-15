@@ -1,8 +1,6 @@
 # YoutubeJExtractor for Android
 
-YoutubeJExtractor allows you to extract youtube video and audio streams 
-from any youtube video along with some other data such as a video title,
- description, author, thumbnails and others.
+YoutubeJExtractor is Android library that allows you to extract youtube video and audio from any youtube video along with some other data such as a video title, description, author, thumbnails and others.
  
 ## Current status
 
