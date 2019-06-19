@@ -1,7 +1,7 @@
-package com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData;
+package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 
-import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
-import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
+import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
+import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

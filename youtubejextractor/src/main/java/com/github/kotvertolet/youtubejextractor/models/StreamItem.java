@@ -1,14 +1,12 @@
-package com.github.kotvertolet.youtubejextractor.pojo;
+package com.github.kotvertolet.youtubejextractor.models;
 
-import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
+import android.os.Parcelable;
 
 import java.util.Map;
 
-import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.extractExtension;
+public abstract class StreamItem implements Parcelable {
 
-public abstract class StreamItem {
-
-    protected Extension extension;
+    protected String extension;
     protected String codec;
     protected int bitrate;
     protected String signature;
@@ -17,10 +15,24 @@ public abstract class StreamItem {
     protected String url;
     protected boolean isStreamEncrypted;
 
+    public StreamItem() {
+    }
+
+    public StreamItem(String extension, String codec, int bitrate, String signature, String sp, int iTag, String url, boolean isStreamEncrypted) {
+        this.extension = extension;
+        this.codec = codec;
+        this.bitrate = bitrate;
+        this.signature = signature;
+        this.sp = sp;
+        this.iTag = iTag;
+        this.url = url;
+        this.isStreamEncrypted = isStreamEncrypted;
+    }
+
     public StreamItem(Map<String, String> map) {
         String[] tempArr = map.get("type").split(";");
         String[] typeArr = tempArr[0].split("/");
-        extension = extractExtension(typeArr[1]);
+        extension = typeArr[1];
         codec = tempArr[1].split("=")[1].replaceAll("\"", "");
         signature = map.get("s");
         sp = map.get("sp");

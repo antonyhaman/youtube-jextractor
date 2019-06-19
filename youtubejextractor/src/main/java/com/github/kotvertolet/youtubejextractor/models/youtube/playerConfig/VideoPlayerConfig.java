@@ -1,4 +1,4 @@
-package com.github.kotvertolet.youtubejextractor.pojo.youtube.playerConfig;
+package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -16,36 +16,36 @@ public class VideoPlayerConfig {
     @SerializedName("attrs")
     private Attrs attrs;
 
-    public void setArgs(Args args) {
-        this.args = args;
-    }
-
     public Args getArgs() {
         return args;
     }
 
-    public void setSts(int sts) {
-        this.sts = sts;
+    public void setArgs(Args args) {
+        this.args = args;
     }
 
     public int getSts() {
         return sts;
     }
 
-    public void setAssets(Assets assets) {
-        this.assets = assets;
+    public void setSts(int sts) {
+        this.sts = sts;
     }
 
     public Assets getAssets() {
         return assets;
     }
 
-    public void setAttrs(Attrs attrs) {
-        this.attrs = attrs;
+    public void setAssets(Assets assets) {
+        this.assets = assets;
     }
 
     public Attrs getAttrs() {
         return attrs;
+    }
+
+    public void setAttrs(Attrs attrs) {
+        this.attrs = attrs;
     }
 
     @Override

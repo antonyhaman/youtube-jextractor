@@ -1,4 +1,4 @@
-package com.github.kotvertolet.youtubejextractor.pojo.enums;
+package com.github.kotvertolet.youtubejextractor.models.enums;
 
 public enum Extension {
 

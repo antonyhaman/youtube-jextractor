@@ -1,13 +1,46 @@
-package com.github.kotvertolet.youtubejextractor.pojo;
+package com.github.kotvertolet.youtubejextractor.models;
 
-import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
+import android.os.Parcel;
 
 import java.util.Map;
 
 public class AudioStreamItem extends StreamItem {
 
+    public static final Creator<AudioStreamItem> CREATOR = new Creator<AudioStreamItem>() {
+
+        @Override
+        public AudioStreamItem createFromParcel(Parcel source) {
+            String extension = source.readString();
+            String codec = source.readString();
+            int bitrate = source.readInt();
+            String signature = source.readString();
+            String sp = source.readString();
+            int itag = source.readInt();
+            String url = source.readString();
+            boolean isStreamEncrypted = source.readInt() == 1;
+
+            int audioChannels = source.readInt();
+            int audioSampleRate = source.readInt();
+            return new AudioStreamItem(extension, codec, bitrate, signature, sp, itag, url, isStreamEncrypted, audioChannels, audioSampleRate);
+        }
+
+        @Override
+        public AudioStreamItem[] newArray(int size) {
+            return new AudioStreamItem[0];
+        }
+    };
     private int audioChannels;
     private int audioSampleRate;
+
+    public AudioStreamItem() {
+    }
+
+    public AudioStreamItem(String extension, String codec, int bitrate, String signature, String sp,
+                           int iTag, String url, boolean isStreamEncrypted, int audioChannels, int audioSampleRate) {
+        super(extension, codec, bitrate, signature, sp, iTag, url, isStreamEncrypted);
+        this.audioChannels = audioChannels;
+        this.audioSampleRate = audioSampleRate;
+    }
 
     public AudioStreamItem(Map<String, String> map) {
         super(map);
@@ -33,11 +66,11 @@ public class AudioStreamItem extends StreamItem {
         this.audioSampleRate = audioSampleRate;
     }
 
-    public Extension getExtension() {
+    public String getExtension() {
         return extension;
     }
 
-    public void setExtension(Extension extension) {
+    public void setExtension(String extension) {
         this.extension = extension;
     }
 
@@ -142,5 +175,25 @@ public class AudioStreamItem extends StreamItem {
                 ", url='" + url + '\'' +
                 ", isStreamEncrypted=" + isStreamEncrypted +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(extension);
+        dest.writeString(codec);
+        dest.writeInt(bitrate);
+        dest.writeString(signature);
+        dest.writeString(sp);
+        dest.writeInt(iTag);
+        dest.writeString(url);
+        dest.writeInt(isStreamEncrypted ? 1 : 0);
+
+        dest.writeInt(audioChannels);
+        dest.writeInt(audioSampleRate);
     }
 }

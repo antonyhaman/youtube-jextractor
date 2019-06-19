@@ -1,15 +1,51 @@
-package com.github.kotvertolet.youtubejextractor.pojo;
+package com.github.kotvertolet.youtubejextractor.models;
 
-import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
+import android.os.Parcel;
 
 import java.util.Map;
 
 public class VideoStreamItem extends StreamItem {
 
+    public static final Creator<VideoStreamItem> CREATOR = new Creator<VideoStreamItem>() {
+
+        @Override
+        public VideoStreamItem createFromParcel(Parcel source) {
+            String extension = source.readString();
+            String codec = source.readString();
+            int bitrate = source.readInt();
+            String signature = source.readString();
+            String sp = source.readString();
+            int itag = source.readInt();
+            String url = source.readString();
+            boolean isStreamEncrypted = source.readInt() == 1;
+
+            int fps = source.readInt();
+            String size = source.readString();
+            String qualityLabel = source.readString();
+            int projectionType = source.readInt();
+            return new VideoStreamItem(extension, codec, bitrate, signature, sp, itag, url, isStreamEncrypted, fps, size, qualityLabel, projectionType);
+        }
+
+        @Override
+        public VideoStreamItem[] newArray(int size) {
+            return new VideoStreamItem[0];
+        }
+    };
     private int fps;
     private String size;
     private String qualityLabel;
     private int projectionType;
+
+    public VideoStreamItem() {
+    }
+
+    public VideoStreamItem(String extension, String codec, int bitrate, String signature, String sp, int iTag, String url, boolean isStreamEncrypted, int fps, String size, String qualityLabel, int projectionType) {
+        super(extension, codec, bitrate, signature, sp, iTag, url, isStreamEncrypted);
+        this.fps = fps;
+        this.size = size;
+        this.qualityLabel = qualityLabel;
+        this.projectionType = projectionType;
+    }
 
     public VideoStreamItem(Map<String, String> map) {
         super(map);
@@ -53,11 +89,11 @@ public class VideoStreamItem extends StreamItem {
         this.projectionType = projectionType;
     }
 
-    public Extension getExtension() {
+    public String getExtension() {
         return extension;
     }
 
-    public void setExtension(Extension extension) {
+    public void setExtension(String extension) {
         this.extension = extension;
     }
 
@@ -169,5 +205,27 @@ public class VideoStreamItem extends StreamItem {
                 ", url='" + url + '\'' +
                 ", isStreamEncrypted=" + isStreamEncrypted +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(extension);
+        dest.writeString(codec);
+        dest.writeInt(bitrate);
+        dest.writeString(signature);
+        dest.writeString(sp);
+        dest.writeInt(iTag);
+        dest.writeString(url);
+        dest.writeInt(isStreamEncrypted ? 1 : 0);
+
+        dest.writeInt(fps);
+        dest.writeString(size);
+        dest.writeString(qualityLabel);
+        dest.writeInt(projectionType);
     }
 }

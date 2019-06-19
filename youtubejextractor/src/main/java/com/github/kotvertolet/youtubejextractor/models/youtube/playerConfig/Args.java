@@ -1,4 +1,4 @@
-package com.github.kotvertolet.youtubejextractor.pojo.youtube.playerConfig;
+package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -97,252 +97,252 @@ public class Args {
     @SerializedName("fflags")
     private String fflags;
 
-    public void setShowContentThumbnail(boolean showContentThumbnail) {
-        this.showContentThumbnail = showContentThumbnail;
-    }
-
     public boolean isShowContentThumbnail() {
         return showContentThumbnail;
     }
 
-    public void setHl(String hl) {
-        this.hl = hl;
+    public void setShowContentThumbnail(boolean showContentThumbnail) {
+        this.showContentThumbnail = showContentThumbnail;
     }
 
     public String getHl() {
         return hl;
     }
 
-    public void setLengthSeconds(String lengthSeconds) {
-        this.lengthSeconds = lengthSeconds;
+    public void setHl(String hl) {
+        this.hl = hl;
     }
 
     public String getLengthSeconds() {
         return lengthSeconds;
     }
 
-    public void setGapiHintParams(String gapiHintParams) {
-        this.gapiHintParams = gapiHintParams;
+    public void setLengthSeconds(String lengthSeconds) {
+        this.lengthSeconds = lengthSeconds;
     }
 
     public String getGapiHintParams() {
         return gapiHintParams;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setGapiHintParams(String gapiHintParams) {
+        this.gapiHintParams = gapiHintParams;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setSsl(String ssl) {
-        this.ssl = ssl;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getSsl() {
         return ssl;
     }
 
-    public void setFmtList(String fmtList) {
-        this.fmtList = fmtList;
+    public void setSsl(String ssl) {
+        this.ssl = ssl;
     }
 
     public String getFmtList() {
         return fmtList;
     }
 
-    public void setCver(String cver) {
-        this.cver = cver;
+    public void setFmtList(String fmtList) {
+        this.fmtList = fmtList;
     }
 
     public String getCver() {
         return cver;
     }
 
-    public void setEnablecsi(String enablecsi) {
-        this.enablecsi = enablecsi;
+    public void setCver(String cver) {
+        this.cver = cver;
     }
 
     public String getEnablecsi() {
         return enablecsi;
     }
 
-    public void setVssHost(String vssHost) {
-        this.vssHost = vssHost;
+    public void setEnablecsi(String enablecsi) {
+        this.enablecsi = enablecsi;
     }
 
     public String getVssHost() {
         return vssHost;
     }
 
-    public void setCsiPageType(String csiPageType) {
-        this.csiPageType = csiPageType;
+    public void setVssHost(String vssHost) {
+        this.vssHost = vssHost;
     }
 
     public String getCsiPageType() {
         return csiPageType;
     }
 
-    public void setFexp(String fexp) {
-        this.fexp = fexp;
+    public void setCsiPageType(String csiPageType) {
+        this.csiPageType = csiPageType;
     }
 
     public String getFexp() {
         return fexp;
     }
 
-    public void setInnertubeContextClientVersion(String innertubeContextClientVersion) {
-        this.innertubeContextClientVersion = innertubeContextClientVersion;
+    public void setFexp(String fexp) {
+        this.fexp = fexp;
     }
 
     public String getInnertubeContextClientVersion() {
         return innertubeContextClientVersion;
     }
 
-    public void setAccountPlaybackToken(String accountPlaybackToken) {
-        this.accountPlaybackToken = accountPlaybackToken;
+    public void setInnertubeContextClientVersion(String innertubeContextClientVersion) {
+        this.innertubeContextClientVersion = innertubeContextClientVersion;
     }
 
     public String getAccountPlaybackToken() {
         return accountPlaybackToken;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setAccountPlaybackToken(String accountPlaybackToken) {
+        this.accountPlaybackToken = accountPlaybackToken;
     }
 
     public String getTimestamp() {
         return timestamp;
     }
 
-    public void setUcid(String ucid) {
-        this.ucid = ucid;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getUcid() {
         return ucid;
     }
 
-    public void setWatermark(String watermark) {
-        this.watermark = watermark;
+    public void setUcid(String ucid) {
+        this.ucid = ucid;
     }
 
     public String getWatermark() {
         return watermark;
     }
 
-    public void setUrlEncodedFmtStreamMap(String urlEncodedFmtStreamMap) {
-        this.urlEncodedFmtStreamMap = urlEncodedFmtStreamMap;
+    public void setWatermark(String watermark) {
+        this.watermark = watermark;
     }
 
     public String getUrlEncodedFmtStreamMap() {
         return urlEncodedFmtStreamMap;
     }
 
-    public void setC(String C) {
-        this.C = C;
+    public void setUrlEncodedFmtStreamMap(String urlEncodedFmtStreamMap) {
+        this.urlEncodedFmtStreamMap = urlEncodedFmtStreamMap;
     }
 
     public String getC() {
         return C;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setC(String C) {
+        this.C = C;
     }
 
     public String getAuthor() {
         return author;
     }
 
-    public void setPlayerResponse(String playerResponse) {
-        this.playerResponse = playerResponse;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getPlayerResponse() {
         return playerResponse;
     }
 
-    public void setEnabledEngageTypes(String enabledEngageTypes) {
-        this.enabledEngageTypes = enabledEngageTypes;
+    public void setPlayerResponse(String playerResponse) {
+        this.playerResponse = playerResponse;
     }
 
     public String getEnabledEngageTypes() {
         return enabledEngageTypes;
     }
 
-    public void setInnertubeApiKey(String innertubeApiKey) {
-        this.innertubeApiKey = innertubeApiKey;
+    public void setEnabledEngageTypes(String enabledEngageTypes) {
+        this.enabledEngageTypes = enabledEngageTypes;
     }
 
     public String getInnertubeApiKey() {
         return innertubeApiKey;
     }
 
-    public void setCr(String cr) {
-        this.cr = cr;
+    public void setInnertubeApiKey(String innertubeApiKey) {
+        this.innertubeApiKey = innertubeApiKey;
     }
 
     public String getCr() {
         return cr;
     }
 
-    public void setHostLanguage(String hostLanguage) {
-        this.hostLanguage = hostLanguage;
+    public void setCr(String cr) {
+        this.cr = cr;
     }
 
     public String getHostLanguage() {
         return hostLanguage;
     }
 
-    public void setInnertubeApiVersion(String innertubeApiVersion) {
-        this.innertubeApiVersion = innertubeApiVersion;
+    public void setHostLanguage(String hostLanguage) {
+        this.hostLanguage = hostLanguage;
     }
 
     public String getInnertubeApiVersion() {
         return innertubeApiVersion;
     }
 
-    public void setLoaderUrl(String loaderUrl) {
-        this.loaderUrl = loaderUrl;
+    public void setInnertubeApiVersion(String innertubeApiVersion) {
+        this.innertubeApiVersion = innertubeApiVersion;
     }
 
     public String getLoaderUrl() {
         return loaderUrl;
     }
 
-    public void setAdaptiveFmts(String adaptiveFmts) {
-        this.adaptiveFmts = adaptiveFmts;
+    public void setLoaderUrl(String loaderUrl) {
+        this.loaderUrl = loaderUrl;
     }
 
     public String getAdaptiveFmts() {
         return adaptiveFmts;
     }
 
-    public void setEnablejsapi(String enablejsapi) {
-        this.enablejsapi = enablejsapi;
+    public void setAdaptiveFmts(String adaptiveFmts) {
+        this.adaptiveFmts = adaptiveFmts;
     }
 
     public String getEnablejsapi() {
         return enablejsapi;
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    public void setEnablejsapi(String enablejsapi) {
+        this.enablejsapi = enablejsapi;
     }
 
     public String getVideoId() {
         return videoId;
     }
 
-    public void setFflags(String fflags) {
-        this.fflags = fflags;
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
     }
 
     public String getFflags() {
         return fflags;
+    }
+
+    public void setFflags(String fflags) {
+        this.fflags = fflags;
     }
 
     @Override

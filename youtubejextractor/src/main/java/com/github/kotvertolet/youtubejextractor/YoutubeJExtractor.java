@@ -5,12 +5,12 @@ import android.util.Log;
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
+import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
+import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.VideoPlayerConfig;
+import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.StreamingData;
+import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.youtubejextractor.pojo.AudioStreamItem;
-import com.github.kotvertolet.youtubejextractor.pojo.VideoStreamItem;
-import com.github.kotvertolet.youtubejextractor.pojo.youtube.playerConfig.VideoPlayerConfig;
-import com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData.StreamingData;
-import com.github.kotvertolet.youtubejextractor.pojo.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
@@ -45,12 +45,16 @@ public class YoutubeJExtractor {
         gson = new Gson();
     }
 
-    public YoutubeVideoData extract(String videoId) throws SignatureDecryptionException, ExtractionException, YoutubeRequestException {
-        YoutubeVideoData youtubeVideoData = extractYoutubeVideoData(videoId);
-        if (areStreamsAreEncrypted(youtubeVideoData)) {
-            return decryptYoutubeStreams(youtubeVideoData);
+    public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
+        try {
+            YoutubeVideoData youtubeVideoData = extractYoutubeVideoData(videoId);
+            if (areStreamsAreEncrypted(youtubeVideoData)) {
+                return decryptYoutubeStreams(youtubeVideoData);
+            }
+            return youtubeVideoData;
+        } catch (SignatureDecryptionException e) {
+            throw new ExtractionException(e);
         }
-        return youtubeVideoData;
     }
 
     private YoutubeVideoData extractYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
@@ -58,7 +62,11 @@ public class YoutubeJExtractor {
         List<Map<String, String>> adaptiveFormatsData = new ArrayList<>();
         String rawYoutubeVideoData;
         try {
+            Pattern pageVerifyPattern = Pattern.compile("<link rel=\"canonical\"\\shref=(\"\\S+\")");
             videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
+            if (!pageVerifyPattern.matcher(videoPageHtml).find()) {
+                throw new ExtractionException(String.format("Invalid video page received, maybe video id '%s' is not valid", videoId));
+            }
             //Protocol and domain are necessary to split url params correctly
             String urlProtocolAndDomain = "http://youtube.con/v?";
             if (isVideoAgeRestricted(videoPageHtml)) {
@@ -69,8 +77,8 @@ public class YoutubeJExtractor {
                 rawYoutubeVideoData = infoMap.get("player_response");
             } else {
                 VideoPlayerConfig youtubePlayerConfig = extractYoutubePlayerConfig(videoId);
-                String[] rawAdaptimeFormatsArr = youtubePlayerConfig.getArgs().getAdaptiveFmts().split(",");
-                for (String rawAdaptiveFormat : rawAdaptimeFormatsArr) {
+                String[] rawAdaptiveFormatsArr = youtubePlayerConfig.getArgs().getAdaptiveFmts().split(",");
+                for (String rawAdaptiveFormat : rawAdaptiveFormatsArr) {
                     url = new URL(urlProtocolAndDomain + rawAdaptiveFormat);
                     adaptiveFormatsData.add(splitUrlParams(url));
                 }

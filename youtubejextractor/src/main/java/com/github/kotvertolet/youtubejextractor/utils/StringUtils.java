@@ -3,7 +3,7 @@ package com.github.kotvertolet.youtubejextractor.utils;
 import android.util.Log;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
-import com.github.kotvertolet.youtubejextractor.pojo.enums.Extension;
+import com.github.kotvertolet.youtubejextractor.models.enums.Extension;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;

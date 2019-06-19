@@ -46,7 +46,7 @@ public class DecryptionUtils {
     /**
      * Creates JS context with all objects and functions to execute decryption function in future
      *
-     * @param jsObjects js objects that are referenced in decryption function
+     * @param jsObjects         js objects that are referenced in decryption function
      * @param jsDecryptFunction js function to decrypt the stream signature
      * @return JS context with all objects and functions to execute decryption function
      */

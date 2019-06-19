@@ -68,7 +68,7 @@ public class YoutubeSiteNetwork {
                 String url = httpCall.request().url().toString();
                 int code = response.code();
                 throw new IOException(
-                        String.format("Could not receive successful response after 3 attempts," +
+                        String.format("Could not receive successful response after 3 attempts check the internet connection," +
                                 " http code was: '%s', url: '%s'", code, url));
             } else {
                 attemptsCounter = 0;

@@ -1,4 +1,4 @@
-package com.github.kotvertolet.youtubejextractor.pojo.youtube.playerConfig;
+package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -10,20 +10,20 @@ public class Assets {
     @SerializedName("js")
     private String js;
 
-    public void setCss(String css) {
-        this.css = css;
-    }
-
     public String getCss() {
         return css;
     }
 
-    public void setJs(String js) {
-        this.js = js;
+    public void setCss(String css) {
+        this.css = css;
     }
 
     public String getJs() {
         return js;
+    }
+
+    public void setJs(String js) {
+        this.js = js;
     }
 
     @Override
