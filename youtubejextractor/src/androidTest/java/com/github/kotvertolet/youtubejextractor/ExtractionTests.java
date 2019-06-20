@@ -28,8 +28,6 @@ public class ExtractionTests {
     private YoutubeJExtractor youtubeJExtractor = new YoutubeJExtractor();
     private YoutubeSiteNetwork youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
     private YoutubeVideoData videoData;
-    private Response<ResponseBody> responseBody;
-    private String errorMask = "Stream wasn't processed correctly, stream details:\\n %s";
 
     @Test(expected = ExtractionException.class)
     public void checkInvalidVideoId() throws YoutubeRequestException, ExtractionException {
@@ -37,97 +35,53 @@ public class ExtractionTests {
     }
 
     @Test
-    public void checkStreamItemsParcel() throws YoutubeRequestException, ExtractionException {
-        String parcelKey1 = "parcel_key1";
-        String parcelKey2 = "parcel_key2";
+    public void checkVideoDataParcel() throws YoutubeRequestException, ExtractionException {
+        String parcelKey = "parcel_key1";
         videoData = youtubeJExtractor.extract("rkas-NHQnsI");
         Bundle bundle = new Bundle();
-        AudioStreamItem audioStreamItem = videoData.getStreamingData().getAudioStreamItems().get(0);
-        VideoStreamItem videoStreamItem = videoData.getStreamingData().getVideoStreamItems().get(0);
-        bundle.putParcelable(parcelKey1, audioStreamItem);
-        bundle.putParcelable(parcelKey2, videoStreamItem);
-        assertEquals(audioStreamItem, bundle.getParcelable(parcelKey1));
-        assertEquals(videoStreamItem, bundle.getParcelable(parcelKey2));
+        bundle.putParcelable(parcelKey, videoData);
+        assertEquals(videoData, bundle.getParcelable(parcelKey));
     }
 
     @Test
     public void checkVideoWithEncryptedSignature() throws ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("kJQP7kiw5Fk");
-        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
-        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
+        checkIfStreamsWork(videoData);
     }
 
     @Test
     public void checkVideoWithoutEncryptedSignature() throws ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("jNQXAC9IVRw");
-        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
-        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
+        checkIfStreamsWork(videoData);
     }
 
     @Test
     public void checkVideoWithAgeCheck() throws ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("h3yFGoSkgk8");
-        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
-        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
+        checkIfStreamsWork(videoData);
     }
 
     @Test
     public void checkVeryLongVideo() throws ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("85bkCmaOh4o");
-        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
-        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
+        checkIfStreamsWork(videoData);
     }
 
     @Test
     public void checkVideoWithRestrictedEmbedding() throws ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("XcicOBS9mBU");
-        for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
-        for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
-            responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
-        }
+        checkIfStreamsWork(videoData);
     }
 
     @Test
     public void checkAgeRestrictedVideo() throws ExtractionException, YoutubeRequestException {
         videoData = youtubeJExtractor.extract("V_7CLYGdkps");
+        checkIfStreamsWork(videoData);
+    }
+
+    private void checkIfStreamsWork(YoutubeVideoData videoData) throws YoutubeRequestException {
+        String errorMask = "Stream wasn't processed correctly, stream details:\\n %s";
+        Response<ResponseBody> responseBody;
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
             assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));

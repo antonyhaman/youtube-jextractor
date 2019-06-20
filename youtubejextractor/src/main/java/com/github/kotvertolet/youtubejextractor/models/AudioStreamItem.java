@@ -26,7 +26,7 @@ public class AudioStreamItem extends StreamItem {
 
         @Override
         public AudioStreamItem[] newArray(int size) {
-            return new AudioStreamItem[0];
+            return new AudioStreamItem[size];
         }
     };
     private int audioChannels;

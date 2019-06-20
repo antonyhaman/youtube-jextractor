@@ -1,18 +1,45 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 
-public class ThumbnailsItem {
+public class ThumbnailsItem implements Parcelable {
 
+    public static final Creator<ThumbnailsItem> CREATOR = new Creator<ThumbnailsItem>() {
+        @Override
+        public ThumbnailsItem createFromParcel(Parcel in) {
+            return new ThumbnailsItem(in);
+        }
+
+        @Override
+        public ThumbnailsItem[] newArray(int size) {
+            return new ThumbnailsItem[size];
+        }
+    };
     @SerializedName("width")
     private int width;
-
+    @SerializedName("height")
+    private int height;
     @SerializedName("url")
     private String url;
 
-    @SerializedName("height")
-    private int height;
+    public ThumbnailsItem() {
+    }
+
+    public ThumbnailsItem(int width, int height, String url) {
+        this.width = width;
+        this.height = height;
+        this.url = url;
+    }
+
+    protected ThumbnailsItem(Parcel in) {
+        width = in.readInt();
+        height = in.readInt();
+        url = in.readString();
+    }
 
     public int getWidth() {
         return width;
@@ -66,5 +93,17 @@ public class ThumbnailsItem {
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + height;
         return result;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(width);
+        dest.writeInt(height);
+        dest.writeString(url);
     }
 }

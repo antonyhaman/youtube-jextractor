@@ -1,9 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
-import android.util.Log;
-
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
-import com.github.kotvertolet.youtubejextractor.models.enums.Extension;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -34,23 +31,6 @@ public class StringUtils {
         return splitUrlParams(queryParams);
     }
 
-    public static Extension extractExtension(String rawExtension) {
-        if (rawExtension.equals(Extension.WEBM.toString())) {
-            return Extension.WEBM;
-        } else if (rawExtension.equals(Extension.GPP.toString())) {
-            return Extension.GPP;
-        } else if (rawExtension.equals(Extension.FLV.toString())) {
-            return Extension.FLV;
-        } else if (rawExtension.equals(Extension.M4A.toString())) {
-            return Extension.M4A;
-        } else if (rawExtension.equals(Extension.MP4.toString())) {
-            return Extension.MP4;
-        } else {
-            Log.e(StringUtils.class.getSimpleName(), "Unknown extension found: " + rawExtension);
-            return Extension.UNKNOWN;
-        }
-    }
-
     private static Map<String, String> splitUrlParams(String[] queryParamsArr) throws ExtractionException {
         final Map<String, String> queryPairs = new LinkedHashMap<>();
         for (String queryParam : queryParamsArr) {
@@ -68,5 +48,4 @@ public class StringUtils {
         }
         return queryPairs;
     }
-
 }

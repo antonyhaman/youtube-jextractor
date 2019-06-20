@@ -1,15 +1,41 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 
-public class YoutubeVideoData {
+public class YoutubeVideoData implements Parcelable {
 
+    public static final Creator<YoutubeVideoData> CREATOR = new Creator<YoutubeVideoData>() {
+        @Override
+        public YoutubeVideoData createFromParcel(Parcel in) {
+            return new YoutubeVideoData(in);
+        }
+
+        @Override
+        public YoutubeVideoData[] newArray(int size) {
+            return new YoutubeVideoData[size];
+        }
+    };
     @SerializedName("videoDetails")
     private VideoDetails videoDetails;
-
     @SerializedName("streamingData")
     private StreamingData streamingData;
+
+    public YoutubeVideoData() {
+    }
+
+    public YoutubeVideoData(VideoDetails videoDetails, StreamingData streamingData) {
+        this.videoDetails = videoDetails;
+        this.streamingData = streamingData;
+    }
+
+    protected YoutubeVideoData(Parcel in) {
+        videoDetails = in.readParcelable(VideoDetails.class.getClassLoader());
+        streamingData = in.readParcelable(StreamingData.class.getClassLoader());
+    }
 
     public VideoDetails getVideoDetails() {
         return videoDetails;
@@ -51,5 +77,16 @@ public class YoutubeVideoData {
         int result = videoDetails.hashCode();
         result = 31 * result + streamingData.hashCode();
         return result;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(videoDetails, flags);
+        dest.writeParcelable(streamingData, flags);
     }
 }

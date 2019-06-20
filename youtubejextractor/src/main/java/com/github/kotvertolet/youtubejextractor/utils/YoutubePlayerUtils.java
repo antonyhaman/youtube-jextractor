@@ -16,12 +16,14 @@ public class YoutubePlayerUtils {
     /**
      * Extracts url of js player from embedded youtube page
      *
-     * @param embeddedVideoPageHtml embedded youtube page
-     * @return returns player ulr (like this one - 'https://www.youtube.com/yts/jsbin/player-vflkwPKV5/en_US/base.js')
+     * @param videoPageHtml youtube page
+     * @return returns player url (like this one - 'https://www.youtube.com/yts/jsbin/player-vflkwPKV5/en_US/base.js')
+     * @throws ExtractionException if there is no video player url in html code which means that
+     *                             there is some problem with regular expression or html code provided
      */
-    public static String getJsPlayerUrl(String embeddedVideoPageHtml) throws ExtractionException {
+    public static String getJsPlayerUrl(String videoPageHtml) throws ExtractionException {
         Pattern pattern = Pattern.compile("\"assets\":.+?\"js\":\\s*(\"[^\"]+\")");
-        Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
+        Matcher matcher = pattern.matcher(videoPageHtml);
 
         if (matcher.find()) {
             String match = matcher.group(1);
@@ -30,7 +32,7 @@ public class YoutubePlayerUtils {
             // Removing leading and trailing quotes
             return match.replaceAll("^\"|\"$", "");
         } else
-            throw new ExtractionException("No encrypted signature found");
+            throw new ExtractionException("No js video player url found");
     }
 
     /**
@@ -38,6 +40,7 @@ public class YoutubePlayerUtils {
      *
      * @param playerUrl player url
      * @return js code of the player
+     * @throws YoutubeRequestException if the player url is invalid or there is connection problems
      */
     public static String downloadJsPlayer(String playerUrl) throws YoutubeRequestException {
         try {

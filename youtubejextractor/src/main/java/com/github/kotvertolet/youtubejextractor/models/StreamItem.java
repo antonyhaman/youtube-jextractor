@@ -15,10 +15,10 @@ public abstract class StreamItem implements Parcelable {
     protected String url;
     protected boolean isStreamEncrypted;
 
-    public StreamItem() {
+    protected StreamItem() {
     }
 
-    public StreamItem(String extension, String codec, int bitrate, String signature, String sp, int iTag, String url, boolean isStreamEncrypted) {
+    protected StreamItem(String extension, String codec, int bitrate, String signature, String sp, int iTag, String url, boolean isStreamEncrypted) {
         this.extension = extension;
         this.codec = codec;
         this.bitrate = bitrate;
@@ -29,7 +29,7 @@ public abstract class StreamItem implements Parcelable {
         this.isStreamEncrypted = isStreamEncrypted;
     }
 
-    public StreamItem(Map<String, String> map) {
+    protected StreamItem(Map<String, String> map) {
         String[] tempArr = map.get("type").split(";");
         String[] typeArr = tempArr[0].split("/");
         extension = typeArr[1];

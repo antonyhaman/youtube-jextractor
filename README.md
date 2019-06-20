@@ -18,17 +18,26 @@ WIP, library is functional but not well tested and documented.
 ## How to use
 
 ```java
-    YoutubeJExtractor = new YoutubeJExtractor();
-    YoutubeVideoData videoData = youtubeJExtractor.extract(videoId);
+    YoutubeJExtractor youtubeJExtractor = new YoutubeJExtractor();
+    YoutubeVideoData videoData;
+    try {
+        videoData = youtubeJExtractor.extract(videoId);
+    }
+    catch (ExtractionException e) {
+        // Something really bad happened, nothing we can do except just show the user error some notification 
+    }
+    catch (YoutubeRequestException e) {
+        // It's possibly there are some connection problems, ask user to check the internet connection and then retry 
+    }
 ``` 
 **YoutubeVideoData** is an object that contains data for the requested 
 video split across two main objects: **VideoDetails** and **StreamingData**.
 
 * **VideoDetails** contains various video data such as title, description, author, rating, view count, etc.
 * **StreamingData** contains two fields with the lists of streams (both video and audio) and ***expiresInSeconds***
-field which indicated how long links will be alive.
+field which indicates how long links will be alive.
  
-To get all video streams:
+To get all the video streams:
 ```java
     List<VideoStreamItem> videoStreamsList = videoData.getStreamingData().getVideoStreamItems()
 ``` 
@@ -44,7 +53,7 @@ The minimum SDK level is limited to 16 due to a third-party library limitation
 
 ## Credits
 
-[Youtube-dl](https://github.com/ytdl-org/youtube-dl) - the idea and implementation of YoutubeJExtractor were influenced by Youtube-dl
+[Youtube-dl](https://github.com/ytdl-org/youtube-dl) - the idea and implementation were influenced by Youtube-dl
  
 ## License
 

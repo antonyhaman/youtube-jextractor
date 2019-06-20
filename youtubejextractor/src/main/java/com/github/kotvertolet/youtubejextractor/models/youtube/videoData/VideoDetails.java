@@ -1,59 +1,103 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 
-public class VideoDetails {
+public class VideoDetails implements Parcelable {
 
+    public static final Creator<VideoDetails> CREATOR = new Creator<VideoDetails>() {
+        @Override
+        public VideoDetails createFromParcel(Parcel in) {
+            return new VideoDetails(in);
+        }
+
+        @Override
+        public VideoDetails[] newArray(int size) {
+            return new VideoDetails[size];
+        }
+    };
     @SerializedName("isOwnerViewing")
     private boolean isOwnerViewing;
-
     @SerializedName("thumbnail")
     private Thumbnail thumbnail;
-
     @SerializedName("isLiveContent")
     private boolean isLiveContent;
-
     @SerializedName("keywords")
     private List<String> keywords;
-
     @SerializedName("author")
     private String author;
-
     @SerializedName("lengthSeconds")
     private String lengthSeconds;
-
     @SerializedName("videoId")
     private String videoId;
-
     @SerializedName("shortDescription")
     private String shortDescription;
-
     @SerializedName("isPrivate")
     private boolean isPrivate;
-
     @SerializedName("title")
     private String title;
-
     @SerializedName("isCrawlable")
     private boolean isCrawlable;
-
     @SerializedName("averageRating")
     private double averageRating;
-
     @SerializedName("isUnpluggedCorpus")
     private boolean isUnpluggedCorpus;
-
     @SerializedName("allowRatings")
     private boolean allowRatings;
-
     @SerializedName("viewCount")
     private String viewCount;
-
     @SerializedName("channelId")
     private String channelId;
+
+    public VideoDetails() {
+    }
+
+    public VideoDetails(boolean isOwnerViewing, Thumbnail thumbnail, boolean isLiveContent,
+                        List<String> keywords, String author, String lengthSeconds, String videoId,
+                        String shortDescription, boolean isPrivate, String title, boolean isCrawlable,
+                        double averageRating, boolean isUnpluggedCorpus, boolean allowRatings,
+                        String viewCount, String channelId) {
+        this.isOwnerViewing = isOwnerViewing;
+        this.thumbnail = thumbnail;
+        this.isLiveContent = isLiveContent;
+        this.keywords = keywords;
+        this.author = author;
+        this.lengthSeconds = lengthSeconds;
+        this.videoId = videoId;
+        this.shortDescription = shortDescription;
+        this.isPrivate = isPrivate;
+        this.title = title;
+        this.isCrawlable = isCrawlable;
+        this.averageRating = averageRating;
+        this.isUnpluggedCorpus = isUnpluggedCorpus;
+        this.allowRatings = allowRatings;
+        this.viewCount = viewCount;
+        this.channelId = channelId;
+    }
+
+    protected VideoDetails(Parcel in) {
+        isOwnerViewing = in.readInt() != 0;
+        thumbnail = in.readParcelable(Thumbnail.class.getClassLoader());
+        isLiveContent = in.readInt() != 0;
+        keywords = in.createStringArrayList();
+        author = in.readString();
+        lengthSeconds = in.readString();
+        videoId = in.readString();
+        shortDescription = in.readString();
+        isPrivate = in.readInt() != 0;
+        title = in.readString();
+        isCrawlable = in.readInt() != 0;
+        averageRating = in.readDouble();
+        isUnpluggedCorpus = in.readInt() != 0;
+        allowRatings = in.readInt() != 0;
+        viewCount = in.readString();
+        channelId = in.readString();
+    }
 
     public boolean isIsOwnerViewing() {
         return isOwnerViewing;
@@ -258,5 +302,30 @@ public class VideoDetails {
         result = 31 * result + (viewCount != null ? viewCount.hashCode() : 0);
         result = 31 * result + (channelId != null ? channelId.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(isOwnerViewing ? 1 : 0);
+        dest.writeParcelable(thumbnail, flags);
+        dest.writeInt(isLiveContent ? 1 : 0);
+        dest.writeList(keywords);
+        dest.writeString(author);
+        dest.writeString(lengthSeconds);
+        dest.writeString(videoId);
+        dest.writeString(shortDescription);
+        dest.writeInt(isPrivate ? 1 : 0);
+        dest.writeString(title);
+        dest.writeInt(isCrawlable ? 1 : 0);
+        dest.writeDouble(averageRating);
+        dest.writeInt(isUnpluggedCorpus ? 1 : 0);
+        dest.writeInt(allowRatings ? 1 : 0);
+        dest.writeString(viewCount);
+        dest.writeString(channelId);
     }
 }
