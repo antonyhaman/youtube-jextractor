@@ -24,7 +24,7 @@ WIP, library is functional but not well tested and documented.
         videoData = youtubeJExtractor.extract(videoId);
     }
     catch (ExtractionException e) {
-        // Something really bad happened, nothing we can do except just show the user error some notification 
+        // Something really bad happened, nothing we can do except just show the user some error notification 
     }
     catch (YoutubeRequestException e) {
         // It's possibly there are some connection problems, ask user to check the internet connection and then retry 
