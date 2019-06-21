@@ -44,24 +44,31 @@ public class ExtractionUtils {
     }
 
     public String extractDecryptFunctionName(String playerCode) throws ExtractionException {
-        Pattern pattern1 = Pattern.compile("([\"\\'])signature\\1\\s*,\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
-        Pattern pattern2 = Pattern.compile("\\.sig\\|\\|(?<sig>[a-zA-Z0-9$]+)\\(");
-        Pattern pattern3 = Pattern.compile("yt\\.akamaized\\.net/\\)\\s*\\|\\|\\s*.*?\\s*c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?(?<sig>[a-zA-Z0-9$]+)\\(");
-        Pattern pattern4 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
-        Pattern pattern5 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*\\([^)]*\\)\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern newPattern1 = Pattern.compile("\\b\\[cs\\]\\s*&&\\s*[adf]\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern newPattern2 = Pattern.compile("\\b[a-zA-Z0-9]+\\s*&&\\s*[a-zA-Z0-9]+\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
+        // Obsolete patterns
+        Pattern obsoletePattern1 = Pattern.compile("([\"\\'])signature\\1\\s*,\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern obsoletePattern2 = Pattern.compile("\\.sig\\|\\|(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern obsoletePattern3 = Pattern.compile("yt\\.akamaized\\.net/\\)\\s*\\|\\|\\s*.*?\\s*c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern obsoletePattern4 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern obsoletePattern5 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*\\([^)]*\\)\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
 
         String signatureDecryptFunctionName;
         Matcher matcher;
-        if (pattern1.matcher(playerCode).find()) {
-            matcher = pattern1.matcher(playerCode);
-        } else if (pattern2.matcher(playerCode).find()) {
-            matcher = pattern2.matcher(playerCode);
-        } else if (pattern3.matcher(playerCode).find()) {
-            matcher = pattern3.matcher(playerCode);
-        } else if (pattern4.matcher(playerCode).find()) {
-            matcher = pattern4.matcher(playerCode);
-        } else if (pattern5.matcher(playerCode).find()) {
-            matcher = pattern5.matcher(playerCode);
+        if (newPattern1.matcher(playerCode).find()) {
+            matcher = newPattern1.matcher(playerCode);
+        } else if (newPattern2.matcher(playerCode).find()) {
+            matcher = newPattern2.matcher(playerCode);
+        } else if (obsoletePattern1.matcher(playerCode).find()) {
+            matcher = obsoletePattern1.matcher(playerCode);
+        } else if (obsoletePattern2.matcher(playerCode).find()) {
+            matcher = obsoletePattern2.matcher(playerCode);
+        } else if (obsoletePattern3.matcher(playerCode).find()) {
+            matcher = obsoletePattern3.matcher(playerCode);
+        } else if (obsoletePattern4.matcher(playerCode).find()) {
+            matcher = obsoletePattern4.matcher(playerCode);
+        } else if (obsoletePattern5.matcher(playerCode).find()) {
+            matcher = obsoletePattern5.matcher(playerCode);
         } else
             throw new ExtractionException("Cannot find required JS function in JS video player code");
         // Restarting the search
