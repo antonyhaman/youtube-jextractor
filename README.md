@@ -1,6 +1,8 @@
 # YoutubeJExtractor for Android
 
 YoutubeJExtractor is Android library that allows you to extract youtube video and audio from any youtube video along with some other data such as a video title, description, author, thumbnails and others.
+
+This library was initially created for my android app [Youtube audio player](https://github.com/kotvertolet/youtube-audio-player)
  
 ## Current status
 
@@ -24,10 +26,10 @@ WIP, library is functional but not well tested and documented.
         videoData = youtubeJExtractor.extract(videoId);
     }
     catch (ExtractionException e) {
-        // Something really bad happened, nothing we can do except just show the user some error notification 
+        // Something really bad happened, nothing we can do except just show some error notification to the user 
     }
     catch (YoutubeRequestException e) {
-        // It's possibly there are some connection problems, ask user to check the internet connection and then retry 
+        // Possibly there are some connection problems, ask user to check the internet connection and then retry 
     }
 ``` 
 **YoutubeVideoData** is an object that contains data for the requested 
