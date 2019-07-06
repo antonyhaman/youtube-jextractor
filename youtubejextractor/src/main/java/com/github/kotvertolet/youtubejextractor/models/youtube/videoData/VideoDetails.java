@@ -115,7 +115,7 @@ public class VideoDetails implements Parcelable {
         this.thumbnail = thumbnail;
     }
 
-    public boolean isIsLiveContent() {
+    public boolean isLiveContent() {
         return isLiveContent;
     }
 

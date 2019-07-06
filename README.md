@@ -4,12 +4,10 @@ YoutubeJExtractor is Android library that allows you to extract youtube video an
  
 ## Current status
 
-WIP, library is functional but not well tested and documented. 
+Work in progress.
 
 #### TODO
-1. Live streams support (dash, hls, etc)
-2. Workaround for region restricted videos
-3. Add more tests
+1. Workaround for region restricted videos
 
 ## How to install
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
@@ -34,8 +32,7 @@ WIP, library is functional but not well tested and documented.
 video split across two main objects: **VideoDetails** and **StreamingData**.
 
 * **VideoDetails** contains various video data such as title, description, author, rating, view count, etc.
-* **StreamingData** contains two fields with the lists of streams (both video and audio) and ***expiresInSeconds***
-field which indicates how long links will be alive.
+* **StreamingData** contains two fields with the lists of streams (video and audio), ***dashManifestUrl*** and ***hlsManifestUrl*** fields which are contains links to the DASH and HLS manifests (if you dealing with a live stream) and ***expiresInSeconds*** which indicates how long links will be alive.
  
 To get all the video streams:
 ```java

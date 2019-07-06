@@ -20,7 +20,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class ExtractionTests {
@@ -74,23 +76,34 @@ public class ExtractionTests {
     }
 
     @Test
-    public void checkAgeRestrictedVideo() throws ExtractionException, YoutubeRequestException {
-        videoData = youtubeJExtractor.extract("V_7CLYGdkps");
+    public void checkLiveStream() throws YoutubeRequestException, ExtractionException {
+        videoData = youtubeJExtractor.extract("hHW1oY26kxQ");
+        assertTrue(videoData.getVideoDetails().isLiveContent());
+        assertNotNull(videoData.getStreamingData().getDashManifestUrl());
+        assertNotNull(videoData.getStreamingData().getHlsManifestUrl());
         checkIfStreamsWork(videoData);
     }
 
     private void checkIfStreamsWork(YoutubeVideoData videoData) throws YoutubeRequestException {
-        String errorMask = "Stream wasn't processed correctly, stream details:\\n %s";
+        String streamErrorMask = "Stream wasn't processed correctly, stream details:\\n %s";
         Response<ResponseBody> responseBody;
         for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
+            assertThat(String.format(streamErrorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
+            assertThat(String.format(streamErrorMask, videoStreamItem.toString()), responseBody.isSuccessful(), is(true));
         }
         for (AudioStreamItem audioStreamItem : videoData.getStreamingData().getAudioStreamItems()) {
             responseBody = youtubeSiteNetwork.getStream(audioStreamItem.getUrl());
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
-            assertThat(String.format(errorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
+            assertThat(String.format(streamErrorMask, audioStreamItem.toString()), responseBody, is(not(nullValue())));
+            assertThat(String.format(streamErrorMask, audioStreamItem.toString()), responseBody.isSuccessful(), is(true));
+        }
+        if (videoData.getVideoDetails().isLiveContent()) {
+            responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getDashManifestUrl());
+            assertNotNull(responseBody);
+            assertTrue(responseBody.isSuccessful());
+            responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getHlsManifestUrl());
+            assertNotNull(responseBody);
+            assertTrue(responseBody.isSuccessful());
         }
     }
 }

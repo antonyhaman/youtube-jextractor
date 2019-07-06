@@ -25,6 +25,10 @@ public class StreamingData implements Parcelable {
     };
     @SerializedName("expiresInSeconds")
     private String expiresInSeconds;
+    @SerializedName("dashManifestUrl")
+    private String dashManifestUrl;
+    @SerializedName("hlsManifestUrl")
+    private String hlsManifestUrl;
     @Expose
     private List<AudioStreamItem> audioStreamItems;
     @Expose
@@ -33,14 +37,18 @@ public class StreamingData implements Parcelable {
     public StreamingData() {
     }
 
-    public StreamingData(String expiresInSeconds, List<AudioStreamItem> audioStreamItems, List<VideoStreamItem> videoStreamItems) {
+    public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AudioStreamItem> audioStreamItems, List<VideoStreamItem> videoStreamItems) {
         this.expiresInSeconds = expiresInSeconds;
+        this.dashManifestUrl = dashManifestUrl;
+        this.hlsManifestUrl = hlsManifestUrl;
         this.audioStreamItems = audioStreamItems;
         this.videoStreamItems = videoStreamItems;
     }
 
     protected StreamingData(Parcel in) {
         expiresInSeconds = in.readString();
+        dashManifestUrl = in.readString();
+        hlsManifestUrl = in.readString();
         audioStreamItems = in.createTypedArrayList(AudioStreamItem.CREATOR);
         videoStreamItems = in.createTypedArrayList(VideoStreamItem.CREATOR);
     }
@@ -51,6 +59,22 @@ public class StreamingData implements Parcelable {
 
     public void setExpiresInSeconds(String expiresInSeconds) {
         this.expiresInSeconds = expiresInSeconds;
+    }
+
+    public String getDashManifestUrl() {
+        return dashManifestUrl;
+    }
+
+    public void setDashManifestUrl(String dashManifestUrl) {
+        this.dashManifestUrl = dashManifestUrl;
+    }
+
+    public String getHlsManifestUrl() {
+        return hlsManifestUrl;
+    }
+
+    public void setHlsManifestUrl(String hlsManifestUrl) {
+        this.hlsManifestUrl = hlsManifestUrl;
     }
 
     public List<AudioStreamItem> getAudioStreamItems() {
@@ -70,6 +94,20 @@ public class StreamingData implements Parcelable {
     }
 
     @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(expiresInSeconds);
+        dest.writeString(dashManifestUrl);
+        dest.writeString(hlsManifestUrl);
+        dest.writeList(audioStreamItems);
+        dest.writeList(videoStreamItems);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof StreamingData)) return false;
@@ -77,6 +115,10 @@ public class StreamingData implements Parcelable {
         StreamingData that = (StreamingData) o;
 
         if (expiresInSeconds != null ? !expiresInSeconds.equals(that.expiresInSeconds) : that.expiresInSeconds != null)
+            return false;
+        if (dashManifestUrl != null ? !dashManifestUrl.equals(that.dashManifestUrl) : that.dashManifestUrl != null)
+            return false;
+        if (hlsManifestUrl != null ? !hlsManifestUrl.equals(that.hlsManifestUrl) : that.hlsManifestUrl != null)
             return false;
         if (audioStreamItems != null ? !audioStreamItems.equals(that.audioStreamItems) : that.audioStreamItems != null)
             return false;
@@ -86,6 +128,8 @@ public class StreamingData implements Parcelable {
     @Override
     public int hashCode() {
         int result = expiresInSeconds != null ? expiresInSeconds.hashCode() : 0;
+        result = 31 * result + (dashManifestUrl != null ? dashManifestUrl.hashCode() : 0);
+        result = 31 * result + (hlsManifestUrl != null ? hlsManifestUrl.hashCode() : 0);
         result = 31 * result + (audioStreamItems != null ? audioStreamItems.hashCode() : 0);
         result = 31 * result + (videoStreamItems != null ? videoStreamItems.hashCode() : 0);
         return result;
@@ -95,20 +139,10 @@ public class StreamingData implements Parcelable {
     public String toString() {
         return "StreamingData{" +
                 "expiresInSeconds='" + expiresInSeconds + '\'' +
+                ", dashManifestUrl='" + dashManifestUrl + '\'' +
+                ", hlsManifestUrl='" + hlsManifestUrl + '\'' +
                 ", audioStreamItems=" + audioStreamItems +
                 ", videoStreamItems=" + videoStreamItems +
                 '}';
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(expiresInSeconds);
-        dest.writeList(audioStreamItems);
-        dest.writeList(videoStreamItems);
     }
 }
