@@ -35,9 +35,9 @@ import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUr
 public class YoutubeJExtractor {
 
     private final String TAG;
-    private YoutubeSiteNetwork youtubeSiteNetwork;
+    private final YoutubeSiteNetwork youtubeSiteNetwork;
+    private final Gson gson;
     private String videoPageHtml;
-    private Gson gson;
 
     public YoutubeJExtractor() {
         TAG = getClass().getSimpleName();
@@ -157,7 +157,7 @@ public class YoutubeJExtractor {
     }
 
     private boolean areStreamsAreEncrypted(YoutubeVideoData youtubeVideoData) {
-        // If a single stream is encrypted means they all are
+        // Even if a single stream is encrypted it means they all are
         return youtubeVideoData.getStreamingData().getVideoStreamItems().get(0).isStreamEncrypted();
     }
 
