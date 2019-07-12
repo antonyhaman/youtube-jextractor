@@ -36,6 +36,11 @@ public class ExtractionTests {
         youtubeJExtractor.extract("invalid_id");
     }
 
+    @Test(expected = ExtractionException.class)
+    public void checkRegionRestrictedVideo() throws YoutubeRequestException, ExtractionException {
+        youtubeJExtractor.extract("dfUyUPx7kpY");
+    }
+
     @Test
     public void checkVideoDataParcel() throws YoutubeRequestException, ExtractionException {
         String parcelKey = "parcel_key1";

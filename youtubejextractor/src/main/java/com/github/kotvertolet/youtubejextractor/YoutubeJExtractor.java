@@ -108,14 +108,19 @@ public class YoutubeJExtractor {
     }
 
     private VideoPlayerConfig extractYoutubePlayerConfig(String videoId) throws ExtractionException {
-        Pattern pattern = Pattern.compile("ytplayer\\.config\\s*=\\s*(\\{.+?\\})\\;ytplayer");
-        Matcher matcher = pattern.matcher(videoPageHtml);
+        Pattern playeConfigPattern = Pattern.compile("ytplayer\\.config\\s*=\\s*(\\{.+?\\})\\;ytplayer");
+        Matcher matcher = playeConfigPattern.matcher(videoPageHtml);
         String rawPlayerConfig;
         if (matcher.find()) {
             rawPlayerConfig = matcher.group(1);
             return gson.fromJson(rawPlayerConfig, VideoPlayerConfig.class);
         } else {
-            throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
+            Pattern videoIsUnavailableMessagePattern = Pattern.compile("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>");
+            matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
+            if (matcher.find()) {
+                throw new ExtractionException(String.format("Cannot extract youtube player config, videoId was: %s, reason: %s", videoId, matcher.group(1)));
+            }
+            else throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
         }
     }
 
