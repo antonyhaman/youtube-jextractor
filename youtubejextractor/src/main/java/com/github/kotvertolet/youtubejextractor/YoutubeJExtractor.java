@@ -11,13 +11,12 @@ import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.Vide
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.StreamingData;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
+import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -87,8 +86,7 @@ public class YoutubeJExtractor {
         } catch (IOException e) {
             throw new ExtractionException(e);
         }
-        JsonObject jsonObject = gson.fromJson(rawYoutubeVideoData, JsonObject.class);
-        YoutubeVideoData youtubeVideoData = gson.fromJson(jsonObject, YoutubeVideoData.class);
+        YoutubeVideoData youtubeVideoData = gson.fromJson(rawYoutubeVideoData, YoutubeVideoData.class);
         extractAudioAndVideoStreams(youtubeVideoData.getStreamingData(), adaptiveFormatsData);
         return youtubeVideoData;
     }

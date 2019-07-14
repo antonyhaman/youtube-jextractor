@@ -34,9 +34,6 @@ dependencies {
     // Regex with named groups for pre Java 7
     implementation 'com.github.tony19:named-regexp:0.2.5'
 
-    // Js interpreter
-    implementation 'com.github.LiquidPlayer:LiquidCore:0.6.0'
-
-    // LongSparseArray support for LiquidCore
-    implementation 'com.android.support:support-v4:28.0.0'
+    // JS interpreter (versions newer than 1.7.10 requires API 26)
+    implementation 'org.mozilla:rhino:1.7.10'
 }
