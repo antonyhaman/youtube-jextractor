@@ -4,8 +4,9 @@ import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionExc
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
-import org.liquidplayer.javascript.JSContext;
-import org.liquidplayer.javascript.JSValue;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.Scriptable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,8 @@ public class DecryptionUtils {
     private String jsDecryptFunctionBody;
     private ArrayList<String> jsObjects;
     private String playerJsCode;
-    private JSContext jsContext;
+    private Context jsContext;
+    private Scriptable scope;
 
     public DecryptionUtils(String playerJsCode, String functionNameToExtract) throws SignatureDecryptionException {
         this.playerJsCode = playerJsCode;
@@ -29,13 +31,13 @@ public class DecryptionUtils {
         jsDecryptFunctionBody = extractFunctionBody(rawExtractedFunction);
         List<String> jsDecryptFunctionArgumentsNames = extractFunctionArgs(rawExtractedFunction);
         jsObjects = extractJsObjectsIfAny(jsDecryptFunctionBody, jsDecryptFunctionArgumentsNames);
-        jsContext = prepareJsContext(jsObjects, jsDecryptFunction);
+        jsContext = prepareJsContext(jsObjects);
     }
 
     public String decryptSignature(String encryptedSignature) throws SignatureDecryptionException {
-        JSValue jsValue = jsContext.evaluateScript(String.format("%s('%s')", jsDecryptFunction, encryptedSignature));
-        if (jsValue != null && jsValue.isString()) {
-            return jsValue.toString();
+        Object result = jsContext.evaluateString(scope, String.format("%s('%s')", jsDecryptFunction, encryptedSignature), "", 0, null);
+        if (result instanceof String) {
+            return result.toString();
         } else {
             throw new SignatureDecryptionException("Decryption function returned no result, function was: \n"
                     + jsDecryptFunction + "\n parameter was: " + encryptedSignature + "\n"
@@ -46,17 +48,17 @@ public class DecryptionUtils {
     /**
      * Creates JS context with all objects and functions to execute decryption function in future
      *
-     * @param jsObjects         js objects that are referenced in decryption function
-     * @param jsDecryptFunction js function to decrypt the stream signature
+     * @param jsObjects         js objects that are referenced in a decryption function
      * @return JS context with all objects and functions to execute decryption function
      */
-    private JSContext prepareJsContext(List<String> jsObjects, String jsDecryptFunction) {
-        JSContext context = new JSContext();
+    private Context prepareJsContext(List<String> jsObjects) {
+        Context jsContext = Context.enter();
+        jsContext.setOptimizationLevel(-1);
+        scope = jsContext.initStandardObjects();
         for (String jsObject : jsObjects) {
-            context.evaluateScript(jsObject);
+            jsContext.evaluateString(scope, jsObject, "", 0, null);
         }
-        context.evaluateScript(jsDecryptFunction);
-        return context;
+        return jsContext;
     }
 
     /**
