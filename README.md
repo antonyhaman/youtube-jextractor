@@ -48,7 +48,7 @@ Each StreamItem object contains fields that describe the stream such as
 
 ## Requirements
 
-The minimum SDK level is limited to 16 due to a third-party library limitation
+Tested on API 16+.
 
 ## Credits
 
