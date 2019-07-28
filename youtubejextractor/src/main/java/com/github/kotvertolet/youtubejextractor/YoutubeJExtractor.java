@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -38,10 +39,16 @@ public class YoutubeJExtractor {
     private final Gson gson;
     private String videoPageHtml;
 
+    public YoutubeJExtractor(OkHttpClient client) {
+        TAG = getClass().getSimpleName();
+        gson = new Gson();
+        youtubeSiteNetwork = YoutubeSiteNetwork.getInstance(client);
+    }
+
     public YoutubeJExtractor() {
         TAG = getClass().getSimpleName();
-        youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
         gson = new Gson();
+        youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
     }
 
     public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
