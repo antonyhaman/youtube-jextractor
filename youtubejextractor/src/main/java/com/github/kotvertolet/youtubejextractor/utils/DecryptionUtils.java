@@ -2,16 +2,16 @@ package com.github.kotvertolet.youtubejextractor.utils;
 
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.getMatcher;
 
 public class DecryptionUtils {
 
@@ -70,11 +70,10 @@ public class DecryptionUtils {
      */
     private Matcher extractJsFunction(String funcName) throws SignatureDecryptionException {
         String escapedFuncName = StringUtils.escapeRegExSpecialCharacters(funcName);
-        String regex = String.format("(?x)(?:function\\s+%s|[{;,]\\s*%s\\s*=\\s*function|var" +
+        String stringPattern = String.format("(?x)(?:function\\s+%s|[{;,]\\s*%s\\s*=\\s*function|var" +
                         "\\s+%s\\s*=\\s*function)\\s*\\((?<args>[^)]*)\\)\\s*\\{(?<code>[^}]+)\\}",
                 escapedFuncName, escapedFuncName, escapedFuncName);
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(playerJsCode);
+        Matcher matcher = getMatcher(stringPattern, playerJsCode);
         if (!matcher.find()) {
             throw new SignatureDecryptionException("Could not find JS function with name " + funcName);
         } else {
@@ -122,19 +121,18 @@ public class DecryptionUtils {
      *
      * @param functionCode Decrypt function extracted from player code
      * @param argNames     Decrypt function args names
-     * @return List of extracted object
+     * @return List of extracted objects
      */
     private ArrayList<String> extractJsObjectsIfAny(String functionCode, List<String> argNames) throws SignatureDecryptionException {
-        Pattern pattern;
         Matcher matcher;
         String[] expressionsArr = functionCode.split(";");
 
         HashMap<String, String> objectFieldsAndStatements = new HashMap<>();
         String charsAndDigitsMask = "[a-zA-Z_$][a-zA-Z_$0-9]*";
-        pattern = Pattern.compile(String.format("(?<var>%s)(?:\\.(?<member>[^(]+)|" +
-                "\\[(?<member2>[^]]+)\\])\\s*", charsAndDigitsMask));
+        String stringPattern = String.format("(?<var>%s)(?:\\.(?<member>[^(]+)|" +
+                "\\[(?<member2>[^]]+)\\])\\s*", charsAndDigitsMask);
         for (String expression : expressionsArr) {
-            matcher = pattern.matcher(expression);
+            matcher = getMatcher(stringPattern, expression);
             if (matcher.find()) {
                 String variable = matcher.group("var");
                 String member = matcher.group("member");
@@ -163,16 +161,16 @@ public class DecryptionUtils {
         HashMap<String, String> obj = new HashMap<>();
         jsObjects = new ArrayList<>();
         String funcNamePattern = "(?:[a-zA-Z$0-9]+|\"[a-zA-Z$0-9]+\"|'[a-zA-Z$0-9]+')";
-        Pattern pattern = Pattern.compile(String.format("(?x)(?<!this\\.)%s\\s*=\\s*\\{\\s*" +
+        String stringPattern = String.format("(?x)(?<!this\\.)%s\\s*=\\s*\\{\\s*" +
                         "(?<fields>(%s\\s*:\\s*function\\s*(.*?)\\s*\\{.*?\\}(?:,\\s*)?)*)\\}\\s*;",
-                StringUtils.escapeRegExSpecialCharacters(objectName), funcNamePattern));
-        Matcher matcher = pattern.matcher(playerJsCode);
+                StringUtils.escapeRegExSpecialCharacters(objectName), funcNamePattern);
+        Matcher matcher = getMatcher(stringPattern, playerJsCode);
         if (matcher.find()) {
             jsObjects.add(matcher.group());
             String fields = matcher.group("fields");
-            pattern = Pattern.compile(String.format("(?x)(?<key>%s)\\s*:\\s*function\\s*" +
-                    "\\((?<args>[a-z,]+)\\)\\{(?<code>[^}]+)\\}", funcNamePattern));
-            matcher = pattern.matcher(fields);
+            stringPattern = String.format("(?x)(?<key>%s)\\s*:\\s*function\\s*" +
+                    "\\((?<args>[a-z,]+)\\)\\{(?<code>[^}]+)\\}", funcNamePattern);
+            matcher = getMatcher(stringPattern, fields);
             while (matcher.find()) {
                 obj.put(matcher.group("key"), matcher.group("code"));
             }

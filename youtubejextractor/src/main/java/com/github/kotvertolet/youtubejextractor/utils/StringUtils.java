@@ -10,10 +10,11 @@ import java.util.Map;
 
 public class StringUtils {
 
-    static String escapeRegExSpecialCharacters(String inputString) {
-        final String[] metaCharacters = {"\\", "^", "$", "{", "}", "[", "]", "(", ")", ".", "*", "+", "?", "|", "<", ">", "-", "&", "%"};
+    private final static String[] META_CHARACTERS =
+            {"\\", "^", "$", "{", "}", "[", "]", "(", ")", ".", "*", "+", "?", "|", "<", ">", "-", "&", "%"};
 
-        for (String metaCharacter : metaCharacters) {
+    static String escapeRegExSpecialCharacters(String inputString) {
+        for (String metaCharacter : META_CHARACTERS) {
             if (inputString.contains(metaCharacter)) {
                 inputString = inputString.replace(metaCharacter, "\\" + metaCharacter);
             }

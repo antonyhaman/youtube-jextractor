@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -29,9 +30,27 @@ public class YoutubeSiteNetwork {
         youtubeSiteApi = retrofit.create(YoutubeSiteApi.class);
     }
 
-    public static synchronized YoutubeSiteNetwork getInstance() {
+    private YoutubeSiteNetwork(OkHttpClient client) {
+        Gson gson = new GsonBuilder()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_SITE_URL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        youtubeSiteApi = retrofit.create(YoutubeSiteApi.class);
+    }
+
+    public static YoutubeSiteNetwork getInstance() {
         if (instance == null) {
             instance = new YoutubeSiteNetwork();
+            return instance;
+        } else return instance;
+    }
+
+    public static YoutubeSiteNetwork getInstance(OkHttpClient client) {
+        if (instance == null) {
+            instance = new YoutubeSiteNetwork(client);
             return instance;
         } else return instance;
     }
