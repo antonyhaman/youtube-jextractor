@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -41,6 +42,12 @@ public class YoutubeJExtractor {
     public YoutubeJExtractor() {
         TAG = getClass().getSimpleName();
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
+        gson = new Gson();
+    }
+
+    public YoutubeJExtractor(OkHttpClient client) {
+        TAG = getClass().getSimpleName();
+        youtubeSiteNetwork = YoutubeSiteNetwork.getInstance(client);
         gson = new Gson();
     }
 
