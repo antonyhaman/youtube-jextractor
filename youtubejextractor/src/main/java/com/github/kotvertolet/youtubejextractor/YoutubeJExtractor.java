@@ -1,7 +1,5 @@
 package com.github.kotvertolet.youtubejextractor;
 
-import android.util.Log;
-
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
@@ -11,11 +9,10 @@ import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.Vide
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.StreamingData;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
+import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
 import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -27,6 +24,9 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogE;
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.getMatcher;
 import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.extractStsFromVideoPageHtml;
 import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.isVideoAgeRestricted;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
@@ -61,10 +61,11 @@ public class YoutubeJExtractor {
         List<Map<String, String>> adaptiveFormatsData = new ArrayList<>();
         String rawYoutubeVideoData;
         try {
-            Pattern pageVerifyPattern = Pattern.compile("<link rel=\"canonical\"\\shref=(\"\\S+\")");
             videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
-            if (!pageVerifyPattern.matcher(videoPageHtml).find()) {
-                throw new ExtractionException(String.format("Invalid video page received, maybe video id '%s' is not valid", videoId));
+            Matcher matcher = getMatcher("<link rel=\"canonical\"\\shref=(\"\\S+\")", videoPageHtml);
+            if (!matcher.find()) {
+                throw new ExtractionException(String.format("Invalid video page received, " +
+                        "maybe video id '%s' is not valid", videoId));
             }
             //Protocol and domain are necessary to split url params correctly
             String urlProtocolAndDomain = "http://youtube.con/v?";
@@ -87,7 +88,7 @@ public class YoutubeJExtractor {
             throw new ExtractionException(e);
         }
         YoutubeVideoData youtubeVideoData = gson.fromJson(rawYoutubeVideoData, YoutubeVideoData.class);
-        extractAudioAndVideoStreams(youtubeVideoData.getStreamingData(), adaptiveFormatsData);
+        youtubeVideoData = extractAudioAndVideoStreams(youtubeVideoData, adaptiveFormatsData);
         return youtubeVideoData;
     }
 
@@ -106,55 +107,63 @@ public class YoutubeJExtractor {
     }
 
     private VideoPlayerConfig extractYoutubePlayerConfig(String videoId) throws ExtractionException {
-        Pattern playeConfigPattern = Pattern.compile("ytplayer\\.config\\s*=\\s*(\\{.+?\\})\\;ytplayer");
-        Matcher matcher = playeConfigPattern.matcher(videoPageHtml);
+        Matcher matcher = getMatcher("ytplayer\\.config\\s*=\\s*(\\{.+?\\})\\;ytplayer", videoPageHtml);
         String rawPlayerConfig;
         if (matcher.find()) {
             rawPlayerConfig = matcher.group(1);
             return gson.fromJson(rawPlayerConfig, VideoPlayerConfig.class);
         } else {
-            Pattern videoIsUnavailableMessagePattern = Pattern.compile("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>");
-            matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
+            matcher = getMatcher("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>", videoPageHtml);
             if (matcher.find()) {
-                throw new ExtractionException(String.format("Cannot extract youtube player config, videoId was: %s, reason: %s", videoId, matcher.group(1)));
+                throw new ExtractionException(String.format("Cannot extract youtube player config, " +
+                        "videoId was: %s, reason: %s", videoId, matcher.group(1)));
             }
-            else throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
+            else throw new ExtractionException("Cannot extract youtube player config," +
+                    " videoId was: " + videoId);
         }
     }
 
-    private StreamingData extractAudioAndVideoStreams(StreamingData streamingData,
+    private YoutubeVideoData extractAudioAndVideoStreams(YoutubeVideoData youtubeVideoData,
                                                       List<Map<String, String>> adaptiveFormatsList) {
+        StreamingData streamingData = youtubeVideoData.getStreamingData();
         List<VideoStreamItem> videoStreamItems = new ArrayList<>();
         List<AudioStreamItem> audioStreamItems = new ArrayList<>();
         for (int i = 0; i < adaptiveFormatsList.size(); i++) {
             Map<String, String> adaptiveFormatDataMap = adaptiveFormatsList.get(i);
             String streamType = adaptiveFormatDataMap.get("type");
             if (streamType == null || streamType.isEmpty()) {
-                Log.e(TAG, "Null or empty stream type found");
+                LogE(TAG, "Null or empty stream type found");
             } else {
                 if (streamType.contains("video")) {
                     videoStreamItems.add(new VideoStreamItem(adaptiveFormatDataMap));
                 } else if (streamType.contains("audio")) {
                     audioStreamItems.add(new AudioStreamItem(adaptiveFormatDataMap));
                 } else {
-                    Log.e(TAG, "Unknown stream type found: " + streamType);
+                    LogE(TAG, "Unknown stream type found: " + streamType);
                 }
             }
         }
         streamingData.setAudioStreamItems(audioStreamItems);
         streamingData.setVideoStreamItems(videoStreamItems);
-        return streamingData;
+        return youtubeVideoData;
     }
 
     private String getVideoInfoForAgeRestrictedVideo(String videoId) throws ExtractionException {
         try {
-            Log.i(TAG, "Age restricted video detected, videoId: " + videoId);
+            LogI(TAG, "Age restricted video detected, videoId: " + videoId);
             this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
-            String sts = extractStsFromVideoPageHtml(videoPageHtml);
-            String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
+            String eUrl;
+            try {
+                String sts = extractStsFromVideoPageHtml(videoPageHtml);
+                eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
+                LogI(TAG, "Sts param wasn't found in video page html code, trying to get video info without it");
+            }
+            catch (ExtractionException e) {
+                eUrl = String.format("https://youtube.googleapis.com/v/%s", videoId);
+            }
             Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
             return videoInfoResponse.body().string();
-        } catch (IOException | NullPointerException | ExtractionException | YoutubeRequestException e) {
+        } catch (IOException | NullPointerException | YoutubeRequestException e) {
             throw new ExtractionException(e);
         }
     }

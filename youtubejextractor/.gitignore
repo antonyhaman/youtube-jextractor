@@ -22,3 +22,6 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Proguard
+*.map
