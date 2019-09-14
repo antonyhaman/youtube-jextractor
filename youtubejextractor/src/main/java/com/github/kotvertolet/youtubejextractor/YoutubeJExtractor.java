@@ -11,8 +11,8 @@ import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.Vide
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.StreamingData;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
+import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
@@ -124,8 +124,8 @@ public class YoutubeJExtractor {
             matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
             if (matcher.find()) {
                 throw new ExtractionException(String.format("Cannot extract youtube player config, videoId was: %s, reason: %s", videoId, matcher.group(1)));
-            }
-            else throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
+            } else
+                throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
         }
     }
 

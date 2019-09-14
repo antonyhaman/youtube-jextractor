@@ -95,5 +95,4 @@ public class ExtractionUtils {
             throw new SignatureDecryptionException("Cannot create proper player url with url: " + playerUrl);
         return playerUrl;
     }
-
 }

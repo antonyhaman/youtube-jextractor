@@ -5,7 +5,6 @@ import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class DecryptionUtils {
     /**
      * Creates JS context with all objects and functions to execute decryption function in future
      *
-     * @param jsObjects         js objects that are referenced in a decryption function
+     * @param jsObjects js objects that are referenced in a decryption function
      * @return JS context with all objects and functions to execute decryption function
      */
     private Context prepareJsContext(List<String> jsObjects) {
