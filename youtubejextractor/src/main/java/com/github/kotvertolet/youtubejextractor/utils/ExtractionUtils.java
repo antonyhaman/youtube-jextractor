@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 
+import android.util.Log;
+
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
@@ -13,13 +15,14 @@ public class ExtractionUtils {
         return videoPageHtml.contains("player-age-gate-content\">");
     }
 
-    public static String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) throws ExtractionException {
+    public static String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) {
         Pattern pattern = Pattern.compile("sts\"\\s*:\\s*(\\d+)");
         Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
         if (matcher.find()) {
             return matcher.group(1);
-        } else
-            throw new ExtractionException("Sts param wasn't found in the embedded player webpage code");
+        } else Log.i(ExtractionUtils.class.getSimpleName(),
+                "Sts param wasn't found in the embedded player webpage code");
+        return "";
     }
 
     public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeRequestException, ExtractionException, SignatureDecryptionException {
