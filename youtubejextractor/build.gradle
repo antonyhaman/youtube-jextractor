@@ -1,10 +1,10 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -16,6 +16,11 @@ android {
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    buildToolsVersion = '29.0.1'
 }
 
 dependencies {
@@ -36,4 +41,6 @@ dependencies {
 
     // JS interpreter (versions newer than 1.7.10 requires API 26)
     implementation 'org.mozilla:rhino:1.7.10'
+
+    implementation("com.google.guava:guava:28.2-android")
 }

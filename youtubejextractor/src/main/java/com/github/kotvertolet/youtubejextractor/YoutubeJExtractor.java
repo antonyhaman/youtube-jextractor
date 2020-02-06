@@ -7,19 +7,31 @@ import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionExc
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.newFolder.NewPlayerResponse;
+import com.github.kotvertolet.youtubejextractor.models.youtube.newFolder.NewVideoPlayerConfig;
+import com.github.kotvertolet.youtubejextractor.models.youtube.newFolder.player_response_items.AdaptiveFormatsItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.newFolder.player_response_items.Cipher;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.VideoPlayerConfig;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.StreamingData;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
-import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
+import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +53,35 @@ public class YoutubeJExtractor {
     public YoutubeJExtractor() {
         TAG = getClass().getSimpleName();
         youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
-        gson = new Gson();
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+
+        JsonDeserializer<Cipher> deserializer = new JsonDeserializer<Cipher>() {
+            @Override
+            public Cipher deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                Cipher cipher = gson.fromJson(paramJson(json.getAsString()), Cipher.class);
+                cipher.setUrl(URLDecoder.decode(cipher.getUrl()));
+                return cipher;
+            }
+        };
+
+        final Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, deserializer).create();
+        JsonDeserializer<NewPlayerResponse> playerResponseJsonDeserializer = new JsonDeserializer<NewPlayerResponse>() {
+            @Override
+            public NewPlayerResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                String jsonRaw = json.getAsString();
+                return tempGson.fromJson(jsonRaw, NewPlayerResponse.class);
+            }
+        };
+        gsonBuilder.registerTypeAdapter(NewPlayerResponse.class, playerResponseJsonDeserializer);
+        gson =  gsonBuilder.create();
+    }
+
+    public static String paramJson(String paramIn) {
+        paramIn = paramIn.replaceAll("=", "\":\"");
+        paramIn = paramIn.replaceAll("&", "\",\"");
+        return "{\"" + paramIn + "\"}";
     }
 
     public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
@@ -111,6 +151,7 @@ public class YoutubeJExtractor {
         String rawPlayerConfig;
         if (matcher.find()) {
             rawPlayerConfig = matcher.group(1);
+            NewVideoPlayerConfig config = gson.fromJson(rawPlayerConfig, NewVideoPlayerConfig.class);
             return gson.fromJson(rawPlayerConfig, VideoPlayerConfig.class);
         } else {
             Pattern videoIsUnavailableMessagePattern = Pattern.compile("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>");

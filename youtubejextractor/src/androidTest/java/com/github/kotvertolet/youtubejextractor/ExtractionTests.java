@@ -52,7 +52,7 @@ public class ExtractionTests {
 
     @Test
     public void checkVideoWithEncryptedSignature() throws ExtractionException, YoutubeRequestException {
-        videoData = youtubeJExtractor.extract("kJQP7kiw5Fk");
+        videoData = youtubeJExtractor.extract("EztbyhAJNtk");
         checkIfStreamsWork(videoData);
     }
 

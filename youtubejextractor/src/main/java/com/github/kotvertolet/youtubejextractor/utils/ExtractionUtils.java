@@ -1,11 +1,17 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 
+import com.github.kotvertolet.youtubejextractor.BuildConfig;
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
+
+import java.util.Iterator;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class ExtractionUtils {
 
@@ -44,8 +50,10 @@ public class ExtractionUtils {
     }
 
     public String extractDecryptFunctionName(String playerCode) throws ExtractionException {
+
         Pattern newPattern1 = Pattern.compile("\\b\\[cs\\]\\s*&&\\s*[adf]\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern newPattern2 = Pattern.compile("\\b[a-zA-Z0-9]+\\s*&&\\s*[a-zA-Z0-9]+\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
+        Pattern newPattern3 = Pattern.compile("\\b(?<sig>[a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)");
         // Obsolete patterns
         Pattern obsoletePattern1 = Pattern.compile("([\"\\'])signature\\1\\s*,\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern obsoletePattern2 = Pattern.compile("\\.sig\\|\\|(?<sig>[a-zA-Z0-9$]+)\\(");
@@ -53,27 +61,48 @@ public class ExtractionUtils {
         Pattern obsoletePattern4 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern obsoletePattern5 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*\\([^)]*\\)\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
 
-        String signatureDecryptFunctionName;
+        String signatureDecryptFunctionName = null;
         Matcher matcher;
-        if (newPattern1.matcher(playerCode).find()) {
-            matcher = newPattern1.matcher(playerCode);
-        } else if (newPattern2.matcher(playerCode).find()) {
-            matcher = newPattern2.matcher(playerCode);
-        } else if (obsoletePattern1.matcher(playerCode).find()) {
-            matcher = obsoletePattern1.matcher(playerCode);
-        } else if (obsoletePattern2.matcher(playerCode).find()) {
-            matcher = obsoletePattern2.matcher(playerCode);
-        } else if (obsoletePattern3.matcher(playerCode).find()) {
-            matcher = obsoletePattern3.matcher(playerCode);
-        } else if (obsoletePattern4.matcher(playerCode).find()) {
-            matcher = obsoletePattern4.matcher(playerCode);
-        } else if (obsoletePattern5.matcher(playerCode).find()) {
-            matcher = obsoletePattern5.matcher(playerCode);
-        } else
+
+        List<Pattern> patterns = asList(
+                Pattern.compile("\\b\\[cs\\]\\s*&&\\s*[adf]\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\("),
+        Pattern.compile("\\b[a-zA-Z0-9]+\\s*&&\\s*[a-zA-Z0-9]+\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*((\\s*(?<sig>[a-zA-Z0-9$]+)\\("),
+                Pattern.compile("\\b(?<sig>[a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)")
+        );
+        Iterator<Pattern> iter = patterns.iterator();
+
+        while (signatureDecryptFunctionName == null && iter.hasNext()) {
+            matcher = iter.next().matcher(playerCode);
+            if (matcher.find()) {
+                // Restarting the search
+                matcher.find(0);
+                signatureDecryptFunctionName = matcher.group(1);
+            }
+        }
+
+        if (signatureDecryptFunctionName == null) {
             throw new ExtractionException("Cannot find required JS function in JS video player code");
-        // Restarting the search
-        matcher.find(0);
-        signatureDecryptFunctionName = matcher.group(1);
+        }
+
+//        if (newPattern1.matcher(playerCode).find()) {
+//            matcher = newPattern1.matcher(playerCode);
+//        } else if (newPattern2.matcher(playerCode).find()) {
+//            matcher = newPattern2.matcher(playerCode);
+//        } else if (obsoletePattern1.matcher(playerCode).find()) {
+//            matcher = obsoletePattern1.matcher(playerCode);
+//        } else if (obsoletePattern2.matcher(playerCode).find()) {
+//            matcher = obsoletePattern2.matcher(playerCode);
+//        } else if (obsoletePattern3.matcher(playerCode).find()) {
+//            matcher = obsoletePattern3.matcher(playerCode);
+//        } else if (obsoletePattern4.matcher(playerCode).find()) {
+//            matcher = obsoletePattern4.matcher(playerCode);
+//        } else if (obsoletePattern5.matcher(playerCode).find()) {
+//            matcher = obsoletePattern5.matcher(playerCode);
+//        } else
+//            throw new ExtractionException("Cannot find required JS function in JS video player code");
+//        // Restarting the search
+//        matcher.find(0);
+//        signatureDecryptFunctionName = matcher.group(1);
         return signatureDecryptFunctionName;
     }
 
