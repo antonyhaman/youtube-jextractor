@@ -3,10 +3,10 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 29
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "0.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,17 +30,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     // Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.7.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
 
     // Gson
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     // Regex with named groups for pre Java 7
     implementation 'com.github.tony19:named-regexp:0.2.5'
 
     // JS interpreter (versions newer than 1.7.10 requires API 26)
     implementation 'org.mozilla:rhino:1.7.10'
-
-    implementation("com.google.guava:guava:28.2-android")
 }

@@ -2,12 +2,17 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.FormatsItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StreamingData implements Parcelable {
@@ -29,12 +34,25 @@ public class StreamingData implements Parcelable {
     private String dashManifestUrl;
     @SerializedName("hlsManifestUrl")
     private String hlsManifestUrl;
+    @SerializedName("formats")
+    private List<FormatsItem> formats;
+    @SerializedName("probeUrl")
+    private String probeUrl;
     @Expose
     private List<AudioStreamItem> audioStreamItems;
     @Expose
     private List<VideoStreamItem> videoStreamItems;
 
     public StreamingData() {
+    }
+
+    public StreamingData(RawStreamingData rawStreamingData) {
+        this.expiresInSeconds = rawStreamingData.getExpiresInSeconds();
+        this.dashManifestUrl = rawStreamingData.getDashManifestUrl();
+        this.hlsManifestUrl = rawStreamingData.getHlsManifestUrl();
+        this.probeUrl = rawStreamingData.getProbeUrl();
+        this.formats = rawStreamingData.getFormats();
+        sortAdaptiveStreamsByType(rawStreamingData.getAdaptiveFormats());
     }
 
     public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AudioStreamItem> audioStreamItems, List<VideoStreamItem> videoStreamItems) {
@@ -137,12 +155,30 @@ public class StreamingData implements Parcelable {
 
     @Override
     public String toString() {
-        return "StreamingData{" +
+        return "RawStreamingData{" +
                 "expiresInSeconds='" + expiresInSeconds + '\'' +
                 ", dashManifestUrl='" + dashManifestUrl + '\'' +
                 ", hlsManifestUrl='" + hlsManifestUrl + '\'' +
                 ", audioStreamItems=" + audioStreamItems +
                 ", videoStreamItems=" + videoStreamItems +
                 '}';
+    }
+
+    private void sortAdaptiveStreamsByType(List<AdaptiveFormatItem> adaptiveFormats) {
+        List<VideoStreamItem> videoStreamItems = new ArrayList<>();
+        List<AudioStreamItem> audioStreamItems = new ArrayList<>();
+
+        for (AdaptiveFormatItem adaptiveFormat : adaptiveFormats) {
+            String mimeType = adaptiveFormat.getMimeType();
+            if (mimeType.contains("audio")) {
+                audioStreamItems.add(new AudioStreamItem(adaptiveFormat));
+            } else if (mimeType.contains("video")) {
+                videoStreamItems.add(new VideoStreamItem(adaptiveFormat));
+            } else {
+                Log.e(getClass().getSimpleName(), "Unknown stream type found: " + mimeType);
+            }
+        }
+        this.audioStreamItems = audioStreamItems;
+        this.videoStreamItems = videoStreamItems;
     }
 }

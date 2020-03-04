@@ -1,7 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 
-import com.github.kotvertolet.youtubejextractor.BuildConfig;
+import android.util.Log;
+
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
@@ -24,8 +25,10 @@ public class ExtractionUtils {
         Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
         if (matcher.find()) {
             return matcher.group(1);
-        } else
-            throw new ExtractionException("Sts param wasn't found in the embedded player webpage code");
+        } else {
+            Log.i(ExtractionUtils.class.getSimpleName(), "Sts param wasn't found in the embedded player webpage code");
+            return "";
+        }
     }
 
     public String extractYoutubeVideoPlayerCode(String playerUrl) throws YoutubeRequestException, ExtractionException, SignatureDecryptionException {
@@ -53,7 +56,8 @@ public class ExtractionUtils {
 
         Pattern newPattern1 = Pattern.compile("\\b\\[cs\\]\\s*&&\\s*[adf]\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern newPattern2 = Pattern.compile("\\b[a-zA-Z0-9]+\\s*&&\\s*[a-zA-Z0-9]+\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
-        Pattern newPattern3 = Pattern.compile("\\b(?<sig>[a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)");
+        Pattern newPattern3 = Pattern.compile("\\b(?<sig>[a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)");
+        Pattern newPattern4 = Pattern.compile("(?<sig>[a-zA-Z0-9$]+)\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)");
         // Obsolete patterns
         Pattern obsoletePattern1 = Pattern.compile("([\"\\'])signature\\1\\s*,\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern obsoletePattern2 = Pattern.compile("\\.sig\\|\\|(?<sig>[a-zA-Z0-9$]+)\\(");
@@ -65,9 +69,10 @@ public class ExtractionUtils {
         Matcher matcher;
 
         List<Pattern> patterns = asList(
-                Pattern.compile("\\b\\[cs\\]\\s*&&\\s*[adf]\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\("),
-        Pattern.compile("\\b[a-zA-Z0-9]+\\s*&&\\s*[a-zA-Z0-9]+\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*((\\s*(?<sig>[a-zA-Z0-9$]+)\\("),
-                Pattern.compile("\\b(?<sig>[a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)")
+                newPattern1,
+                newPattern2,
+                newPattern3,
+                newPattern4
         );
         Iterator<Pattern> iter = patterns.iterator();
 

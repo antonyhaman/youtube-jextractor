@@ -5,10 +5,21 @@ import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StringUtils {
+
+    public static final String UTF_8 = StandardCharsets.UTF_8.name();
+
+    public static String urlDecode(String urlEncodedStr) {
+        try {
+            return URLDecoder.decode(urlEncodedStr, UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            return URLDecoder.decode(urlEncodedStr);
+        }
+    }
 
     static String escapeRegExSpecialCharacters(String inputString) {
         final String[] metaCharacters = {"\\", "^", "$", "{", "}", "[", "]", "(", ")", ".", "*", "+", "?", "|", "<", ">", "-", "&", "%"};
@@ -19,6 +30,12 @@ public class StringUtils {
             }
         }
         return inputString;
+    }
+
+    public static String urlParamsToJson(String paramIn) {
+        paramIn = paramIn.replaceAll("=", "\":\"");
+        paramIn = paramIn.replaceAll("&", "\",\"");
+        return "{\"" + paramIn + "\"}";
     }
 
     public static Map<String, String> splitUrlParams(String url) throws ExtractionException {
@@ -36,10 +53,10 @@ public class StringUtils {
         for (String queryParam : queryParamsArr) {
             final int idx = queryParam.indexOf("=");
             try {
-                final String key = idx > 0 ? URLDecoder.decode(queryParam.substring(0, idx), "UTF-8") : queryParam;
+                final String key = idx > 0 ? URLDecoder.decode(queryParam.substring(0, idx), UTF_8) : queryParam;
                 if (!queryPairs.containsKey(key)) {
                     final String value = idx > 0 && queryParam.length() > idx + 1
-                            ? URLDecoder.decode(queryParam.substring(idx + 1), "UTF-8") : null;
+                            ? URLDecoder.decode(queryParam.substring(idx + 1), UTF_8) : null;
                     queryPairs.put(key, value);
                 }
             } catch (UnsupportedEncodingException e) {

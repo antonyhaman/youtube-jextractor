@@ -1,4 +1,6 @@
-package com.github.kotvertolet.youtubejextractor.models.youtube.newFolder.player_response_items;
+package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
+
+import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlDecode;
 
 public class Cipher {
 
@@ -7,7 +9,7 @@ public class Cipher {
     private String url;
 
     public String getS() {
-        return s;
+        return urlDecode(s);
     }
 
     public void setS(String s) {

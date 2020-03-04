@@ -2,57 +2,135 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcelable;
 
-import java.util.Map;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
 
 public abstract class StreamItem implements Parcelable {
 
     protected String extension;
     protected String codec;
     protected int bitrate;
-    protected String signature;
-    protected String sp;
     protected int iTag;
     protected String url;
-    protected boolean isStreamEncrypted;
+    protected int averageBitrate;
+    protected Integer approxDurationMs;
 
-    protected StreamItem() {
-    }
-
-    protected StreamItem(String extension, String codec, int bitrate, String signature, String sp, int iTag, String url, boolean isStreamEncrypted) {
+    protected StreamItem(String extension, String codec, int bitrate, int iTag, String url, int averageBitrate, int approxDurationMs) {
         this.extension = extension;
         this.codec = codec;
         this.bitrate = bitrate;
-        this.signature = signature;
-        this.sp = sp;
         this.iTag = iTag;
         this.url = url;
-        this.isStreamEncrypted = isStreamEncrypted;
+        this.averageBitrate = averageBitrate;
+        this.approxDurationMs = approxDurationMs;
     }
 
-    protected StreamItem(Map<String, String> map) {
-        String[] tempArr = map.get("type").split(";");
-        String[] typeArr = tempArr[0].split("/");
-        extension = typeArr[1];
-        codec = tempArr[1].split("=")[1].replaceAll("\"", "");
-        signature = map.get("s");
-        sp = map.get("sp");
-        isStreamEncrypted = signature != null;
-        String rawItag = map.get("itag") == null ? "0" : map.get("itag");
-        iTag = Integer.valueOf(rawItag);
-        url = map.get("url");
-        String rawBitrate = map.get("bitrate") == null ? "0" : map.get("bitrate");
-        bitrate = Integer.valueOf(rawBitrate);
+    protected StreamItem(AdaptiveFormatItem adaptiveFormatItem) {
+        String[] mimeTypeArr = adaptiveFormatItem.getMimeType().split("[/;]");
+        extension = mimeTypeArr[1];
+        codec = mimeTypeArr[2].split("=")[1].replaceAll("\"", "");
+        url = adaptiveFormatItem.getUrl();
+        iTag = adaptiveFormatItem.getItag();
+        bitrate = adaptiveFormatItem.getBitrate();
+        averageBitrate = adaptiveFormatItem.getAverageBitrate();
+        String rawDuration = adaptiveFormatItem.getApproxDurationMs();
+        approxDurationMs = rawDuration == null ? 0 : Integer.valueOf(rawDuration);
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    public String getCodec() {
+        return codec;
+    }
+
+    public void setCodec(String codec) {
+        this.codec = codec;
+    }
+
+    public int getBitrate() {
+        return bitrate;
+    }
+
+    public void setBitrate(int bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    public int getAverageBitrate() {
+        return averageBitrate;
+    }
+
+    public void setAverageBitrate(int averageBitrate) {
+        this.averageBitrate = averageBitrate;
+    }
+
+    public int getiTag() {
+        return iTag;
+    }
+
+    public void setiTag(int iTag) {
+        this.iTag = iTag;
     }
 
     public String getUrl() {
-        if (isStreamEncrypted) {
-            isStreamEncrypted = false;
-            url = String.format("%s&%s=%s", url, sp, signature);
-            if (!url.contains("ratebypass")) {
-                url = url + "&ratebypass=yes";
-            }
-            isStreamEncrypted = false;
-        }
         return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public int getApproxDurationMs() {
+        return approxDurationMs;
+    }
+
+    public void setApproxDurationMs(int approxDurationMs) {
+        this.approxDurationMs = approxDurationMs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StreamItem that = (StreamItem) o;
+
+        if (bitrate != that.bitrate) return false;
+        if (iTag != that.iTag) return false;
+        if (averageBitrate != that.averageBitrate) return false;
+        if (extension != null ? !extension.equals(that.extension) : that.extension != null)
+            return false;
+        if (codec != null ? !codec.equals(that.codec) : that.codec != null) return false;
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        return approxDurationMs != null ? approxDurationMs.equals(that.approxDurationMs) : that.approxDurationMs == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = extension != null ? extension.hashCode() : 0;
+        result = 31 * result + (codec != null ? codec.hashCode() : 0);
+        result = 31 * result + bitrate;
+        result = 31 * result + iTag;
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + averageBitrate;
+        result = 31 * result + (approxDurationMs != null ? approxDurationMs.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "StreamItem{" +
+                "extension='" + extension + '\'' +
+                ", codec='" + codec + '\'' +
+                ", bitrate=" + bitrate +
+                ", averageBitrate=" + averageBitrate +
+                ", iTag=" + iTag +
+                ", url='" + url + '\'' +
+                ", approxDurationMs=" + approxDurationMs +
+                '}';
     }
 }
