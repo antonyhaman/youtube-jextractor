@@ -4,13 +4,6 @@ YoutubeJExtractor is Android library that allows you to extract youtube video an
 
 This library was initially created for my android app [Youtube audio player](https://github.com/kotvertolet/youtube-audio-player)
  
-## Current status
-
-Work in progress.
-
-#### TODO
-1. Workaround for region restricted videos
-
 ## How to install
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 

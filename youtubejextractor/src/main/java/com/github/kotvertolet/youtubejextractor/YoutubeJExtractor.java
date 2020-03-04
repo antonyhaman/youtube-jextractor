@@ -1,7 +1,5 @@
 package com.github.kotvertolet.youtubejextractor;
 
-import android.util.Log;
-
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
@@ -32,6 +30,7 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
 import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.extractStsFromVideoPageHtml;
 import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.isVideoAgeRestricted;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
@@ -122,7 +121,7 @@ public class YoutubeJExtractor {
 
     private String getVideoInfoForAgeRestrictedVideo(String videoId) throws ExtractionException {
         try {
-            Log.i(TAG, "Age restricted video detected, videoId: " + videoId);
+            LogI(TAG, "Age restricted video detected, videoId: " + videoId);
             this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
             String sts = extractStsFromVideoPageHtml(videoPageHtml);
             String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);

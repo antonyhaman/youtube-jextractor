@@ -2,7 +2,6 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
@@ -14,6 +13,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogE;
 
 public class StreamingData implements Parcelable {
 
@@ -93,6 +94,22 @@ public class StreamingData implements Parcelable {
 
     public void setHlsManifestUrl(String hlsManifestUrl) {
         this.hlsManifestUrl = hlsManifestUrl;
+    }
+
+    public List<FormatsItem> getFormats() {
+        return formats;
+    }
+
+    public void setFormats(List<FormatsItem> formats) {
+        this.formats = formats;
+    }
+
+    public String getProbeUrl() {
+        return probeUrl;
+    }
+
+    public void setProbeUrl(String probeUrl) {
+        this.probeUrl = probeUrl;
     }
 
     public List<AudioStreamItem> getAudioStreamItems() {
@@ -175,7 +192,7 @@ public class StreamingData implements Parcelable {
             } else if (mimeType.contains("video")) {
                 videoStreamItems.add(new VideoStreamItem(adaptiveFormat));
             } else {
-                Log.e(getClass().getSimpleName(), "Unknown stream type found: " + mimeType);
+                LogE(getClass().getSimpleName(), "Unknown stream type found: " + mimeType);
             }
         }
         this.audioStreamItems = audioStreamItems;

@@ -1,8 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.utils;
 
 
-import android.util.Log;
-
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
@@ -12,6 +10,7 @@ import com.google.code.regexp.Pattern;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
 import static java.util.Arrays.asList;
 
 public class ExtractionUtils {
@@ -26,7 +25,7 @@ public class ExtractionUtils {
         if (matcher.find()) {
             return matcher.group(1);
         } else {
-            Log.i(ExtractionUtils.class.getSimpleName(), "Sts param wasn't found in the embedded player webpage code");
+            LogI(ExtractionUtils.class.getSimpleName(), "Sts param wasn't found in the embedded player webpage code");
             return "";
         }
     }
