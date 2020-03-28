@@ -19,7 +19,7 @@ public class ExtractionUtils {
         return videoPageHtml.contains("player-age-gate-content\">");
     }
 
-    public static String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) throws ExtractionException {
+    public static String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) {
         Pattern pattern = Pattern.compile("sts\"\\s*:\\s*(\\d+)");
         Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
         if (matcher.find()) {
@@ -71,10 +71,15 @@ public class ExtractionUtils {
                 newPattern1,
                 newPattern2,
                 newPattern3,
-                newPattern4
+                newPattern4,
+                obsoletePattern1,
+                obsoletePattern2,
+                obsoletePattern3,
+                obsoletePattern4,
+                obsoletePattern5
         );
-        Iterator<Pattern> iter = patterns.iterator();
 
+        Iterator<Pattern> iter = patterns.iterator();
         while (signatureDecryptFunctionName == null && iter.hasNext()) {
             matcher = iter.next().matcher(playerCode);
             if (matcher.find()) {
@@ -83,30 +88,9 @@ public class ExtractionUtils {
                 signatureDecryptFunctionName = matcher.group(1);
             }
         }
-
         if (signatureDecryptFunctionName == null) {
             throw new ExtractionException("Cannot find required JS function in JS video player code");
         }
-
-//        if (newPattern1.matcher(playerCode).find()) {
-//            matcher = newPattern1.matcher(playerCode);
-//        } else if (newPattern2.matcher(playerCode).find()) {
-//            matcher = newPattern2.matcher(playerCode);
-//        } else if (obsoletePattern1.matcher(playerCode).find()) {
-//            matcher = obsoletePattern1.matcher(playerCode);
-//        } else if (obsoletePattern2.matcher(playerCode).find()) {
-//            matcher = obsoletePattern2.matcher(playerCode);
-//        } else if (obsoletePattern3.matcher(playerCode).find()) {
-//            matcher = obsoletePattern3.matcher(playerCode);
-//        } else if (obsoletePattern4.matcher(playerCode).find()) {
-//            matcher = obsoletePattern4.matcher(playerCode);
-//        } else if (obsoletePattern5.matcher(playerCode).find()) {
-//            matcher = obsoletePattern5.matcher(playerCode);
-//        } else
-//            throw new ExtractionException("Cannot find required JS function in JS video player code");
-//        // Restarting the search
-//        matcher.find(0);
-//        signatureDecryptFunctionName = matcher.group(1);
         return signatureDecryptFunctionName;
     }
 

@@ -9,6 +9,10 @@ android {
         versionName "0.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -19,11 +23,11 @@ android {
             minifyEnabled false
         }
     }
+    buildToolsVersion = '29.0.1'
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-    buildToolsVersion = '29.0.1'
 }
 
 dependencies {
