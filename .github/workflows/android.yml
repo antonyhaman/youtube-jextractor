@@ -7,18 +7,6 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
-    name: Run Unit Tests
-    runs-on: ubuntu-18.04
-
-    steps:
-      - uses: actions/checkout@v1
-      - name: set up JDK 1.8
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Unit tests
-        run: bash ./gradlew test --stacktrace
   
   build:
 
@@ -32,3 +20,21 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
+      
+  aar:
+    name: Generate AAR
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Build debug AAR
+        run: bash ./gradlew assembleDebug --stacktrace
+      - name: Upload AAR
+        uses: actions/upload-artifact@v1
+        with:
+          name: lib
+          path: aar/youtubejextractor-debug.aar
