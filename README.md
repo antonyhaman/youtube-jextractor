@@ -41,7 +41,7 @@ Each StreamItem object contains fields that describe the stream such as
 
 ## Requirements
 
-Tested on API 16+.
+Tested on API 19+.
 
 ## Credits
 
