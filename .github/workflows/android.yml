@@ -37,4 +37,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: lib
-          path: ./aar/youtubejextractor-debug.aar
+          path: /home/runner/work/youtube-jextractor/youtube-jextractor/aar/youtubejextractor-debug.aar
