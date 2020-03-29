@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -20,19 +21,21 @@ public class YoutubeSiteNetwork {
     private YoutubeSiteApi youtubeSiteApi;
     private int attemptsCounter = 0;
 
-    private YoutubeSiteNetwork() {
-        Gson gson = new GsonBuilder()
-                .create();
+    private YoutubeSiteNetwork(Gson gson) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_SITE_URL)
+                .client(httpClient.build())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         youtubeSiteApi = retrofit.create(YoutubeSiteApi.class);
     }
 
-    private YoutubeSiteNetwork(OkHttpClient client) {
-        Gson gson = new GsonBuilder()
-                .create();
+    private YoutubeSiteNetwork(Gson gson, OkHttpClient client) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_SITE_URL)
                 .client(client)
@@ -41,16 +44,16 @@ public class YoutubeSiteNetwork {
         youtubeSiteApi = retrofit.create(YoutubeSiteApi.class);
     }
 
-    public static YoutubeSiteNetwork getInstance() {
+    public static YoutubeSiteNetwork getInstance(Gson gson) {
         if (instance == null) {
-            instance = new YoutubeSiteNetwork();
+            instance = new YoutubeSiteNetwork(gson);
             return instance;
         } else return instance;
     }
 
-    public static YoutubeSiteNetwork getInstance(OkHttpClient client) {
+    public static YoutubeSiteNetwork getInstance(Gson gson, OkHttpClient client) {
         if (instance == null) {
-            instance = new YoutubeSiteNetwork(client);
+            instance = new YoutubeSiteNetwork(gson, client);
             return instance;
         } else return instance;
     }

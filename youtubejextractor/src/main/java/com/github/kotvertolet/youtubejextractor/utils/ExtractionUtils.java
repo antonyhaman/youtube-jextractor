@@ -15,11 +15,17 @@ import static java.util.Arrays.asList;
 
 public class ExtractionUtils {
 
-    public static boolean isVideoAgeRestricted(String videoPageHtml) {
+    private YoutubePlayerUtils youtubePlayerUtils;
+
+    public ExtractionUtils(YoutubePlayerUtils youtubePlayerUtils) {
+        this.youtubePlayerUtils = youtubePlayerUtils;
+    }
+
+    public boolean isVideoAgeRestricted(String videoPageHtml) {
         return videoPageHtml.contains("player-age-gate-content\">");
     }
 
-    public static String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) {
+    public String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) {
         Pattern pattern = Pattern.compile("sts\"\\s*:\\s*(\\d+)");
         Matcher matcher = pattern.matcher(embeddedVideoPageHtml);
         if (matcher.find()) {
@@ -42,7 +48,7 @@ public class ExtractionUtils {
         String playerType = matcher.group();
         switch (playerType) {
             case "js":
-                return YoutubePlayerUtils.downloadJsPlayer(playerUrl);
+                return youtubePlayerUtils.downloadJsPlayer(playerUrl);
             //TODO: This might be not necessary as swf player is outdated and not used anymore
             case "swf":
                 throw new UnsupportedOperationException("Swf player type is not supported");
@@ -52,7 +58,6 @@ public class ExtractionUtils {
     }
 
     public String extractDecryptFunctionName(String playerCode) throws ExtractionException {
-
         Pattern newPattern1 = Pattern.compile("\\b\\[cs\\]\\s*&&\\s*[adf]\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern newPattern2 = Pattern.compile("\\b[a-zA-Z0-9]+\\s*&&\\s*[a-zA-Z0-9]+\\.set\\([^,]+\\s*,\\s*encodeURIComponent\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern newPattern3 = Pattern.compile("\\b(?<sig>[a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)");
@@ -109,5 +114,4 @@ public class ExtractionUtils {
             throw new SignatureDecryptionException("Cannot create proper player url with url: " + playerUrl);
         return playerUrl;
     }
-
 }

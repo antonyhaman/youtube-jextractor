@@ -32,8 +32,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
-import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.extractStsFromVideoPageHtml;
-import static com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils.isVideoAgeRestricted;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlDecode;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlParamsToJson;
@@ -42,7 +40,9 @@ public class YoutubeJExtractor {
 
     private final static String ERROR_MESSAGE = "Extraction failed. Please, report here: https://github.com/kotvertolet/youtube-jextractor/issues. Error details: ";
     private final String TAG = getClass().getSimpleName();
-    private final YoutubeSiteNetwork youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
+    private final YoutubeSiteNetwork youtubeSiteNetwork;
+    private final YoutubePlayerUtils youtubePlayerUtils;
+    private final ExtractionUtils extractionUtils;
     private final Gson gson;
     private String videoPageHtml;
 
@@ -57,22 +57,27 @@ public class YoutubeJExtractor {
             }
         };
 
-        final Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, cipherDeserializer).create();
         JsonDeserializer<PlayerResponse> playerResponseJsonDeserializer = new JsonDeserializer<PlayerResponse>() {
             @Override
             public PlayerResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, cipherDeserializer).create();
                 String jsonRaw = json.getAsString();
                 return tempGson.fromJson(jsonRaw, PlayerResponse.class);
             }
         };
         gsonBuilder.registerTypeAdapter(PlayerResponse.class, playerResponseJsonDeserializer);
         gson = gsonBuilder.create();
+        youtubeSiteNetwork = YoutubeSiteNetwork.getInstance(gson);
+        youtubePlayerUtils = new YoutubePlayerUtils(youtubeSiteNetwork);
+        extractionUtils = new ExtractionUtils(youtubePlayerUtils);
     }
 
     public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
         try {
+            LogI(TAG, "Extracting video data from youtube page");
             PlayerResponse playerResponse = extractYoutubeVideoData(videoId);
             if (areStreamsAreEncrypted(playerResponse)) {
+                LogI(TAG, "Streams are encrypted, decrypting");
                 decryptYoutubeStreams(playerResponse);
             }
             return new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData());
@@ -88,17 +93,23 @@ public class YoutubeJExtractor {
             Pattern pageVerifyPattern = Pattern.compile("<link rel=\"canonical\"\\shref=(\"\\S+\")");
             videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
             if (!pageVerifyPattern.matcher(videoPageHtml).find()) {
-                throw new ExtractionException(ERROR_MESSAGE + String.format("Invalid video page received, maybe video id '%s' is not valid", videoId));
+                throw new ExtractionException(ERROR_MESSAGE + String.format("Invalid video page received, maybe video id '%s' is not valid. Video page recieved: %s", videoId, videoPageHtml));
             }
             //Protocol and domain are necessary to split url params correctly
             String urlProtocolAndDomain = "http://youtube.con/v?";
-            if (isVideoAgeRestricted(videoPageHtml)) {
+            if (extractionUtils.isVideoAgeRestricted(videoPageHtml)) {
+                LogI(TAG, "Age restricted video detected, getting video data from google apis");
                 String videoInfo = getVideoInfoForAgeRestrictedVideo(videoId);
                 url = new URL(urlProtocolAndDomain + videoInfo);
-                Map<String, String> infoMap = splitUrlParams(url);
-                playerResponse = gson.fromJson(gson.toJson(infoMap.get("player_response")), PlayerResponse.class);
+                Map<String, String> videoInfoMap = splitUrlParams(url);
+                String rawPlayerResponse = videoInfoMap.get("player_response");
+                if (rawPlayerResponse == null || rawPlayerResponse.isEmpty()) {
+                    throw new ExtractionException(ERROR_MESSAGE + "Player response extracted from video info was null or empty");
+                }
+                playerResponse = gson.fromJson(gson.toJson(videoInfoMap.get("player_response")), PlayerResponse.class);
 
             } else {
+                LogI(TAG, "Video is not age restricted, extracting youtube video player config");
                 playerResponse = extractYoutubePlayerConfig(videoId).getArgs().getPlayerResponse();
             }
         } catch (IOException e) {
@@ -118,20 +129,28 @@ public class YoutubeJExtractor {
             Pattern videoIsUnavailableMessagePattern = Pattern.compile("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>");
             matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
             if (matcher.find()) {
-                throw new ExtractionException(ERROR_MESSAGE + String.format("Cannot extract youtube player config, videoId was: %s, reason: %s", videoId, matcher.group(1)));
-            } else
-                throw new ExtractionException(ERROR_MESSAGE + "Cannot extract youtube player config, videoId was: " + videoId);
+                throw new ExtractionException(ERROR_MESSAGE +
+                        String.format("Cannot extract youtube player config, videoId was: %s, reason: %s",
+                                videoId, matcher.group(1)));
+            } else throw new ExtractionException(ERROR_MESSAGE +
+                    "Cannot extract youtube player config, videoId was: " + videoId);
         }
     }
 
     private String getVideoInfoForAgeRestrictedVideo(String videoId) throws ExtractionException {
         try {
-            LogI(TAG, "Age restricted video detected, videoId: " + videoId);
             this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
-            String sts = extractStsFromVideoPageHtml(videoPageHtml);
+            String sts = extractionUtils.extractStsFromVideoPageHtml(videoPageHtml);
             String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
             Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
-            return videoInfoResponse.body().string();
+            if (videoInfoResponse.body() != null) {
+                String videoInfo = videoInfoResponse.body().string();
+                if (videoInfo.isEmpty())
+                    throw new ExtractionException(ERROR_MESSAGE + "Video info was empty");
+                else return videoInfo;
+            } else {
+                throw new ExtractionException(ERROR_MESSAGE + "Video info response body was null or empty");
+            }
         } catch (IOException | NullPointerException | YoutubeRequestException e) {
             throw new ExtractionException(e);
         }
@@ -151,9 +170,7 @@ public class YoutubeJExtractor {
 
     private void decryptYoutubeStreams(PlayerResponse youtubeVideoData) throws ExtractionException, SignatureDecryptionException, YoutubeRequestException {
         List<AdaptiveFormatItem> streamItems = youtubeVideoData.getRawStreamingData().getAdaptiveFormats();
-
-        String playerUrl = YoutubePlayerUtils.getJsPlayerUrl(videoPageHtml);
-        ExtractionUtils extractionUtils = new ExtractionUtils();
+        String playerUrl = youtubePlayerUtils.getJsPlayerUrl(videoPageHtml);
         String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);
         String decryptFunctionName = extractionUtils.extractDecryptFunctionName(youtubeVideoPlayerCode);
         DecryptionUtils decryptionUtils = new DecryptionUtils(youtubeVideoPlayerCode, decryptFunctionName);
