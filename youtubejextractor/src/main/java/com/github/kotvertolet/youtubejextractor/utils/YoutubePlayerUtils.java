@@ -13,6 +13,12 @@ import retrofit2.Response;
 
 public class YoutubePlayerUtils {
 
+    private YoutubeSiteNetwork youtubeSiteNetwork;
+
+    public YoutubePlayerUtils(YoutubeSiteNetwork youtubeSiteNetwork) {
+        this.youtubeSiteNetwork = youtubeSiteNetwork;
+    }
+
     /**
      * Extracts url of js player from embedded youtube page
      *
@@ -21,7 +27,7 @@ public class YoutubePlayerUtils {
      * @throws ExtractionException if there is no video player url in html code which means that
      *                             there is some problem with regular expression or html code provided
      */
-    public static String getJsPlayerUrl(String videoPageHtml) throws ExtractionException {
+    public String getJsPlayerUrl(String videoPageHtml) throws ExtractionException {
         Pattern pattern = Pattern.compile("\"assets\":.+?\"js\":\\s*(\"[^\"]+\")");
         Matcher matcher = pattern.matcher(videoPageHtml);
 
@@ -42,9 +48,9 @@ public class YoutubePlayerUtils {
      * @return js code of the player
      * @throws YoutubeRequestException if the player url is invalid or there is connection problems
      */
-    public static String downloadJsPlayer(String playerUrl) throws YoutubeRequestException {
+    public String downloadJsPlayer(String playerUrl) throws YoutubeRequestException {
         try {
-            Response<ResponseBody> responseBody = YoutubeSiteNetwork.getInstance().downloadWebpage(playerUrl);
+            Response<ResponseBody> responseBody = youtubeSiteNetwork.downloadWebpage(playerUrl);
             return responseBody.body().string();
         } catch (IOException | NullPointerException e) {
             throw new YoutubeRequestException("Error while downloading youtube js video player", e);

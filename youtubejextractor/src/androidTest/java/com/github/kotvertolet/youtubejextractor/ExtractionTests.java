@@ -9,6 +9,7 @@ import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
 import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
+import com.google.gson.GsonBuilder;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 public class ExtractionTests {
 
     private YoutubeJExtractor youtubeJExtractor = new YoutubeJExtractor();
-    private YoutubeSiteNetwork youtubeSiteNetwork = YoutubeSiteNetwork.getInstance();
+    private YoutubeSiteNetwork youtubeSiteNetwork = YoutubeSiteNetwork.getInstance(new GsonBuilder().create());
     private YoutubeVideoData videoData;
 
     @Test(expected = ExtractionException.class)
@@ -94,8 +95,7 @@ public class ExtractionTests {
             responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getHlsManifestUrl());
             assertNotNull(responseBody);
             assertTrue(responseBody.isSuccessful());
-        }
-        else {
+        } else {
             for (VideoStreamItem videoStreamItem : videoData.getStreamingData().getVideoStreamItems()) {
                 responseBody = youtubeSiteNetwork.getStream(videoStreamItem.getUrl());
                 assertThat(String.format(streamErrorMask, videoStreamItem.toString()), responseBody, is(not(nullValue())));
