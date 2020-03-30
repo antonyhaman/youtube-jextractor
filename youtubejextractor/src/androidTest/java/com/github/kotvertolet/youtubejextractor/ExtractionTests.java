@@ -11,6 +11,8 @@ import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.Youtube
 import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
 import com.google.gson.GsonBuilder;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,10 +28,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class ExtractionTests {
-
+public class ExtractionTests extends TestCase {
     private YoutubeJExtractor youtubeJExtractor = new YoutubeJExtractor();
-    private YoutubeSiteNetwork youtubeSiteNetwork = YoutubeSiteNetwork.getInstance(new GsonBuilder().create());
+    private YoutubeSiteNetwork youtubeSiteNetwork = new YoutubeSiteNetwork(new GsonBuilder().create());
     private YoutubeVideoData videoData;
 
     @Test(expected = ExtractionException.class)

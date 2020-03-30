@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -46,28 +47,25 @@ public class YoutubeJExtractor {
     private final Gson gson;
     private String videoPageHtml;
 
+    /**
+     * No-args constructor
+     */
     public YoutubeJExtractor() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        JsonDeserializer<Cipher> cipherDeserializer = new JsonDeserializer<Cipher>() {
-            @Override
-            public Cipher deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                Cipher cipher = gson.fromJson(urlParamsToJson(json.getAsString()), Cipher.class);
-                cipher.setUrl(urlDecode(cipher.getUrl()));
-                return cipher;
-            }
-        };
+        gson = initGson();
+        youtubeSiteNetwork = new YoutubeSiteNetwork(gson);
+        youtubePlayerUtils = new YoutubePlayerUtils(youtubeSiteNetwork);
+        extractionUtils = new ExtractionUtils(youtubePlayerUtils);
+    }
 
-        JsonDeserializer<PlayerResponse> playerResponseJsonDeserializer = new JsonDeserializer<PlayerResponse>() {
-            @Override
-            public PlayerResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, cipherDeserializer).create();
-                String jsonRaw = json.getAsString();
-                return tempGson.fromJson(jsonRaw, PlayerResponse.class);
-            }
-        };
-        gsonBuilder.registerTypeAdapter(PlayerResponse.class, playerResponseJsonDeserializer);
-        gson = gsonBuilder.create();
-        youtubeSiteNetwork = YoutubeSiteNetwork.getInstance(gson);
+    /**
+     * Constructs YoutubeJExtractor with custom OkHttpClient instance which allows for ex.
+     * to use custom proxy to deal with region restricted video
+     *
+     * @param client Custom OkHttpClient instance
+     */
+    public YoutubeJExtractor(OkHttpClient client) {
+        gson = initGson();
+        youtubeSiteNetwork = new YoutubeSiteNetwork(gson, client);
         youtubePlayerUtils = new YoutubePlayerUtils(youtubeSiteNetwork);
         extractionUtils = new ExtractionUtils(youtubePlayerUtils);
     }
@@ -179,5 +177,28 @@ public class YoutubeJExtractor {
             String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
             streamItems.get(i).getCipher().setS(decryptedSignature);
         }
+    }
+
+    private Gson initGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        JsonDeserializer<Cipher> cipherDeserializer = new JsonDeserializer<Cipher>() {
+            @Override
+            public Cipher deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                Cipher cipher = gson.fromJson(urlParamsToJson(json.getAsString()), Cipher.class);
+                cipher.setUrl(urlDecode(cipher.getUrl()));
+                return cipher;
+            }
+        };
+
+        JsonDeserializer<PlayerResponse> playerResponseJsonDeserializer = new JsonDeserializer<PlayerResponse>() {
+            @Override
+            public PlayerResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, cipherDeserializer).create();
+                String jsonRaw = json.getAsString();
+                return tempGson.fromJson(jsonRaw, PlayerResponse.class);
+            }
+        };
+        gsonBuilder.registerTypeAdapter(PlayerResponse.class, playerResponseJsonDeserializer);
+        return gsonBuilder.create();
     }
 }

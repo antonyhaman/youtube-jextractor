@@ -15,7 +15,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'proguard-rules.pro'
         }
@@ -24,7 +24,7 @@ android {
             minifyEnabled false
         }
     }
-    buildToolsVersion = '29.0.1'
+    buildToolsVersion = '29.0.3'
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
