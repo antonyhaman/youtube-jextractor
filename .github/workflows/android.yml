@@ -21,18 +21,19 @@ jobs:
       
   test:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        api-level: [19, 25, 29]
+        target: [default]
     steps:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: run tests on 19 SDK
+    - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 19
-        script: ./gradlew connectedCheck
-
-    - name: run tests on 29 SDK
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 29
+        api-level: ${{ matrix.api-level }}
+        target: ${{ matrix.target }}
+        arch: x86
+        profile: Nexus 6
         script: ./gradlew connectedCheck
