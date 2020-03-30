@@ -9,8 +9,8 @@ This library was initially created for my android app [Youtube audio player](htt
 
 ## What's new?
 In 0.2.4 were added two main things:
-1. Possibility to use YoutubeJExtractor with custom OkHttpClient instance via the following one argument constructor - YoutubeJExtractor(OkHttpClient client). It could be usefull for region restricted video (via creating OkHttpClient instance with proxy).
-2. Implemented RequestExecutor class with executeWithRetry(...) method - now every http call will be executed up to 3 times before YoutubeRequestException throw, it will increase stability.
+1. Possibility to use YoutubeJExtractor with custom `OkHttpClient` instance via the following one argument constructor - `YoutubeJExtractor(OkHttpClient client)`. It could be usefull for region restricted video (via creating `OkHttpClient` instance with proxy).
+2. Implemented RequestExecutor class with `executeWithRetry(...)` method - now every http call will be executed up to 3 times before `YoutubeRequestException` throw, it will increase stability.
 
 ## How to use
 
