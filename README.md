@@ -35,7 +35,7 @@ Muxed streams are now supported! Thanks to @comptoost for enchancements request 
 video split across two main objects: **VideoDetails** and **StreamingData**.
 
 * **VideoDetails** contains various video data such as title, description, author, rating, view count, etc.
-* **StreamingData** contains two fields with the lists of streams (video and audio), ***dashManifestUrl*** and ***hlsManifestUrl*** fields which are contains links to the DASH and HLS manifests (if you dealing with a live stream) and ***expiresInSeconds*** which indicates how long links will be alive.
+* **StreamingData** contains two fields with the lists of adaptive streams (video and audio), ***muxedStreams** contains as the name implies muxed streams (streams that contain both audio and video) ***dashManifestUrl*** and ***hlsManifestUrl*** fields which are contains links to the DASH and HLS manifests (if you dealing with a live stream) and ***expiresInSeconds*** which indicates how long links will be alive.
  
 To get all the video streams:
 ```java
