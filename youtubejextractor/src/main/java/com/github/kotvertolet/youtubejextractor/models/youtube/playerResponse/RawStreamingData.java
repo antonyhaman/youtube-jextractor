@@ -1,22 +1,26 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class RawStreamingData {
 
-    private List<FormatsItem> formats;
+    @SerializedName("formats")
+    private List<MuxedStream> muxedStreams;
     private String probeUrl;
-    private List<AdaptiveFormatItem> adaptiveFormats;
+    @SerializedName("adaptiveFormats")
+    private List<AdaptiveStream> adaptiveStreams;
     private String expiresInSeconds;
     private String dashManifestUrl;
     private String hlsManifestUrl;
 
-    public List<FormatsItem> getFormats() {
-        return formats;
+    public List<MuxedStream> getMuxedStreams() {
+        return muxedStreams;
     }
 
-    public void setFormats(List<FormatsItem> formats) {
-        this.formats = formats;
+    public void setMuxedStreams(List<MuxedStream> muxedStreams) {
+        this.muxedStreams = muxedStreams;
     }
 
     public String getProbeUrl() {
@@ -27,12 +31,12 @@ public class RawStreamingData {
         this.probeUrl = probeUrl;
     }
 
-    public List<AdaptiveFormatItem> getAdaptiveFormats() {
-        return adaptiveFormats;
+    public List<AdaptiveStream> getAdaptiveStreams() {
+        return adaptiveStreams;
     }
 
-    public void setAdaptiveFormats(List<AdaptiveFormatItem> adaptiveFormats) {
-        this.adaptiveFormats = adaptiveFormats;
+    public void setAdaptiveStreams(List<AdaptiveStream> adaptiveStreams) {
+        this.adaptiveStreams = adaptiveStreams;
     }
 
     public String getExpiresInSeconds() {
@@ -66,10 +70,10 @@ public class RawStreamingData {
 
         RawStreamingData that = (RawStreamingData) o;
 
-        if (formats != null ? !formats.equals(that.formats) : that.formats != null) return false;
+        if (muxedStreams != null ? !muxedStreams.equals(that.muxedStreams) : that.muxedStreams != null) return false;
         if (probeUrl != null ? !probeUrl.equals(that.probeUrl) : that.probeUrl != null)
             return false;
-        if (adaptiveFormats != null ? !adaptiveFormats.equals(that.adaptiveFormats) : that.adaptiveFormats != null)
+        if (adaptiveStreams != null ? !adaptiveStreams.equals(that.adaptiveStreams) : that.adaptiveStreams != null)
             return false;
         if (expiresInSeconds != null ? !expiresInSeconds.equals(that.expiresInSeconds) : that.expiresInSeconds != null)
             return false;
@@ -80,9 +84,9 @@ public class RawStreamingData {
 
     @Override
     public int hashCode() {
-        int result = formats != null ? formats.hashCode() : 0;
+        int result = muxedStreams != null ? muxedStreams.hashCode() : 0;
         result = 31 * result + (probeUrl != null ? probeUrl.hashCode() : 0);
-        result = 31 * result + (adaptiveFormats != null ? adaptiveFormats.hashCode() : 0);
+        result = 31 * result + (adaptiveStreams != null ? adaptiveStreams.hashCode() : 0);
         result = 31 * result + (expiresInSeconds != null ? expiresInSeconds.hashCode() : 0);
         result = 31 * result + (dashManifestUrl != null ? dashManifestUrl.hashCode() : 0);
         result = 31 * result + (hlsManifestUrl != null ? hlsManifestUrl.hashCode() : 0);
@@ -92,9 +96,9 @@ public class RawStreamingData {
     @Override
     public String toString() {
         return "RawStreamingData{" +
-                "formats=" + formats +
+                "formats=" + muxedStreams +
                 ", probeUrl='" + probeUrl + '\'' +
-                ", adaptiveFormats=" + adaptiveFormats +
+                ", adaptiveFormats=" + adaptiveStreams +
                 ", expiresInSeconds='" + expiresInSeconds + '\'' +
                 ", dashManifestUrl='" + dashManifestUrl + '\'' +
                 ", hlsManifestUrl='" + hlsManifestUrl + '\'' +

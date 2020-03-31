@@ -1,6 +1,6 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class AdaptiveFormatItem {
+public class AdaptiveStream {
 
     private int itag;
     private Cipher cipher;

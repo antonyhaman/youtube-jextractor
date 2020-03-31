@@ -2,14 +2,14 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcel;
 
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 
-public class VideoStreamItem extends StreamItem {
+public class AdaptiveVideoStream extends StreamItem {
 
-    public static final Creator<VideoStreamItem> CREATOR = new Creator<VideoStreamItem>() {
+    public static final Creator<AdaptiveVideoStream> CREATOR = new Creator<AdaptiveVideoStream>() {
 
         @Override
-        public VideoStreamItem createFromParcel(Parcel source) {
+        public AdaptiveVideoStream createFromParcel(Parcel source) {
             String extension = source.readString();
             String codec = source.readString();
             int bitrate = source.readInt();
@@ -21,12 +21,12 @@ public class VideoStreamItem extends StreamItem {
             String size = source.readString();
             String qualityLabel = source.readString();
             String projectionType = source.readString();
-            return new VideoStreamItem(extension, codec, bitrate, iTag, url, averageBitrate, approxDurationMs, fps, size, qualityLabel, projectionType);
+            return new AdaptiveVideoStream(extension, codec, bitrate, iTag, url, averageBitrate, approxDurationMs, fps, size, qualityLabel, projectionType);
         }
 
         @Override
-        public VideoStreamItem[] newArray(int size) {
-            return new VideoStreamItem[0];
+        public AdaptiveVideoStream[] newArray(int size) {
+            return new AdaptiveVideoStream[0];
         }
     };
     private int fps;
@@ -35,7 +35,7 @@ public class VideoStreamItem extends StreamItem {
     private String projectionType;
 
 
-    public VideoStreamItem(String extension, String codec, int bitrate, int iTag, String url, int averageBitrate, int approxDurationMs, int fps, String size, String qualityLabel, String projectionType) {
+    public AdaptiveVideoStream(String extension, String codec, int bitrate, int iTag, String url, int averageBitrate, int approxDurationMs, int fps, String size, String qualityLabel, String projectionType) {
         super(extension, codec, bitrate, iTag, url, averageBitrate, approxDurationMs);
         this.fps = fps;
         this.size = size;
@@ -43,7 +43,7 @@ public class VideoStreamItem extends StreamItem {
         this.projectionType = projectionType;
     }
 
-    public VideoStreamItem(AdaptiveFormatItem adaptiveFormat) {
+    public AdaptiveVideoStream(AdaptiveStream adaptiveFormat) {
         super(adaptiveFormat);
         fps = adaptiveFormat.getFps();
         qualityLabel = adaptiveFormat.getQualityLabel();
@@ -108,7 +108,7 @@ public class VideoStreamItem extends StreamItem {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        VideoStreamItem that = (VideoStreamItem) o;
+        AdaptiveVideoStream that = (AdaptiveVideoStream) o;
 
         if (fps != that.fps) return false;
         if (size != null ? !size.equals(that.size) : that.size != null) return false;

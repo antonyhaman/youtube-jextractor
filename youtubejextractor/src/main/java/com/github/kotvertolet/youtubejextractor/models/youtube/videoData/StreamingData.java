@@ -3,10 +3,10 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.videoData;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.kotvertolet.youtubejextractor.models.AudioStreamItem;
-import com.github.kotvertolet.youtubejextractor.models.VideoStreamItem;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.FormatsItem;
+import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
+import com.github.kotvertolet.youtubejextractor.models.AdaptiveVideoStream;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -36,13 +36,13 @@ public class StreamingData implements Parcelable {
     @SerializedName("hlsManifestUrl")
     private String hlsManifestUrl;
     @SerializedName("formats")
-    private List<FormatsItem> formats;
+    private List<MuxedStream> muxedStreams;
     @SerializedName("probeUrl")
     private String probeUrl;
     @Expose
-    private List<AudioStreamItem> audioStreamItems;
+    private List<AdaptiveAudioStream> adaptiveAudioStreams;
     @Expose
-    private List<VideoStreamItem> videoStreamItems;
+    private List<AdaptiveVideoStream> adaptiveVideoStreams;
 
     public StreamingData() {
     }
@@ -52,24 +52,24 @@ public class StreamingData implements Parcelable {
         this.dashManifestUrl = rawStreamingData.getDashManifestUrl();
         this.hlsManifestUrl = rawStreamingData.getHlsManifestUrl();
         this.probeUrl = rawStreamingData.getProbeUrl();
-        this.formats = rawStreamingData.getFormats();
-        sortAdaptiveStreamsByType(rawStreamingData.getAdaptiveFormats());
+        this.muxedStreams = rawStreamingData.getMuxedStreams();
+        sortAdaptiveStreamsByType(rawStreamingData.getAdaptiveStreams());
     }
 
-    public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AudioStreamItem> audioStreamItems, List<VideoStreamItem> videoStreamItems) {
+    public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AdaptiveAudioStream> adaptiveAudioStreams, List<AdaptiveVideoStream> adaptiveVideoStreams) {
         this.expiresInSeconds = expiresInSeconds;
         this.dashManifestUrl = dashManifestUrl;
         this.hlsManifestUrl = hlsManifestUrl;
-        this.audioStreamItems = audioStreamItems;
-        this.videoStreamItems = videoStreamItems;
+        this.adaptiveAudioStreams = adaptiveAudioStreams;
+        this.adaptiveVideoStreams = adaptiveVideoStreams;
     }
 
     protected StreamingData(Parcel in) {
         expiresInSeconds = in.readString();
         dashManifestUrl = in.readString();
         hlsManifestUrl = in.readString();
-        audioStreamItems = in.createTypedArrayList(AudioStreamItem.CREATOR);
-        videoStreamItems = in.createTypedArrayList(VideoStreamItem.CREATOR);
+        adaptiveAudioStreams = in.createTypedArrayList(AdaptiveAudioStream.CREATOR);
+        adaptiveVideoStreams = in.createTypedArrayList(AdaptiveVideoStream.CREATOR);
     }
 
     public String getExpiresInSeconds() {
@@ -96,12 +96,12 @@ public class StreamingData implements Parcelable {
         this.hlsManifestUrl = hlsManifestUrl;
     }
 
-    public List<FormatsItem> getFormats() {
-        return formats;
+    public List<MuxedStream> getMuxedStreams() {
+        return muxedStreams;
     }
 
-    public void setFormats(List<FormatsItem> formats) {
-        this.formats = formats;
+    public void setMuxedStreams(List<MuxedStream> muxedStreams) {
+        this.muxedStreams = muxedStreams;
     }
 
     public String getProbeUrl() {
@@ -112,20 +112,20 @@ public class StreamingData implements Parcelable {
         this.probeUrl = probeUrl;
     }
 
-    public List<AudioStreamItem> getAudioStreamItems() {
-        return audioStreamItems;
+    public List<AdaptiveAudioStream> getAdaptiveAudioStreams() {
+        return adaptiveAudioStreams;
     }
 
-    public void setAudioStreamItems(List<AudioStreamItem> audioStreamItems) {
-        this.audioStreamItems = audioStreamItems;
+    public void setAdaptiveAudioStreams(List<AdaptiveAudioStream> adaptiveAudioStreams) {
+        this.adaptiveAudioStreams = adaptiveAudioStreams;
     }
 
-    public List<VideoStreamItem> getVideoStreamItems() {
-        return videoStreamItems;
+    public List<AdaptiveVideoStream> getAdaptiveVideoStreams() {
+        return adaptiveVideoStreams;
     }
 
-    public void setVideoStreamItems(List<VideoStreamItem> videoStreamItems) {
-        this.videoStreamItems = videoStreamItems;
+    public void setAdaptiveVideoStreams(List<AdaptiveVideoStream> adaptiveVideoStreams) {
+        this.adaptiveVideoStreams = adaptiveVideoStreams;
     }
 
     @Override
@@ -138,8 +138,8 @@ public class StreamingData implements Parcelable {
         dest.writeString(expiresInSeconds);
         dest.writeString(dashManifestUrl);
         dest.writeString(hlsManifestUrl);
-        dest.writeList(audioStreamItems);
-        dest.writeList(videoStreamItems);
+        dest.writeList(adaptiveAudioStreams);
+        dest.writeList(adaptiveVideoStreams);
     }
 
     @Override
@@ -155,9 +155,9 @@ public class StreamingData implements Parcelable {
             return false;
         if (hlsManifestUrl != null ? !hlsManifestUrl.equals(that.hlsManifestUrl) : that.hlsManifestUrl != null)
             return false;
-        if (audioStreamItems != null ? !audioStreamItems.equals(that.audioStreamItems) : that.audioStreamItems != null)
+        if (adaptiveAudioStreams != null ? !adaptiveAudioStreams.equals(that.adaptiveAudioStreams) : that.adaptiveAudioStreams != null)
             return false;
-        return videoStreamItems != null ? videoStreamItems.equals(that.videoStreamItems) : that.videoStreamItems == null;
+        return adaptiveVideoStreams != null ? adaptiveVideoStreams.equals(that.adaptiveVideoStreams) : that.adaptiveVideoStreams == null;
     }
 
     @Override
@@ -165,8 +165,8 @@ public class StreamingData implements Parcelable {
         int result = expiresInSeconds != null ? expiresInSeconds.hashCode() : 0;
         result = 31 * result + (dashManifestUrl != null ? dashManifestUrl.hashCode() : 0);
         result = 31 * result + (hlsManifestUrl != null ? hlsManifestUrl.hashCode() : 0);
-        result = 31 * result + (audioStreamItems != null ? audioStreamItems.hashCode() : 0);
-        result = 31 * result + (videoStreamItems != null ? videoStreamItems.hashCode() : 0);
+        result = 31 * result + (adaptiveAudioStreams != null ? adaptiveAudioStreams.hashCode() : 0);
+        result = 31 * result + (adaptiveVideoStreams != null ? adaptiveVideoStreams.hashCode() : 0);
         return result;
     }
 
@@ -176,26 +176,26 @@ public class StreamingData implements Parcelable {
                 "expiresInSeconds='" + expiresInSeconds + '\'' +
                 ", dashManifestUrl='" + dashManifestUrl + '\'' +
                 ", hlsManifestUrl='" + hlsManifestUrl + '\'' +
-                ", audioStreamItems=" + audioStreamItems +
-                ", videoStreamItems=" + videoStreamItems +
+                ", audioStreamItems=" + adaptiveAudioStreams +
+                ", videoStreamItems=" + adaptiveVideoStreams +
                 '}';
     }
 
-    private void sortAdaptiveStreamsByType(List<AdaptiveFormatItem> adaptiveFormats) {
-        List<VideoStreamItem> videoStreamItems = new ArrayList<>();
-        List<AudioStreamItem> audioStreamItems = new ArrayList<>();
+    private void sortAdaptiveStreamsByType(List<AdaptiveStream> adaptiveStreams) {
+        List<AdaptiveVideoStream> adaptiveVideoStreams = new ArrayList<>();
+        List<AdaptiveAudioStream> adaptiveAudioStreams = new ArrayList<>();
 
-        for (AdaptiveFormatItem adaptiveFormat : adaptiveFormats) {
+        for (AdaptiveStream adaptiveFormat : adaptiveStreams) {
             String mimeType = adaptiveFormat.getMimeType();
             if (mimeType.contains("audio")) {
-                audioStreamItems.add(new AudioStreamItem(adaptiveFormat));
+                adaptiveAudioStreams.add(new AdaptiveAudioStream(adaptiveFormat));
             } else if (mimeType.contains("video")) {
-                videoStreamItems.add(new VideoStreamItem(adaptiveFormat));
+                adaptiveVideoStreams.add(new AdaptiveVideoStream(adaptiveFormat));
             } else {
                 LogE(getClass().getSimpleName(), "Unknown stream type found: " + mimeType);
             }
         }
-        this.audioStreamItems = audioStreamItems;
-        this.videoStreamItems = videoStreamItems;
+        this.adaptiveAudioStreams = adaptiveAudioStreams;
+        this.adaptiveVideoStreams = adaptiveVideoStreams;
     }
 }
