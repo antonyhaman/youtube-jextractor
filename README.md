@@ -10,7 +10,7 @@ This library was initially created for my android app [Youtube audio player](htt
 ## What's new?
 
 ### v0.2.5:
-Muxed streams are now supported! Thanks to @comptoost for enchancements request #19
+Muxed streams are now supported! Thanks to @comptoost for enchancement request 
 
 ### v0.2.4:
 1. Possibility to use YoutubeJExtractor with custom `OkHttpClient` instance via the following one argument constructor - `YoutubeJExtractor(OkHttpClient client)`. It could be usefull for region restricted video (via creating `OkHttpClient` instance with proxy).
