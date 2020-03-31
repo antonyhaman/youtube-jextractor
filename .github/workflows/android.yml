@@ -19,21 +19,21 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
       
-  test:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        api-level: [19, 29]
-        target: [default]
-    steps:
-    - name: checkout
-      uses: actions/checkout@v2
+#   test:
+#     runs-on: macos-latest
+#     strategy:
+#       matrix:
+#         api-level: [19, 29]
+#         target: [default]
+#     steps:
+#     - name: checkout
+#       uses: actions/checkout@v2
 
-    - name: run tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        target: ${{ matrix.target }}
-        arch: x86
-        profile: Nexus 6
-        script: ./gradlew connectedCheck
+#     - name: run tests
+#       uses: reactivecircus/android-emulator-runner@v2
+#       with:
+#         api-level: ${{ matrix.api-level }}
+#         target: ${{ matrix.target }}
+#         arch: x86
+#         profile: Nexus 6
+#         script: ./gradlew connectedCheck
