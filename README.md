@@ -8,10 +8,11 @@ This library was initially created for my android app [Youtube audio player](htt
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 
 ## What's new?
-### 0.2.5
+
+### v0.2.5:
 Muxed streams are now supported! Thanks to @comptoost for enchancements request #19
 
-###In 0.2.4 were added two main things:
+### v0.2.4:
 1. Possibility to use YoutubeJExtractor with custom `OkHttpClient` instance via the following one argument constructor - `YoutubeJExtractor(OkHttpClient client)`. It could be usefull for region restricted video (via creating `OkHttpClient` instance with proxy).
 2. Implemented RequestExecutor class with `executeWithRetry(...)` method - now every http call will be executed up to 3 times before `YoutubeRequestException` throw, it will increase stability.
 
