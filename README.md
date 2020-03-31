@@ -3,6 +3,13 @@
 YoutubeJExtractor is Android library that allows you to extract youtube video and audio from any youtube video along with some other data such as a video title, description, author, thumbnails and others.
 
 This library was initially created for my android app [Youtube audio player](https://github.com/kotvertolet/youtube-audio-player)
+## Features
+1. Extracts video and audio streams from Youtube videos. Supports both adaptive and muxed streams.
+2. Extracts various video data like title, description, view count, channel id, etc.
+3. Supports age restricted videos.
+4. Supports videos with restricted embedding.
+5. Supports regon restricted videos (through a proxy).
+6. Supports HLS and DASH live streams.
  
 ## How to install
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
@@ -39,13 +46,14 @@ video split across two main objects: **VideoDetails** and **StreamingData**.
  
 To get all the video streams:
 ```java
-    List<VideoStreamItem> videoStreamsList = videoData.getStreamingData().getVideoStreamItems()
+    List<AdaptiveVideoStream> videoStreamsList = videoData.getStreamingData().getAdaptiveVideoStreams()
 ``` 
 
-Each StreamItem object contains fields that describe the stream such as
- it's ***extension*** (like mp4, ogg, etc),
- ***codec***, ***bitrate***, ***url*** and many others. 
- Check *VideoStreamItem.class* and *AudioStreamItem.class* for the details.
+Each StreamItem object contains fields that describe the stream such as:
+* it's ***extension*** (like mp4, ogg, etc),
+* ***codec***, ***bitrate***, ***url*** and many others. 
+
+ Check `AdaptiveVideoStream.class` and `AdaptiveAudioStream.class` for the details.
 
 ## Requirements
 
