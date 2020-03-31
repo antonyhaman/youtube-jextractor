@@ -1,5 +1,8 @@
 # Change Log
 
+## v0.2.5
+* Implemented support for muxed streams (streams with both audio and video)
+
 ## v0.2.4
 * Added possibility to use custom OkHttpClient, it allows to deal with region restricted videos.
 * Implemented executeWithRetry() function for network calls, now each request will be executed up to 3 times before ExtractionException throw.
