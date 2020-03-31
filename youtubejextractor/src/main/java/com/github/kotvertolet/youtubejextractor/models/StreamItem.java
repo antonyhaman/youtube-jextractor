@@ -2,7 +2,7 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcelable;
 
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 
 public abstract class StreamItem implements Parcelable {
 
@@ -24,15 +24,15 @@ public abstract class StreamItem implements Parcelable {
         this.approxDurationMs = approxDurationMs;
     }
 
-    protected StreamItem(AdaptiveFormatItem adaptiveFormatItem) {
-        String[] mimeTypeArr = adaptiveFormatItem.getMimeType().split("[/;]");
+    protected StreamItem(AdaptiveStream adaptiveStream) {
+        String[] mimeTypeArr = adaptiveStream.getMimeType().split("[/;]");
         extension = mimeTypeArr[1];
         codec = mimeTypeArr[2].split("=")[1].replaceAll("\"", "");
-        url = adaptiveFormatItem.getUrl();
-        iTag = adaptiveFormatItem.getItag();
-        bitrate = adaptiveFormatItem.getBitrate();
-        averageBitrate = adaptiveFormatItem.getAverageBitrate();
-        String rawDuration = adaptiveFormatItem.getApproxDurationMs();
+        url = adaptiveStream.getUrl();
+        iTag = adaptiveStream.getItag();
+        bitrate = adaptiveStream.getBitrate();
+        averageBitrate = adaptiveStream.getAverageBitrate();
+        String rawDuration = adaptiveStream.getApproxDurationMs();
         approxDurationMs = rawDuration == null ? 0 : Integer.valueOf(rawDuration);
     }
 

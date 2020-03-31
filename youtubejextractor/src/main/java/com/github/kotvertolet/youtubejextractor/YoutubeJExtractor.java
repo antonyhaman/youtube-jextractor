@@ -4,8 +4,9 @@ import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.VideoPlayerConfig;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.Cipher;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.PlayerResponse;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
@@ -158,7 +159,7 @@ public class YoutubeJExtractor {
         // Even if a single stream is encrypted it means they all are
         RawStreamingData rawStreamingData = playerResponse.getRawStreamingData();
         if (rawStreamingData != null) {
-            List<AdaptiveFormatItem> formatItems = rawStreamingData.getAdaptiveFormats();
+            List<AdaptiveStream> formatItems = rawStreamingData.getAdaptiveStreams();
             if (formatItems != null && formatItems.size() > 0) {
                 return formatItems.get(0).getCipher() != null;
             } else
@@ -167,15 +168,22 @@ public class YoutubeJExtractor {
     }
 
     private void decryptYoutubeStreams(PlayerResponse youtubeVideoData) throws ExtractionException, SignatureDecryptionException, YoutubeRequestException {
-        List<AdaptiveFormatItem> streamItems = youtubeVideoData.getRawStreamingData().getAdaptiveFormats();
+        List<AdaptiveStream> adaptiveStreams = youtubeVideoData.getRawStreamingData().getAdaptiveStreams();
+        List<MuxedStream> muxedStreams = youtubeVideoData.getRawStreamingData().getMuxedStreams();
+
         String playerUrl = youtubePlayerUtils.getJsPlayerUrl(videoPageHtml);
         String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);
         String decryptFunctionName = extractionUtils.extractDecryptFunctionName(youtubeVideoPlayerCode);
         DecryptionUtils decryptionUtils = new DecryptionUtils(youtubeVideoPlayerCode, decryptFunctionName);
-        for (int i = 0; i < streamItems.size(); i++) {
-            String encryptedSignature = streamItems.get(i).getCipher().getS();
+        for (int i = 0; i < adaptiveStreams.size(); i++) {
+            String encryptedSignature = adaptiveStreams.get(i).getCipher().getS();
             String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
-            streamItems.get(i).getCipher().setS(decryptedSignature);
+            adaptiveStreams.get(i).getCipher().setS(decryptedSignature);
+        }
+        for (int i = 0; i < muxedStreams.size(); i++) {
+            String encryptedSignature = muxedStreams.get(i).getCipher().getS();
+            String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
+            muxedStreams.get(i).getCipher().setS(decryptedSignature);
         }
     }
 

@@ -2,14 +2,14 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcel;
 
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveFormatItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 
-public class AudioStreamItem extends StreamItem {
+public class AdaptiveAudioStream extends StreamItem {
 
-    public static final Creator<AudioStreamItem> CREATOR = new Creator<AudioStreamItem>() {
+    public static final Creator<AdaptiveAudioStream> CREATOR = new Creator<AdaptiveAudioStream>() {
 
         @Override
-        public AudioStreamItem createFromParcel(Parcel source) {
+        public AdaptiveAudioStream createFromParcel(Parcel source) {
             String extension = source.readString();
             String codec = source.readString();
             int bitrate = source.readInt();
@@ -19,29 +19,29 @@ public class AudioStreamItem extends StreamItem {
             int audioSampleRate = source.readInt();
             int averageBitrate = source.readInt();
             int approxDurationMs = source.readInt();
-            return new AudioStreamItem(extension, codec, bitrate, iTag, url, audioChannels,
+            return new AdaptiveAudioStream(extension, codec, bitrate, iTag, url, audioChannels,
                     audioSampleRate, averageBitrate, approxDurationMs);
         }
 
         @Override
-        public AudioStreamItem[] newArray(int size) {
-            return new AudioStreamItem[size];
+        public AdaptiveAudioStream[] newArray(int size) {
+            return new AdaptiveAudioStream[size];
         }
     };
     private int audioChannels;
     private int audioSampleRate;
 
-    public AudioStreamItem(String extension, String codec, int bitrate, int iTag, String url,
-                           int audioChannels, int audioSampleRate, int averageBitrate, int approxDurationMs) {
+    public AdaptiveAudioStream(String extension, String codec, int bitrate, int iTag, String url,
+                               int audioChannels, int audioSampleRate, int averageBitrate, int approxDurationMs) {
         super(extension, codec, bitrate, iTag, url, averageBitrate, approxDurationMs);
         this.audioChannels = audioChannels;
         this.audioSampleRate = audioSampleRate;
     }
 
-    public AudioStreamItem(AdaptiveFormatItem adaptiveFormatItem) {
-        super(adaptiveFormatItem);
-        audioChannels = adaptiveFormatItem.getAudioChannels();
-        audioSampleRate = Integer.valueOf(adaptiveFormatItem.getAudioSampleRate());
+    public AdaptiveAudioStream(AdaptiveStream adaptiveStream) {
+        super(adaptiveStream);
+        audioChannels = adaptiveStream.getAudioChannels();
+        audioSampleRate = Integer.valueOf(adaptiveStream.getAudioSampleRate());
     }
 
     public int getAudioChannels() {
@@ -84,7 +84,7 @@ public class AudioStreamItem extends StreamItem {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        AudioStreamItem that = (AudioStreamItem) o;
+        AdaptiveAudioStream that = (AdaptiveAudioStream) o;
 
         if (audioChannels != that.audioChannels) return false;
         return audioSampleRate == that.audioSampleRate;

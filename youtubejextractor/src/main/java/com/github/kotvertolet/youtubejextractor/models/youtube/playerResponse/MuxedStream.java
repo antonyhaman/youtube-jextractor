@@ -1,156 +1,187 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class FormatsItem {
+import android.os.Parcel;
+import android.os.Parcelable;
 
+import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
+import com.google.gson.annotations.SerializedName;
+
+public class MuxedStream {
+
+    @SerializedName("itag")
     private int itag;
+    @SerializedName("cipher")
     private Cipher cipher;
+    @SerializedName("projectionType")
     private String projectionType;
+    @SerializedName("bitrate")
     private int bitrate;
+    @SerializedName("mimeType")
     private String mimeType;
+    @SerializedName("audioQuality")
     private String audioQuality;
+    @SerializedName("approxDurationMs")
     private String approxDurationMs;
+    @SerializedName("audioSampleRate")
     private String audioSampleRate;
+    @SerializedName("quality")
     private String quality;
+    @SerializedName("qualityLabel")
     private String qualityLabel;
+    @SerializedName("audioChannels")
     private int audioChannels;
+    @SerializedName("width")
     private int width;
+    @SerializedName("contentLength")
     private String contentLength;
+    @SerializedName("lastModified")
     private String lastModified;
+    @SerializedName("height")
     private int height;
+    @SerializedName("averageBitrate")
     private int averageBitrate;
-
-    public int getItag() {
-        return itag;
-    }
+    @SerializedName("url")
+    private String url;
 
     public void setItag(int itag) {
         this.itag = itag;
     }
 
-    public Cipher getCipher() {
-        return cipher;
+    public int getItag() {
+        return itag;
     }
 
     public void setCipher(Cipher cipher) {
         this.cipher = cipher;
     }
 
-    public String getProjectionType() {
-        return projectionType;
+    public Cipher getCipher() {
+        return cipher;
     }
 
     public void setProjectionType(String projectionType) {
         this.projectionType = projectionType;
     }
 
-    public int getBitrate() {
-        return bitrate;
+    public String getProjectionType() {
+        return projectionType;
     }
 
     public void setBitrate(int bitrate) {
         this.bitrate = bitrate;
     }
 
-    public String getMimeType() {
-        return mimeType;
+    public int getBitrate() {
+        return bitrate;
     }
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
     }
 
-    public String getAudioQuality() {
-        return audioQuality;
+    public String getMimeType() {
+        return mimeType;
     }
 
     public void setAudioQuality(String audioQuality) {
         this.audioQuality = audioQuality;
     }
 
-    public String getApproxDurationMs() {
-        return approxDurationMs;
+    public String getAudioQuality() {
+        return audioQuality;
     }
 
     public void setApproxDurationMs(String approxDurationMs) {
         this.approxDurationMs = approxDurationMs;
     }
 
-    public String getAudioSampleRate() {
-        return audioSampleRate;
+    public String getApproxDurationMs() {
+        return approxDurationMs;
     }
 
     public void setAudioSampleRate(String audioSampleRate) {
         this.audioSampleRate = audioSampleRate;
     }
 
-    public String getQuality() {
-        return quality;
+    public String getAudioSampleRate() {
+        return audioSampleRate;
     }
 
     public void setQuality(String quality) {
         this.quality = quality;
     }
 
-    public String getQualityLabel() {
-        return qualityLabel;
+    public String getQuality() {
+        return quality;
     }
 
     public void setQualityLabel(String qualityLabel) {
         this.qualityLabel = qualityLabel;
     }
 
-    public int getAudioChannels() {
-        return audioChannels;
+    public String getQualityLabel() {
+        return qualityLabel;
     }
 
     public void setAudioChannels(int audioChannels) {
         this.audioChannels = audioChannels;
     }
 
-    public int getWidth() {
-        return width;
+    public int getAudioChannels() {
+        return audioChannels;
     }
 
     public void setWidth(int width) {
         this.width = width;
     }
 
-    public String getContentLength() {
-        return contentLength;
+    public int getWidth() {
+        return width;
     }
 
     public void setContentLength(String contentLength) {
         this.contentLength = contentLength;
     }
 
-    public String getLastModified() {
-        return lastModified;
+    public String getContentLength() {
+        return contentLength;
     }
 
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
     }
 
-    public int getHeight() {
-        return height;
+    public String getLastModified() {
+        return lastModified;
     }
 
     public void setHeight(int height) {
         this.height = height;
     }
 
-    public int getAverageBitrate() {
-        return averageBitrate;
+    public int getHeight() {
+        return height;
     }
 
     public void setAverageBitrate(int averageBitrate) {
         this.averageBitrate = averageBitrate;
     }
 
+    public int getAverageBitrate() {
+        return averageBitrate;
+    }
+
+    public String getUrl() {
+        if (url == null && getCipher() != null) {
+            url = String.format("%s&%s=%s", getCipher().getUrl(), getCipher().getSp(), getCipher().getS());
+        }
+        return url;
+    }
+
     @Override
     public String toString() {
         return
-                "FormatsItem{" +
+                "NonAdaptiveFormatItem{" +
                         "itag = '" + itag + '\'' +
                         ",cipher = '" + cipher + '\'' +
                         ",projectionType = '" + projectionType + '\'' +
