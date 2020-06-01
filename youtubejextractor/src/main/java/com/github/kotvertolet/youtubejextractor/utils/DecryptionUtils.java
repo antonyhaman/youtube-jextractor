@@ -142,7 +142,7 @@ public class DecryptionUtils {
                 if (argNames.contains(variable)) {
                     continue;
                 } else {
-                    if (!objectFieldsAndStatements.keySet().contains(member)) {
+                    if (!objectFieldsAndStatements.containsKey(member)) {
                         objectFieldsAndStatements.putAll(extractJsObject(variable));
                     }
                 }

@@ -71,7 +71,8 @@ public class RawStreamingData implements Serializable {
 
         RawStreamingData that = (RawStreamingData) o;
 
-        if (muxedStreams != null ? !muxedStreams.equals(that.muxedStreams) : that.muxedStreams != null) return false;
+        if (muxedStreams != null ? !muxedStreams.equals(that.muxedStreams) : that.muxedStreams != null)
+            return false;
         if (probeUrl != null ? !probeUrl.equals(that.probeUrl) : that.probeUrl != null)
             return false;
         if (adaptiveStreams != null ? !adaptiveStreams.equals(that.adaptiveStreams) : that.adaptiveStreams != null)

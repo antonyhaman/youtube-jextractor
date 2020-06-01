@@ -20,6 +20,7 @@ public class YoutubeSiteNetwork {
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
+        httpClient.addInterceptor(new UserAgentInterceptor());
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_SITE_URL)

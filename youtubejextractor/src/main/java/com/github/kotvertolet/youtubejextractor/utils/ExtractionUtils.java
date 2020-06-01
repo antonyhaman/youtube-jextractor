@@ -22,7 +22,7 @@ public class ExtractionUtils {
     }
 
     public boolean isVideoAgeRestricted(String videoPageHtml) {
-        return videoPageHtml.contains("player-age-gate-content\">");
+        return videoPageHtml.contains("LOGIN_REQUIRED");
     }
 
     public String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) {
