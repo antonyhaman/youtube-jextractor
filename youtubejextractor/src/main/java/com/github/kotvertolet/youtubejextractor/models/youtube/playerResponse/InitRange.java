@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class InitRange {
+import java.io.Serializable;
+
+public class InitRange implements Serializable {
 
     private String start;
     private String end;

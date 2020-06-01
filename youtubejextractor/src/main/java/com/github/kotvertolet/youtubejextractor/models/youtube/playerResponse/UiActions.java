@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class UiActions {
+import java.io.Serializable;
+
+public class UiActions implements Serializable {
     private boolean hideEnclosingContainer;
 
     public boolean isHideEnclosingContainer() {

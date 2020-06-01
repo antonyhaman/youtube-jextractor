@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class AtrUrl {
+import java.io.Serializable;
+
+public class AtrUrl implements Serializable {
 
     private String baseUrl;
     private int elapsedMediaTimeSeconds;

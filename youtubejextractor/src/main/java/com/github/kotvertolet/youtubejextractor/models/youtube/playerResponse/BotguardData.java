@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class BotguardData {
+import java.io.Serializable;
+
+public class BotguardData implements Serializable {
 
     private String interpreterUrl;
     private String program;

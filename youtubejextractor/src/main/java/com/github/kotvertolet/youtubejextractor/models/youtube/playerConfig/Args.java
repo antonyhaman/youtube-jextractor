@@ -3,7 +3,9 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.PlayerResponse;
 import com.google.gson.annotations.SerializedName;
 
-public class Args {
+import java.io.Serializable;
+
+public class Args implements Serializable {
 
     @SerializedName("show_content_thumbnail")
     private boolean showContentThumbnail;

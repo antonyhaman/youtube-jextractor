@@ -23,10 +23,7 @@ import retrofit2.Response;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class ExtractionTests extends TestCase {
@@ -88,7 +85,7 @@ public class ExtractionTests extends TestCase {
     }
 
     @Test
-    public void checkMuxedStreamNonEncrypted()  throws YoutubeRequestException, ExtractionException {
+    public void checkMuxedStreamNonEncrypted() throws YoutubeRequestException, ExtractionException {
         videoData = youtubeJExtractor.extract("8QyDmvuts9s");
         checkIfStreamsWork(videoData);
     }

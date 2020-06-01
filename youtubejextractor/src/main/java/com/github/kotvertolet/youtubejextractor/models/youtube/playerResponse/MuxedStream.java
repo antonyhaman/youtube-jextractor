@@ -1,16 +1,14 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
 import com.google.gson.annotations.SerializedName;
 
-public class MuxedStream {
+import java.io.Serializable;
+
+public class MuxedStream implements Serializable {
 
     @SerializedName("itag")
     private int itag;
-    @SerializedName("cipher")
+    @SerializedName("signatureCipher")
     private Cipher cipher;
     @SerializedName("projectionType")
     private String projectionType;

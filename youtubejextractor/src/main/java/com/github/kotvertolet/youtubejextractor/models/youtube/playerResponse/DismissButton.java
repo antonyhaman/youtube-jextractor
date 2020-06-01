@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class DismissButton {
+import java.io.Serializable;
+
+public class DismissButton implements Serializable {
 
     private ButtonRenderer buttonRenderer;
 

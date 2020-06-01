@@ -1,8 +1,9 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MessageTextsItem {
+public class MessageTextsItem implements Serializable {
 
     private List<RunsItem> runs;
 

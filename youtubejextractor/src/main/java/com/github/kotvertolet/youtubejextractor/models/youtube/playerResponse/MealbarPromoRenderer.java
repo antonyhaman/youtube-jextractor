@@ -1,8 +1,9 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MealbarPromoRenderer {
+public class MealbarPromoRenderer implements Serializable {
 
     private String triggerCondition;
     private String trackingParams;

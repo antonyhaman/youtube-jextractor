@@ -1,6 +1,9 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class ActionButton {
+import java.io.Serializable;
+
+public class ActionButton implements Serializable {
+
     private ButtonRenderer buttonRenderer;
 
     public ButtonRenderer getButtonRenderer() {

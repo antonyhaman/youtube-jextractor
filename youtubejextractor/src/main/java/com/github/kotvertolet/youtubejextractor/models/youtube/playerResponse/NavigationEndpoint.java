@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class NavigationEndpoint {
+import java.io.Serializable;
+
+public class NavigationEndpoint implements Serializable {
 
     private String clickTrackingParams;
     private UrlEndpoint urlEndpoint;

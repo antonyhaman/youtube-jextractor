@@ -1,8 +1,9 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Thumbnail {
+public class Thumbnail implements Serializable {
     private List<ThumbnailsItem> thumbnails;
 
     public List<ThumbnailsItem> getThumbnails() {

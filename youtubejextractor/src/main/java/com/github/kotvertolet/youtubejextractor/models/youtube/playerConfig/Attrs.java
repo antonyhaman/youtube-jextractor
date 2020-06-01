@@ -2,7 +2,9 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Attrs {
+import java.io.Serializable;
+
+public class Attrs implements Serializable {
 
     @SerializedName("id")
     private String id;

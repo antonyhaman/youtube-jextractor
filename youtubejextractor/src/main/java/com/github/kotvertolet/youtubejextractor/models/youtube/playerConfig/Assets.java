@@ -2,7 +2,9 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Assets {
+import java.io.Serializable;
+
+public class Assets implements Serializable {
 
     @SerializedName("css")
     private String css;

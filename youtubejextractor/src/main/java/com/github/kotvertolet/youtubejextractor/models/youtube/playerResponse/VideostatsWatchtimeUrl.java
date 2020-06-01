@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class VideostatsWatchtimeUrl {
+import java.io.Serializable;
+
+public class VideostatsWatchtimeUrl implements Serializable {
 
     private String baseUrl;
 

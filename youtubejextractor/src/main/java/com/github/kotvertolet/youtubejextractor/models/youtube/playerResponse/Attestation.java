@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class Attestation {
+import java.io.Serializable;
+
+public class Attestation implements Serializable {
 
     private PlayerAttestationRenderer playerAttestationRenderer;
 

@@ -2,7 +2,9 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VideoPlayerConfig {
+import java.io.Serializable;
+
+public class VideoPlayerConfig implements Serializable {
 
     @SerializedName("args")
     private Args args;

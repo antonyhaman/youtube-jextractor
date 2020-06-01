@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class ImpressionEndpointsItem {
+import java.io.Serializable;
+
+public class ImpressionEndpointsItem implements Serializable {
 
     private FeedbackEndpoint feedbackEndpoint;
     private String clickTrackingParams;

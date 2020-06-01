@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class Title {
+import java.io.Serializable;
+
+public class Title implements Serializable {
     private String simpleText;
 
     public String getSimpleText() {

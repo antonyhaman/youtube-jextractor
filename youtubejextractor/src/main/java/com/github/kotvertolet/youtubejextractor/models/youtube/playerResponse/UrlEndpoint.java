@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class UrlEndpoint {
+import java.io.Serializable;
+
+public class UrlEndpoint implements Serializable {
     private String url;
 
     public String getUrl() {

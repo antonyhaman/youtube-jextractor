@@ -3,9 +3,10 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.VideoDetails;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PlayerResponse {
+public class PlayerResponse implements Serializable {
 
     private PlayerConfig playerConfig;
     private String trackingParams;

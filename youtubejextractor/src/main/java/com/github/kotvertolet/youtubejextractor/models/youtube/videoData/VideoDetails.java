@@ -5,10 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class VideoDetails implements Parcelable {
+public class VideoDetails implements Parcelable, Serializable {
 
     public static final Creator<VideoDetails> CREATOR = new Creator<VideoDetails>() {
         @Override

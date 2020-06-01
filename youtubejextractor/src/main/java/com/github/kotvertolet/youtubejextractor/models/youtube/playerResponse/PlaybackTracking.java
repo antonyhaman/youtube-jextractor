@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class PlaybackTracking {
+import java.io.Serializable;
+
+public class PlaybackTracking implements Serializable {
     private VideostatsWatchtimeUrl videostatsWatchtimeUrl;
     private VideostatsDelayplayUrl videostatsDelayplayUrl;
     private QoeUrl qoeUrl;

@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class ServiceEndpoint {
+import java.io.Serializable;
+
+public class ServiceEndpoint implements Serializable {
     private FeedbackEndpoint feedbackEndpoint;
     private String clickTrackingParams;
 

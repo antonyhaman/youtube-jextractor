@@ -5,10 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class Thumbnail implements Parcelable {
+public class Thumbnail implements Parcelable, Serializable {
 
     public static final Creator<Thumbnail> CREATOR = new Creator<Thumbnail>() {
         @Override

@@ -1,8 +1,9 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PlayerMicroformatRenderer {
+public class PlayerMicroformatRenderer implements Serializable {
     private Thumbnail thumbnail;
     private String ownerGplusProfileUrl;
     private String externalChannelId;

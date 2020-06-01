@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class Microformat {
+import java.io.Serializable;
+
+public class Microformat implements Serializable {
 
     private PlayerMicroformatRenderer playerMicroformatRenderer;
 

@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class ThumbnailsItem {
+import java.io.Serializable;
+
+public class ThumbnailsItem implements Serializable {
     private int width;
     private String url;
     private int height;

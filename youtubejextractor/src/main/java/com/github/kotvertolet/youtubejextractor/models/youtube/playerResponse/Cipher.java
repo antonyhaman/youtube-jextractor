@@ -1,8 +1,10 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
+import java.io.Serializable;
+
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlDecode;
 
-public class Cipher {
+public class Cipher implements Serializable {
 
     private String s;
     private String sp;
