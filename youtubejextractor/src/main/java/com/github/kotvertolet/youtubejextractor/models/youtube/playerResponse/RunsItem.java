@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class RunsItem {
+import java.io.Serializable;
+
+public class RunsItem implements Serializable {
     private String text;
 
     public String getText() {

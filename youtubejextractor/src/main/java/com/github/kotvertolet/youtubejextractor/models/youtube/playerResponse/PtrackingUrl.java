@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class PtrackingUrl {
+import java.io.Serializable;
+
+public class PtrackingUrl implements Serializable {
     private String baseUrl;
 
     public String getBaseUrl() {

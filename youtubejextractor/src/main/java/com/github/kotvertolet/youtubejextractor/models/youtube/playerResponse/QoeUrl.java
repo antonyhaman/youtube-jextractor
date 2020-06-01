@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class QoeUrl {
+import java.io.Serializable;
+
+public class QoeUrl implements Serializable {
     private String baseUrl;
 
     public String getBaseUrl() {

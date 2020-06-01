@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class VideostatsDelayplayUrl {
+import java.io.Serializable;
+
+public class VideostatsDelayplayUrl implements Serializable {
     private String baseUrl;
 
     public String getBaseUrl() {

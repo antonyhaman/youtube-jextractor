@@ -6,8 +6,10 @@ import android.os.Parcelable;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 
-public class YoutubeVideoData implements Parcelable {
+
+public class YoutubeVideoData implements Parcelable, Serializable {
 
     public static final Creator<YoutubeVideoData> CREATOR = new Creator<YoutubeVideoData>() {
         @Override

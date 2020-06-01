@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class DynamicReadaheadConfig {
+import java.io.Serializable;
+
+public class DynamicReadaheadConfig implements Serializable {
 
     private int readAheadGrowthRateMs;
     private int maxReadAheadMediaTimeMs;

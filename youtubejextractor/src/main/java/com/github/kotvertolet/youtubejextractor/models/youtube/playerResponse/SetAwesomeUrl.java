@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class SetAwesomeUrl {
+import java.io.Serializable;
+
+public class SetAwesomeUrl implements Serializable {
     private String baseUrl;
     private int elapsedMediaTimeSeconds;
 

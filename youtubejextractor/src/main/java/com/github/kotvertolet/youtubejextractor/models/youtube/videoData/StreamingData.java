@@ -11,12 +11,13 @@ import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.Ra
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogE;
 
-public class StreamingData implements Parcelable {
+public class StreamingData implements Parcelable, Serializable {
 
     public static final Creator<StreamingData> CREATOR = new Creator<StreamingData>() {
         @Override

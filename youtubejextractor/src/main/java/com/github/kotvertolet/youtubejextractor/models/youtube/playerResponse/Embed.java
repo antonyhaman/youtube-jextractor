@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class Embed {
+import java.io.Serializable;
+
+public class Embed implements Serializable {
 
     private int width;
     private String flashUrl;

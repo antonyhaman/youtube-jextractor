@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class FeedbackEndpoint {
+import java.io.Serializable;
+
+public class FeedbackEndpoint implements Serializable {
 
     private UiActions uiActions;
     private String feedbackToken;

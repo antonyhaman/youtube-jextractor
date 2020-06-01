@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class Storyboards {
+import java.io.Serializable;
+
+public class Storyboards implements Serializable {
     private PlayerStoryboardSpecRenderer playerStoryboardSpecRenderer;
 
     public PlayerStoryboardSpecRenderer getPlayerStoryboardSpecRenderer() {

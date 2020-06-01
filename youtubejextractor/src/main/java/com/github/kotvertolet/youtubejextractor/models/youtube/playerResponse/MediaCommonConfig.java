@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class MediaCommonConfig {
+import java.io.Serializable;
+
+public class MediaCommonConfig implements Serializable {
 
     private DynamicReadaheadConfig dynamicReadaheadConfig;
 

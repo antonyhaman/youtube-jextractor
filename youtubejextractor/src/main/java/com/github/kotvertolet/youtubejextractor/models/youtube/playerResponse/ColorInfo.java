@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class ColorInfo {
+import java.io.Serializable;
+
+public class ColorInfo implements Serializable {
 
     private String primaries;
     private String matrixCoefficients;

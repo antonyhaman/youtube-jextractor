@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class PlayerConfig {
+import java.io.Serializable;
+
+public class PlayerConfig implements Serializable {
     private MediaCommonConfig mediaCommonConfig;
     private AudioConfig audioConfig;
     private StreamSelectionConfig streamSelectionConfig;

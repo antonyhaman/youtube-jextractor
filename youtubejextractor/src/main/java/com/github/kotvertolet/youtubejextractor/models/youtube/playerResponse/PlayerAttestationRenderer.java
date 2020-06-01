@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class PlayerAttestationRenderer {
+import java.io.Serializable;
+
+public class PlayerAttestationRenderer implements Serializable {
     private BotguardData botguardData;
     private String challenge;
 

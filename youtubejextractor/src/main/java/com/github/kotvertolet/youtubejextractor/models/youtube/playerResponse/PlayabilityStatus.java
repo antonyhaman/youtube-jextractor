@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class PlayabilityStatus {
+import java.io.Serializable;
+
+public class PlayabilityStatus implements Serializable {
     private boolean playableInEmbed;
     private String contextParams;
     private String status;

@@ -6,8 +6,7 @@
 -printmapping out.map
 -keepparameternames
 -renamesourcefileattribute SourceFile
--keepattributes Exceptions,InnerClasses,Signature,Deprecated,
-                SourceFile,LineNumberTable,EnclosingMethod
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,EnclosingMethod
 
 # Preserve all annotations.
 
@@ -47,6 +46,8 @@
 # If your code contains serializable classes that have to be backward
 # compatible, please refer to the manual.
 
+-keep class * implements java.io.Serializable
+
 -keepclassmembers class * implements java.io.Serializable {
     static final long serialVersionUID;
     static final java.io.ObjectStreamField[] serialPersistentFields;
@@ -55,10 +56,3 @@
     java.lang.Object writeReplace();
     java.lang.Object readResolve();
 }
-
-# Your library may contain more items that need to be preserved;
-# typically classes that are dynamically created using Class.forName:
-
-# -keep public class mypackage.MyClass
-# -keep public interface mypackage.MyInterface
-# -keep public class * implements mypackage.MyInterface

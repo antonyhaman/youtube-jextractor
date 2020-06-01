@@ -2,9 +2,10 @@ package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RawStreamingData {
+public class RawStreamingData implements Serializable {
 
     @SerializedName("formats")
     private List<MuxedStream> muxedStreams;

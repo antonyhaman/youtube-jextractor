@@ -4,7 +4,9 @@ import android.os.Parcelable;
 
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 
-public abstract class StreamItem implements Parcelable {
+import java.io.Serializable;
+
+public abstract class StreamItem implements Parcelable, Serializable {
 
     protected String extension;
     protected String codec;

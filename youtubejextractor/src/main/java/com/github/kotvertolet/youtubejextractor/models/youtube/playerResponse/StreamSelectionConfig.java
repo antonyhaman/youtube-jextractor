@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class StreamSelectionConfig {
+import java.io.Serializable;
+
+public class StreamSelectionConfig implements Serializable {
     private String maxBitrate;
 
     public String getMaxBitrate() {

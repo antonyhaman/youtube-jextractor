@@ -1,8 +1,13 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class AdaptiveStream {
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class AdaptiveStream implements Serializable {
 
     private int itag;
+    @SerializedName("signatureCipher")
     private Cipher cipher;
     private IndexRange indexRange;
     private String projectionType;

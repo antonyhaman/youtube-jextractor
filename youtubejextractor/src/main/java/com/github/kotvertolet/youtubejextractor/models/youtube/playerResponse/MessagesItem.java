@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class MessagesItem {
+import java.io.Serializable;
+
+public class MessagesItem implements Serializable {
 
     private MealbarPromoRenderer mealbarPromoRenderer;
 

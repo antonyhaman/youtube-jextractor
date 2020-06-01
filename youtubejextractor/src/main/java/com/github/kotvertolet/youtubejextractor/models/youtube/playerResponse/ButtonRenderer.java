@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class ButtonRenderer {
+import java.io.Serializable;
+
+public class ButtonRenderer implements Serializable {
 
     private String trackingParams;
     private String size;

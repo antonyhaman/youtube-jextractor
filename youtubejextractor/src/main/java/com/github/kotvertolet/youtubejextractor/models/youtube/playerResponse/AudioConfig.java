@@ -1,6 +1,8 @@
 package com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse;
 
-public class AudioConfig {
+import java.io.Serializable;
+
+public class AudioConfig implements Serializable {
 
     private double perceptualLoudnessDb;
     private double loudnessDb;
