@@ -85,11 +85,7 @@ public class YoutubeJExtractor {
         PlayerResponse playerResponse;
         try {
             URL url;
-            Pattern pageVerifyPattern = Pattern.compile("<link rel=\"canonical\"\\shref=(\"\\S+\")");
             videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
-            if (!pageVerifyPattern.matcher(videoPageHtml).find()) {
-                throw new ExtractionException(ERROR_MESSAGE + String.format("Invalid video page received, maybe video id '%s' is not valid. Video page recieved: %s", videoId, videoPageHtml));
-            }
             //Protocol and domain are necessary to split url params correctly
             String urlProtocolAndDomain = "http://youtube.con/v?";
             if (extractionUtils.isVideoAgeRestricted(videoPageHtml)) {

@@ -41,132 +41,132 @@ public class MuxedStream implements Serializable {
     @SerializedName("url")
     private String url;
 
-    public void setItag(int itag) {
-        this.itag = itag;
-    }
-
     public int getItag() {
         return itag;
     }
 
-    public void setCipher(Cipher cipher) {
-        this.cipher = cipher;
+    public void setItag(int itag) {
+        this.itag = itag;
     }
 
     public Cipher getCipher() {
         return cipher;
     }
 
-    public void setProjectionType(String projectionType) {
-        this.projectionType = projectionType;
+    public void setCipher(Cipher cipher) {
+        this.cipher = cipher;
     }
 
     public String getProjectionType() {
         return projectionType;
     }
 
-    public void setBitrate(int bitrate) {
-        this.bitrate = bitrate;
+    public void setProjectionType(String projectionType) {
+        this.projectionType = projectionType;
     }
 
     public int getBitrate() {
         return bitrate;
     }
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+    public void setBitrate(int bitrate) {
+        this.bitrate = bitrate;
     }
 
     public String getMimeType() {
         return mimeType;
     }
 
-    public void setAudioQuality(String audioQuality) {
-        this.audioQuality = audioQuality;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
     public String getAudioQuality() {
         return audioQuality;
     }
 
-    public void setApproxDurationMs(String approxDurationMs) {
-        this.approxDurationMs = approxDurationMs;
+    public void setAudioQuality(String audioQuality) {
+        this.audioQuality = audioQuality;
     }
 
     public String getApproxDurationMs() {
         return approxDurationMs;
     }
 
-    public void setAudioSampleRate(String audioSampleRate) {
-        this.audioSampleRate = audioSampleRate;
+    public void setApproxDurationMs(String approxDurationMs) {
+        this.approxDurationMs = approxDurationMs;
     }
 
     public String getAudioSampleRate() {
         return audioSampleRate;
     }
 
-    public void setQuality(String quality) {
-        this.quality = quality;
+    public void setAudioSampleRate(String audioSampleRate) {
+        this.audioSampleRate = audioSampleRate;
     }
 
     public String getQuality() {
         return quality;
     }
 
-    public void setQualityLabel(String qualityLabel) {
-        this.qualityLabel = qualityLabel;
+    public void setQuality(String quality) {
+        this.quality = quality;
     }
 
     public String getQualityLabel() {
         return qualityLabel;
     }
 
-    public void setAudioChannels(int audioChannels) {
-        this.audioChannels = audioChannels;
+    public void setQualityLabel(String qualityLabel) {
+        this.qualityLabel = qualityLabel;
     }
 
     public int getAudioChannels() {
         return audioChannels;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public void setAudioChannels(int audioChannels) {
+        this.audioChannels = audioChannels;
     }
 
     public int getWidth() {
         return width;
     }
 
-    public void setContentLength(String contentLength) {
-        this.contentLength = contentLength;
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public String getContentLength() {
         return contentLength;
     }
 
-    public void setLastModified(String lastModified) {
-        this.lastModified = lastModified;
+    public void setContentLength(String contentLength) {
+        this.contentLength = contentLength;
     }
 
     public String getLastModified() {
         return lastModified;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
     }
 
     public int getHeight() {
         return height;
     }
 
-    public void setAverageBitrate(int averageBitrate) {
-        this.averageBitrate = averageBitrate;
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public int getAverageBitrate() {
         return averageBitrate;
+    }
+
+    public void setAverageBitrate(int averageBitrate) {
+        this.averageBitrate = averageBitrate;
     }
 
     public String getUrl() {
