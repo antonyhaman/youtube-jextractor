@@ -9,6 +9,7 @@ public class RawStreamingData implements Serializable {
 
     @SerializedName("formats")
     private List<MuxedStream> muxedStreams;
+    @SerializedName("probeUrl")
     private String probeUrl;
     @SerializedName("adaptiveFormats")
     private List<AdaptiveStream> adaptiveStreams;

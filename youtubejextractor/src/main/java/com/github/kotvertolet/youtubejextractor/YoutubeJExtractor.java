@@ -1,5 +1,7 @@
 package com.github.kotvertolet.youtubejextractor;
 
+import android.util.Log;
+
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
@@ -75,6 +77,7 @@ public class YoutubeJExtractor {
                 LogI(TAG, "Streams are encrypted, decrypting");
                 decryptYoutubeStreams(playerResponse);
             }
+            else LogI(TAG, "Streams are not encrypted");
             return new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData());
         } catch (SignatureDecryptionException e) {
             throw new ExtractionException(e);
@@ -123,7 +126,7 @@ public class YoutubeJExtractor {
                 throw new ExtractionException(ERROR_MESSAGE +
                         String.format("Cannot extract youtube player config, videoId was: %s, reason: %s",
                                 videoId, matcher.group(1)));
-            } else throw new ExtractionException(ERROR_MESSAGE +
+            } else throw new ExtractionException(ERROR_MESSAGE  +
                     "Cannot extract youtube player config, videoId was: " + videoId);
         }
     }
@@ -152,10 +155,19 @@ public class YoutubeJExtractor {
         RawStreamingData rawStreamingData = playerResponse.getRawStreamingData();
         if (rawStreamingData != null) {
             List<AdaptiveStream> formatItems = rawStreamingData.getAdaptiveStreams();
+            if (playerResponse.getVideoDetails().isLiveContent()) {
+                Log.i(TAG, "Requested content is live stream");
+                if (formatItems == null || formatItems.size() == 0) {
+                    Log.i(TAG, "Requested content is a live stream and doesn't contain adaptive streams, " +
+                            "use DASH or HLS manifests. If the content is not a live stream or it was but has ended, " +
+                            "just wait some time, youtube usually needs a couple of hours to prepare adaptive streams");
+                    return false;
+                }
+            }
             if (formatItems != null && formatItems.size() > 0) {
                 return formatItems.get(0).getCipher() != null;
-            } else
-                throw new ExtractionException(ERROR_MESSAGE + "AdaptiveFormatItem list was null or empty");
+            }
+            else throw new ExtractionException(ERROR_MESSAGE + "AdaptiveFormatItem list was null or empty");
         } else throw new ExtractionException(ERROR_MESSAGE + "RawStreamingData object was null");
     }
 

@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class AdaptiveStream implements Serializable {
 
     private int itag;
-    @SerializedName("signatureCipher")
+    @SerializedName(value = "signatureCipher", alternate = "cipher")
     private Cipher cipher;
     private IndexRange indexRange;
     private String projectionType;
