@@ -57,6 +57,21 @@ Each StreamItem object contains fields that describe the stream such as:
 * ***codec***, ***bitrate***, ***url*** and many others. 
 
  Check `AdaptiveVideoStream.class` and `AdaptiveAudioStream.class` for the details.
+ 
+ ### Live streams
+ 
+Live streams are also supported by ***YoutubeJextractor***, but you have to treat them differently than regular videos, to play live content you have to use ***DASH*** or ***HLS*** manifests. Your code will look like this:
+```java
+YoutubeVideoData videoData = youtubeJExtractor.extract("stream_video_id");
+if (videoData.getVideoDetails().isLiveContent()) {
+    String dashManifest = videoData.getStreamingData().getDashManifestUrl();
+   // or use HLS manifest via getHlsManifestUrl() method
+}
+else {
+...
+}
+```
+Then you have to decide how to deal with manifest url, it depends on how you're gonna play media content, for instance, if you are using [ExoPlayer](https://exoplayer.dev/), please refer to the [DASH](https://exoplayer.dev/dash.html) and [HLS](https://exoplayer.dev/hls.html) guides.
 
 ## Requirements
 
