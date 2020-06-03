@@ -15,6 +15,9 @@ This library was initially created for my android app [Youtube audio player](htt
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 
 ## What's new?
+### v0.2.9
+Minor changes, increased stability and logging is slightly improved
+
 ### v0.2.8
 1. Code updated to match latest youtube changes
 2. Improved age restricted videos detection
