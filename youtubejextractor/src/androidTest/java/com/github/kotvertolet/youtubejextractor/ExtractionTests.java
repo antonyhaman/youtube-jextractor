@@ -85,37 +85,72 @@ public class ExtractionTests extends TestCase {
     }
 
     @Test
+    public void checkLiveStreamWithoutAdaptiveStreams() throws YoutubeRequestException, ExtractionException {
+        videoData = youtubeJExtractor.extract("up0fWFqgC6g");
+        assertTrue(videoData.getVideoDetails().isLiveContent());
+        assertNotNull(videoData.getStreamingData().getDashManifestUrl());
+        assertNotNull(videoData.getStreamingData().getHlsManifestUrl());
+        assertEquals(0, videoData.getStreamingData().getAdaptiveAudioStreams().size());
+        assertEquals(0, videoData.getStreamingData().getAdaptiveVideoStreams().size());
+    }
+
+    @Test
     public void checkMuxedStreamNonEncrypted() throws YoutubeRequestException, ExtractionException {
         videoData = youtubeJExtractor.extract("8QyDmvuts9s");
         checkIfStreamsWork(videoData);
     }
 
-    private void checkIfStreamsWork(YoutubeVideoData videoData) throws YoutubeRequestException {
+    @Test
+    public void checkCallbackBasedExtractionSuccessful() {
+        youtubeJExtractor.extract("iIKxyDRjecU", new JExtractorCallback() {
+            @Override
+            public void onSuccess(YoutubeVideoData videoData) {
+                checkIfStreamsWork(videoData);
+            }
+
+            @Override
+            public void onNetworkException(YoutubeRequestException e) {
+                fail("Network exception occurred");
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                fail("Extraction exception occurred");
+            }
+        });
+    }
+
+    private void checkIfStreamsWork(YoutubeVideoData videoData) {
         String streamErrorMask = "Stream wasn't processed correctly, stream details:\\n %s";
         Response<ResponseBody> responseBody;
-        if (videoData.getVideoDetails().isLiveContent()) {
-            responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getDashManifestUrl());
-            assertNotNull(responseBody);
-            assertTrue(responseBody.isSuccessful());
-            responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getHlsManifestUrl());
-            assertNotNull(responseBody);
-            assertTrue(responseBody.isSuccessful());
-        } else {
-            for (AdaptiveVideoStream adaptiveVideoStream : videoData.getStreamingData().getAdaptiveVideoStreams()) {
-                responseBody = youtubeSiteNetwork.getStream(adaptiveVideoStream.getUrl());
-                assertThat(String.format(streamErrorMask, adaptiveVideoStream.toString()), responseBody, is(not(nullValue())));
-                assertThat(String.format(streamErrorMask, adaptiveVideoStream.toString()), responseBody.isSuccessful(), is(true));
+        try {
+            if (videoData.getVideoDetails().isLiveContent()) {
+                responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getDashManifestUrl());
+                assertNotNull(responseBody);
+                assertTrue(responseBody.isSuccessful());
+                responseBody = youtubeSiteNetwork.getStream(videoData.getStreamingData().getHlsManifestUrl());
+                assertNotNull(responseBody);
+                assertTrue(responseBody.isSuccessful());
+            } else {
+                for (AdaptiveVideoStream adaptiveVideoStream : videoData.getStreamingData().getAdaptiveVideoStreams()) {
+                    responseBody = youtubeSiteNetwork.getStream(adaptiveVideoStream.getUrl());
+                    assertThat(String.format(streamErrorMask, adaptiveVideoStream.toString()), responseBody, is(not(nullValue())));
+                    assertThat(String.format(streamErrorMask, adaptiveVideoStream.toString()), responseBody.isSuccessful(), is(true));
+                }
+                for (AdaptiveAudioStream adaptiveAudioStream : videoData.getStreamingData().getAdaptiveAudioStreams()) {
+                    responseBody = youtubeSiteNetwork.getStream(adaptiveAudioStream.getUrl());
+                    assertThat(String.format(streamErrorMask, adaptiveAudioStream.toString()), responseBody, is(not(nullValue())));
+                    assertThat(String.format(streamErrorMask, adaptiveAudioStream.toString()), responseBody.isSuccessful(), is(true));
+                }
+                for (MuxedStream muxedStream : videoData.getStreamingData().getMuxedStreams()) {
+                    responseBody = youtubeSiteNetwork.getStream(muxedStream.getUrl());
+                    assertThat(String.format(streamErrorMask, muxedStream.toString()), responseBody, is(not(nullValue())));
+                    assertThat(String.format(streamErrorMask, muxedStream.toString()), responseBody.isSuccessful(), is(true));
+                }
             }
-            for (AdaptiveAudioStream adaptiveAudioStream : videoData.getStreamingData().getAdaptiveAudioStreams()) {
-                responseBody = youtubeSiteNetwork.getStream(adaptiveAudioStream.getUrl());
-                assertThat(String.format(streamErrorMask, adaptiveAudioStream.toString()), responseBody, is(not(nullValue())));
-                assertThat(String.format(streamErrorMask, adaptiveAudioStream.toString()), responseBody.isSuccessful(), is(true));
-            }
-            for (MuxedStream muxedStream : videoData.getStreamingData().getMuxedStreams()) {
-                responseBody = youtubeSiteNetwork.getStream(muxedStream.getUrl());
-                assertThat(String.format(streamErrorMask, muxedStream.toString()), responseBody, is(not(nullValue())));
-                assertThat(String.format(streamErrorMask, muxedStream.toString()), responseBody.isSuccessful(), is(true));
-            }
+        }
+        catch (YoutubeRequestException e) {
+            fail(e.getMessage());
         }
     }
 }

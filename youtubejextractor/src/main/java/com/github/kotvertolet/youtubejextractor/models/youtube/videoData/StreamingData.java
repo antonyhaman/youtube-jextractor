@@ -41,9 +41,9 @@ public class StreamingData implements Parcelable, Serializable {
     @SerializedName("probeUrl")
     private String probeUrl;
     @Expose
-    private List<AdaptiveAudioStream> adaptiveAudioStreams;
+    private List<AdaptiveAudioStream> adaptiveAudioStreams = new ArrayList<>();
     @Expose
-    private List<AdaptiveVideoStream> adaptiveVideoStreams;
+    private List<AdaptiveVideoStream> adaptiveVideoStreams = new ArrayList<>();
 
     public StreamingData() {
     }
@@ -54,7 +54,10 @@ public class StreamingData implements Parcelable, Serializable {
         this.hlsManifestUrl = rawStreamingData.getHlsManifestUrl();
         this.probeUrl = rawStreamingData.getProbeUrl();
         this.muxedStreams = rawStreamingData.getMuxedStreams();
-        sortAdaptiveStreamsByType(rawStreamingData.getAdaptiveStreams());
+        List<AdaptiveStream> adaptiveStreams = rawStreamingData.getAdaptiveStreams();
+        if (adaptiveStreams != null && adaptiveStreams.size() > 0) {
+            sortAdaptiveStreamsByType(adaptiveStreams);
+        }
     }
 
     public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AdaptiveAudioStream> adaptiveAudioStreams, List<AdaptiveVideoStream> adaptiveVideoStreams) {
