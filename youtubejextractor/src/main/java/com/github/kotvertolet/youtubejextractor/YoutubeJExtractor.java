@@ -72,17 +72,38 @@ public class YoutubeJExtractor {
     public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
         try {
             LogI(TAG, "Extracting video data from youtube page");
-            PlayerResponse playerResponse = extractYoutubeVideoData(videoId);
-            if (areStreamsAreEncrypted(playerResponse)) {
-                LogI(TAG, "Streams are encrypted, decrypting");
-                decryptYoutubeStreams(playerResponse);
-            }
-            else LogI(TAG, "Streams are not encrypted");
+            PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
             return new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData());
         } catch (SignatureDecryptionException e) {
             throw new ExtractionException(e);
         }
     }
+
+    public void extract(String videoId, JExtractorCallback callback) {
+        try {
+            PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
+            callback.onSuccess(new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData()));
+        }
+        catch (SignatureDecryptionException | ExtractionException e) {
+            callback.onError(e);
+        }
+        catch (YoutubeRequestException e) {
+            callback.onNetworkException(e);
+        }
+
+    }
+
+    private PlayerResponse extractAndPrepareVideoData(String videoId) throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
+        LogI(TAG, "Extracting video data from youtube page");
+        PlayerResponse playerResponse = extractYoutubeVideoData(videoId);
+        if (checkIfStreamsAreEncrypted(playerResponse)) {
+            LogI(TAG, "Streams are encrypted, decrypting");
+            decryptYoutubeStreams(playerResponse);
+        }
+        else LogI(TAG, "Streams are not encrypted");
+        return playerResponse;
+    }
+
 
     private PlayerResponse extractYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
         PlayerResponse playerResponse;
@@ -150,7 +171,7 @@ public class YoutubeJExtractor {
         }
     }
 
-    private boolean areStreamsAreEncrypted(PlayerResponse playerResponse) throws ExtractionException {
+    private boolean checkIfStreamsAreEncrypted(PlayerResponse playerResponse) throws ExtractionException {
         // Even if a single stream is encrypted it means they all are
         RawStreamingData rawStreamingData = playerResponse.getRawStreamingData();
         if (rawStreamingData != null) {
