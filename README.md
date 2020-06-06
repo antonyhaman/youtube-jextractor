@@ -15,6 +15,28 @@ This library was initially created for my android app [Youtube audio player](htt
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 
 ## What's new?
+### v0.3.0
+1. Fixed NPE #28, thanks @niteshfel for reporting
+2. Implemented new overloaded extract method that takes callback as parameter:
+```java
+     youtubeJExtractor.extract("iIKxyDRjecU", new JExtractorCallback() {
+            @Override
+            public void onSuccess(YoutubeVideoData videoData) {
+                // use extracted data
+            }
+
+            @Override
+            public void onNetworkException(YoutubeRequestException e) {
+                // may be a connection problem, ask user to check his internet connection
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                // some serious problem occured, just show some error message
+            }
+        });
+```
+
 ### v0.2.9
 Minor changes, increased stability and logging is slightly improved
 
