@@ -85,7 +85,7 @@ Each StreamItem object contains fields that describe the stream such as:
  
  ### Live streams
  
-Live streams are also supported by ***YoutubeJextractor***, but you have to treat them differently than regular videos, to play live content you have to use ***DASH*** or ***HLS*** manifests. Your code will look like this:
+Live streams are also supported by ***YoutubeJextractor***, but you have to treat them differently than the regular videos, to play live content you have to use ***DASH*** or ***HLS*** manifests. Your code will look like this:
 ```java
 YoutubeVideoData videoData = youtubeJExtractor.extract("stream_video_id");
 if (videoData.getVideoDetails().isLiveContent()) {
@@ -97,6 +97,25 @@ else {
 }
 ```
 Then you have to decide how to deal with manifest url, it depends on how you're gonna play media content, for instance, if you are using [ExoPlayer](https://exoplayer.dev/), please refer to the [DASH](https://exoplayer.dev/dash.html) and [HLS](https://exoplayer.dev/hls.html) guides.
+
+## FAQ
+### Q: What is a muxed stream?
+[Muxed](https://wiki.videolan.org/Muxing/) stream is a stream that contains video and audio at the same time. My library extracts muxed streams along with [demuxed](https://wiki.videolan.org/Demuxing/) that contain only video or audio.
+
+### Q: I need to play both video and audio at the same time, but your library gives me no muxed streams (or they have lower quality), is it a bug of the library?
+No, it's not, my library extracts *everything* what youtube provides for the specific video, but for some youtube's internal reasons they have different set of streams available for each video, sometimes there are muxed streams sometimes there aren't. But it's not a problem because you can take separately audio and video stream and then combine them into a single, muxed stream, with any quality you want! 
+ #### How to do that?
+Depends on how you're gonna play your streams, for instance if you're using ExoPlayer (what I personally recommend for media playback in andoird) you need to take a look at MegingMediaSource.class:
+
+``` java
+
+MediaSource videoSource = new ProgressiveMediaSource.Factory(...)
+    .createMediaSource(videoUri);
+MediaSource audioSource = new ProgressiveMediaSource.Factory(...)
+    .createMediaSource(audioUri);
+
+MergingMediaSource mergedSource = new MergingMediaSource(videoSource, audioSource);
+```
 
 ## Requirements
 
