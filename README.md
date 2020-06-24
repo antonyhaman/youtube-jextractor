@@ -19,7 +19,7 @@ This library was initially created for my android app [Youtube audio player](htt
 1. Fixed NPE #28, thanks @niteshfel for reporting
 2. Implemented new overloaded extract method that takes callback as parameter:
 ```java
-     youtubeJExtractor.extract("iIKxyDRjecU", new JExtractorCallback() {
+     youtubeJExtractor.extract(videoId, new JExtractorCallback() {
             @Override
             public void onSuccess(YoutubeVideoData videoData) {
                 // use extracted data
