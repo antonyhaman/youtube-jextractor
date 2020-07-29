@@ -15,6 +15,9 @@ This library was initially created for my android app [Youtube audio player](htt
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 
 ## What's new?
+### v0.3.1
+Bug fixes
+
 ### v0.3.0
 1. Fixed NPE #28, thanks @niteshfel for reporting
 2. Implemented new overloaded extract method that takes callback as parameter:
