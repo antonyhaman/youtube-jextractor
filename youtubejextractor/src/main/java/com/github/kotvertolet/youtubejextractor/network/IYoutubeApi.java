@@ -8,7 +8,7 @@ import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 
-public interface YoutubeSiteApi {
+public interface IYoutubeApi {
 
     @GET("get_video_info")
     Call<ResponseBody> getVideoInfo(@Query("video_id") String videoId, @Query("eurl") String eurl);

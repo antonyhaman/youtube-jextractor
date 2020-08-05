@@ -10,12 +10,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class YoutubeSiteNetwork {
+public class YoutubeNetwork {
 
     private final static String YOUTUBE_SITE_URL = "https://www.youtube.com/";
-    private YoutubeSiteApi youtubeSiteApi;
+    private IYoutubeApi youtubeApi;
 
-    public YoutubeSiteNetwork(Gson gson) {
+    public YoutubeNetwork(Gson gson) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -27,35 +27,35 @@ public class YoutubeSiteNetwork {
                 .client(httpClient.build())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-        youtubeSiteApi = retrofit.create(YoutubeSiteApi.class);
+        youtubeApi = retrofit.create(IYoutubeApi.class);
     }
 
-    public YoutubeSiteNetwork(Gson gson, OkHttpClient client) {
+    public YoutubeNetwork(Gson gson, OkHttpClient client) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_SITE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-        youtubeSiteApi = retrofit.create(YoutubeSiteApi.class);
+        youtubeApi = retrofit.create(IYoutubeApi.class);
     }
 
     public Response<ResponseBody> getYoutubeVideoInfo(String videoId, String eUrl) throws YoutubeRequestException {
-        return new RequestExecutor().executeWithRetry(youtubeSiteApi.getVideoInfo(videoId, eUrl));
+        return new RequestExecutor().executeWithRetry(youtubeApi.getVideoInfo(videoId, eUrl));
     }
 
     public Response<ResponseBody> getYoutubeEmbeddedVideoPage(String videoId) throws YoutubeRequestException {
-        return new RequestExecutor().executeWithRetry(youtubeSiteApi.getEmbeddedVideoPage(videoId));
+        return new RequestExecutor().executeWithRetry(youtubeApi.getEmbeddedVideoPage(videoId));
     }
 
     public Response<ResponseBody> getYoutubeVideoPage(String videoId) throws YoutubeRequestException {
-        return new RequestExecutor().executeWithRetry(youtubeSiteApi.getVideoPage(videoId, "US", 1, "9999999999"));
+        return new RequestExecutor().executeWithRetry(youtubeApi.getVideoPage(videoId, "US", 1, "9999999999"));
     }
 
     public Response<ResponseBody> downloadWebpage(String url) throws YoutubeRequestException {
-        return new RequestExecutor().executeWithRetry(youtubeSiteApi.getWebPage(url));
+        return new RequestExecutor().executeWithRetry(youtubeApi.getWebPage(url));
     }
 
     public Response<ResponseBody> getStream(String url) throws YoutubeRequestException {
-        return new RequestExecutor().executeWithRetry(youtubeSiteApi.getStream(url));
+        return new RequestExecutor().executeWithRetry(youtubeApi.getStream(url));
     }
 }

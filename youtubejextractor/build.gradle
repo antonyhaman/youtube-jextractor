@@ -50,4 +50,6 @@ dependencies {
 
     // JS interpreter (versions newer than 1.7.10 requires API 26)
     implementation 'org.mozilla:rhino:1.7.10'
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
 }

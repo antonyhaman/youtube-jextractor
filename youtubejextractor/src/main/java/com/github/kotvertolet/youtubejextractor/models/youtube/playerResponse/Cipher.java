@@ -10,6 +10,12 @@ public class Cipher implements Serializable {
     private String sp;
     private String url;
 
+    public Cipher(String s, String sp, String url) {
+        this.s = s;
+        this.sp = sp;
+        this.url = url;
+    }
+
     public String getS() {
         return urlDecode(s);
     }
