@@ -2,7 +2,7 @@ package com.github.kotvertolet.youtubejextractor.utils;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
-import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
+import com.github.kotvertolet.youtubejextractor.network.YoutubeNetwork;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -13,10 +13,10 @@ import retrofit2.Response;
 
 public class YoutubePlayerUtils {
 
-    private YoutubeSiteNetwork youtubeSiteNetwork;
+    private YoutubeNetwork youtubeNetwork;
 
-    public YoutubePlayerUtils(YoutubeSiteNetwork youtubeSiteNetwork) {
-        this.youtubeSiteNetwork = youtubeSiteNetwork;
+    public YoutubePlayerUtils(YoutubeNetwork youtubeNetwork) {
+        this.youtubeNetwork = youtubeNetwork;
     }
 
     /**
@@ -50,7 +50,7 @@ public class YoutubePlayerUtils {
      */
     public String downloadJsPlayer(String playerUrl) throws YoutubeRequestException {
         try {
-            Response<ResponseBody> responseBody = youtubeSiteNetwork.downloadWebpage(playerUrl);
+            Response<ResponseBody> responseBody = youtubeNetwork.downloadWebpage(playerUrl);
             return responseBody.body().string();
         } catch (IOException | NullPointerException e) {
             throw new YoutubeRequestException("Error while downloading youtube js video player", e);

@@ -1,5 +1,11 @@
 apply plugin: 'com.android.library'
 
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -50,4 +56,6 @@ dependencies {
 
     // JS interpreter (versions newer than 1.7.10 requires API 26)
     implementation 'org.mozilla:rhino:1.7.10'
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
 }

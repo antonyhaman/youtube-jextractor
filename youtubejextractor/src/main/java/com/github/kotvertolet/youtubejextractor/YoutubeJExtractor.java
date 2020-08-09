@@ -5,27 +5,38 @@ import android.util.Log;
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
+import com.github.kotvertolet.youtubejextractor.models.subtitles.Subtitle;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.VideoPlayerConfig;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.Cipher;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.PlayerResponse;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
-import com.github.kotvertolet.youtubejextractor.network.YoutubeSiteNetwork;
+import com.github.kotvertolet.youtubejextractor.network.GoogleVideoNetwork;
+import com.github.kotvertolet.youtubejextractor.network.YoutubeNetwork;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.ExtractionUtils;
 import com.github.kotvertolet.youtubejextractor.utils.YoutubePlayerUtils;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -33,14 +44,11 @@ import retrofit2.Response;
 
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
-import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlDecode;
-import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlParamsToJson;
 
 public class YoutubeJExtractor {
 
-    private final static String ERROR_MESSAGE = "Extraction failed. Please, report here: https://github.com/kotvertolet/youtube-jextractor/issues. Error details: ";
     private final String TAG = getClass().getSimpleName();
-    private final YoutubeSiteNetwork youtubeSiteNetwork;
+    private final YoutubeNetwork youtubeNetwork;
     private final YoutubePlayerUtils youtubePlayerUtils;
     private final ExtractionUtils extractionUtils;
     private final Gson gson;
@@ -50,9 +58,9 @@ public class YoutubeJExtractor {
      * No-args constructor
      */
     public YoutubeJExtractor() {
-        gson = initGson();
-        youtubeSiteNetwork = new YoutubeSiteNetwork(gson);
-        youtubePlayerUtils = new YoutubePlayerUtils(youtubeSiteNetwork);
+        gson = new IGsonFactoryImpl().initGson();
+        youtubeNetwork = new YoutubeNetwork(gson);
+        youtubePlayerUtils = new YoutubePlayerUtils(youtubeNetwork);
         extractionUtils = new ExtractionUtils(youtubePlayerUtils);
     }
 
@@ -63,9 +71,9 @@ public class YoutubeJExtractor {
      * @param client Custom OkHttpClient instance
      */
     public YoutubeJExtractor(OkHttpClient client) {
-        gson = initGson();
-        youtubeSiteNetwork = new YoutubeSiteNetwork(gson, client);
-        youtubePlayerUtils = new YoutubePlayerUtils(youtubeSiteNetwork);
+        gson = new IGsonFactoryImpl().initGson();
+        youtubeNetwork = new YoutubeNetwork(gson, client);
+        youtubePlayerUtils = new YoutubePlayerUtils(youtubeNetwork);
         extractionUtils = new ExtractionUtils(youtubePlayerUtils);
     }
 
@@ -73,7 +81,8 @@ public class YoutubeJExtractor {
         try {
             LogI(TAG, "Extracting video data from youtube page");
             PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
-            return new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData());
+            return new YoutubeVideoData(playerResponse.getVideoDetails(),
+                            playerResponse.getRawStreamingData());
         } catch (SignatureDecryptionException e) {
             throw new ExtractionException(e);
         }
@@ -82,25 +91,64 @@ public class YoutubeJExtractor {
     public void extract(String videoId, JExtractorCallback callback) {
         try {
             PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
-            callback.onSuccess(new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData()));
-        }
-        catch (SignatureDecryptionException | ExtractionException e) {
+            YoutubeVideoData youtubeVideoData = new YoutubeVideoData(playerResponse.getVideoDetails(),
+                    playerResponse.getRawStreamingData());
+            callback.onSuccess(youtubeVideoData);
+        } catch (SignatureDecryptionException | ExtractionException e) {
             callback.onError(e);
-        }
-        catch (YoutubeRequestException e) {
+        } catch (YoutubeRequestException e) {
             callback.onNetworkException(e);
         }
+    }
 
+    public Map<String, ArrayList<Subtitle>> extractSubtitles(String videoId) {
+        Response<ResponseBody> subtitlesLangsResponse;
+        GoogleVideoNetwork googleVideoNetwork = new GoogleVideoNetwork(gson);
+        try {
+            subtitlesLangsResponse = googleVideoNetwork.getSubtitlesList(videoId);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document languagesXml = builder.parse(subtitlesLangsResponse.body().byteStream());
+            NodeList languagesNodeList = languagesXml.getDocumentElement().getChildNodes();
+            if (languagesNodeList.getLength() > 0) {
+                ArrayList<String> availableSubtitlesLangCodes = new ArrayList<>();
+                for (int i = 0; i < languagesNodeList.getLength(); i++) {
+                    String langCode = languagesNodeList.item(i).getAttributes().getNamedItem("lang_code").getNodeValue();
+                    availableSubtitlesLangCodes.add(langCode);
+                }
+                Map<String, ArrayList<Subtitle>> subtitlesByLang = new HashMap<>();
+                for (String langCode : availableSubtitlesLangCodes) {
+                    Response<ResponseBody> response = googleVideoNetwork.getSubtitles(videoId, langCode);
+                    Document subtitlesXml = builder.parse(response.body().byteStream());
+                    NodeList subLineNodeList = subtitlesXml.getDocumentElement().getChildNodes();
+                    ArrayList<Subtitle> subtitleArrayList = new ArrayList<>();
+                    for (int i = 0; i < subLineNodeList.getLength(); i++) {
+                        Node node = subLineNodeList.item(i);
+                        String start = node.getAttributes().getNamedItem("start").getNodeValue();
+                        String duration = node.getAttributes().getNamedItem("dur").getNodeValue();
+                        String text = node.getTextContent();
+                        subtitleArrayList.add(new Subtitle(start, duration, text));
+                    }
+                    subtitlesByLang.put(langCode, subtitleArrayList);
+                }
+                return subtitlesByLang;
+            } else {
+                LogI(TAG, "Subtitles not found");
+                return Collections.emptyMap();
+            }
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyMap();
     }
 
     private PlayerResponse extractAndPrepareVideoData(String videoId) throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
         LogI(TAG, "Extracting video data from youtube page");
         PlayerResponse playerResponse = extractYoutubeVideoData(videoId);
-        if (checkIfStreamsAreEncrypted(playerResponse)) {
-            LogI(TAG, "Streams are encrypted, decrypting");
+        if (checkIfStreamsAreCiphered(playerResponse)) {
+            LogI(TAG, "Streams are ciphered, decrypting");
             decryptYoutubeStreams(playerResponse);
-        }
-        else LogI(TAG, "Streams are not encrypted");
+        } else LogI(TAG, "Streams are not encrypted");
         return playerResponse;
     }
 
@@ -109,7 +157,7 @@ public class YoutubeJExtractor {
         PlayerResponse playerResponse;
         try {
             URL url;
-            videoPageHtml = youtubeSiteNetwork.getYoutubeVideoPage(videoId).body().string();
+            videoPageHtml = youtubeNetwork.getYoutubeVideoPage(videoId).body().string();
             //Protocol and domain are necessary to split url params correctly
             String urlProtocolAndDomain = "http://youtube.con/v?";
             if (extractionUtils.isVideoAgeRestricted(videoPageHtml)) {
@@ -119,7 +167,7 @@ public class YoutubeJExtractor {
                 Map<String, String> videoInfoMap = splitUrlParams(url);
                 String rawPlayerResponse = videoInfoMap.get("player_response");
                 if (rawPlayerResponse == null || rawPlayerResponse.isEmpty()) {
-                    throw new ExtractionException(ERROR_MESSAGE + "Player response extracted from video info was null or empty");
+                    throw new ExtractionException("Player response extracted from video info was null or empty");
                 }
                 playerResponse = gson.fromJson(gson.toJson(videoInfoMap.get("player_response")), PlayerResponse.class);
 
@@ -144,34 +192,33 @@ public class YoutubeJExtractor {
             Pattern videoIsUnavailableMessagePattern = Pattern.compile("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>");
             matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
             if (matcher.find()) {
-                throw new ExtractionException(ERROR_MESSAGE +
-                        String.format("Cannot extract youtube player config, videoId was: %s, reason: %s",
-                                videoId, matcher.group(1)));
-            } else throw new ExtractionException(ERROR_MESSAGE  +
-                    "Cannot extract youtube player config, videoId was: " + videoId);
+                throw new ExtractionException(String.format("Cannot extract youtube player config, " +
+                        "videoId was: %s, reason: %s", videoId, matcher.group(1)));
+            } else
+                throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
         }
     }
 
     private String getVideoInfoForAgeRestrictedVideo(String videoId) throws ExtractionException {
         try {
-            this.videoPageHtml = youtubeSiteNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
+            this.videoPageHtml = youtubeNetwork.getYoutubeEmbeddedVideoPage(videoId).body().string();
             String sts = extractionUtils.extractStsFromVideoPageHtml(videoPageHtml);
             String eUrl = String.format("https://youtube.googleapis.com/v/%s&sts=%s", videoId, sts);
-            Response<ResponseBody> videoInfoResponse = youtubeSiteNetwork.getYoutubeVideoInfo(videoId, eUrl);
+            Response<ResponseBody> videoInfoResponse = youtubeNetwork.getYoutubeVideoInfo(videoId, eUrl);
             if (videoInfoResponse.body() != null) {
                 String videoInfo = videoInfoResponse.body().string();
                 if (videoInfo.isEmpty())
-                    throw new ExtractionException(ERROR_MESSAGE + "Video info was empty");
+                    throw new ExtractionException("Video info was empty");
                 else return videoInfo;
             } else {
-                throw new ExtractionException(ERROR_MESSAGE + "Video info response body was null or empty");
+                throw new ExtractionException("Video info response body was null or empty");
             }
         } catch (IOException | NullPointerException | YoutubeRequestException e) {
             throw new ExtractionException(e);
         }
     }
 
-    private boolean checkIfStreamsAreEncrypted(PlayerResponse playerResponse) throws ExtractionException {
+    private boolean checkIfStreamsAreCiphered(PlayerResponse playerResponse) throws ExtractionException {
         // Even if a single stream is encrypted it means they all are
         RawStreamingData rawStreamingData = playerResponse.getRawStreamingData();
         if (rawStreamingData != null) {
@@ -187,9 +234,9 @@ public class YoutubeJExtractor {
             }
             if (formatItems != null && formatItems.size() > 0) {
                 return formatItems.get(0).getCipher() != null;
-            }
-            else throw new ExtractionException(ERROR_MESSAGE + "AdaptiveFormatItem list was null or empty");
-        } else throw new ExtractionException(ERROR_MESSAGE + "RawStreamingData object was null");
+            } else
+                throw new ExtractionException("AdaptiveFormatItem list was null or empty");
+        } else throw new ExtractionException("RawStreamingData object was null");
     }
 
     private void decryptYoutubeStreams(PlayerResponse youtubeVideoData) throws ExtractionException, SignatureDecryptionException, YoutubeRequestException {
@@ -210,22 +257,5 @@ public class YoutubeJExtractor {
             String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
             muxedStreams.get(i).getCipher().setS(decryptedSignature);
         }
-    }
-
-    private Gson initGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        JsonDeserializer<Cipher> cipherDeserializer = (json, typeOfT, context) -> {
-            Cipher cipher = gson.fromJson(urlParamsToJson(json.getAsString()), Cipher.class);
-            cipher.setUrl(urlDecode(cipher.getUrl()));
-            return cipher;
-        };
-
-        JsonDeserializer<PlayerResponse> playerResponseJsonDeserializer = (json, typeOfT, context) -> {
-            Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, cipherDeserializer).create();
-            String jsonRaw = json.getAsString();
-            return tempGson.fromJson(jsonRaw, PlayerResponse.class);
-        };
-        gsonBuilder.registerTypeAdapter(PlayerResponse.class, playerResponseJsonDeserializer);
-        return gsonBuilder.create();
     }
 }
