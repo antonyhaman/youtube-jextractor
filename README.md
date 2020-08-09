@@ -10,11 +10,15 @@ This library was initially created for my android app [Youtube audio player](htt
 4. Supports videos with restricted embedding.
 5. Supports regon restricted videos (through a proxy).
 6. Supports HLS and DASH live streams.
+7. Supports subtitles extraction 
  
 ## How to install
 [![](https://jitpack.io/v/kotvertolet/youtube-jextractor.svg)](https://jitpack.io/#kotvertolet/youtube-jextractor)
 
 ## What's new?
+### v0.3.2
+Subtitles extraction implemented
+
 ### v0.3.1
 Bug fixes
 
