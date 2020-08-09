@@ -5,6 +5,7 @@ import android.util.Log;
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
+import com.github.kotvertolet.youtubejextractor.models.subtitles.Subtitle;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.VideoPlayerConfig;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
@@ -25,10 +26,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,48 +70,19 @@ public class YoutubeJExtractor {
      *
      * @param client Custom OkHttpClient instance
      */
-    public YoutubeJExtractor(OkHttpClient client, Boolean extractSubtitles) {
+    public YoutubeJExtractor(OkHttpClient client) {
         gson = new IGsonFactoryImpl().initGson();
-        ;
         youtubeNetwork = new YoutubeNetwork(gson, client);
         youtubePlayerUtils = new YoutubePlayerUtils(youtubeNetwork);
         extractionUtils = new ExtractionUtils(youtubePlayerUtils);
     }
 
     public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
-        Response<ResponseBody> re = null;
-        GoogleVideoNetwork googleVideoNetwork = new GoogleVideoNetwork(gson);
-        try {
-            re = googleVideoNetwork.getSubtitlesList(videoId);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new ByteArrayInputStream(re.body().string().getBytes()));
-            NodeList nodeList = doc.getDocumentElement().getChildNodes();
-            Log.d(TAG, "extract: " + nodeList.getLength());
-            ArrayList<String> arrayList = new ArrayList<>();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String a = node.getAttributes().getNamedItem("lang_code").getNodeValue();
-                arrayList.add(a);
-            }
-            for (String langCode : arrayList) {
-                Response<ResponseBody> response = googleVideoNetwork.getSubtitles(videoId, langCode);
-                response.body();
-            }
-            int b = 2;
-
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
-        }
         try {
             LogI(TAG, "Extracting video data from youtube page");
             PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
-            return new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData());
+            return new YoutubeVideoData(playerResponse.getVideoDetails(),
+                            playerResponse.getRawStreamingData());
         } catch (SignatureDecryptionException e) {
             throw new ExtractionException(e);
         }
@@ -118,13 +91,55 @@ public class YoutubeJExtractor {
     public void extract(String videoId, JExtractorCallback callback) {
         try {
             PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
-            callback.onSuccess(new YoutubeVideoData(playerResponse.getVideoDetails(), playerResponse.getRawStreamingData()));
+            YoutubeVideoData youtubeVideoData = new YoutubeVideoData(playerResponse.getVideoDetails(),
+                    playerResponse.getRawStreamingData());
+            callback.onSuccess(youtubeVideoData);
         } catch (SignatureDecryptionException | ExtractionException e) {
             callback.onError(e);
         } catch (YoutubeRequestException e) {
             callback.onNetworkException(e);
         }
+    }
 
+    public Map<String, ArrayList<Subtitle>> extractSubtitles(String videoId) {
+        Response<ResponseBody> subtitlesLangsResponse;
+        GoogleVideoNetwork googleVideoNetwork = new GoogleVideoNetwork(gson);
+        try {
+            subtitlesLangsResponse = googleVideoNetwork.getSubtitlesList(videoId);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document languagesXml = builder.parse(subtitlesLangsResponse.body().byteStream());
+            NodeList languagesNodeList = languagesXml.getDocumentElement().getChildNodes();
+            if (languagesNodeList.getLength() > 0) {
+                ArrayList<String> availableSubtitlesLangCodes = new ArrayList<>();
+                for (int i = 0; i < languagesNodeList.getLength(); i++) {
+                    String langCode = languagesNodeList.item(i).getAttributes().getNamedItem("lang_code").getNodeValue();
+                    availableSubtitlesLangCodes.add(langCode);
+                }
+                Map<String, ArrayList<Subtitle>> subtitlesByLang = new HashMap<>();
+                for (String langCode : availableSubtitlesLangCodes) {
+                    Response<ResponseBody> response = googleVideoNetwork.getSubtitles(videoId, langCode);
+                    Document subtitlesXml = builder.parse(response.body().byteStream());
+                    NodeList subLineNodeList = subtitlesXml.getDocumentElement().getChildNodes();
+                    ArrayList<Subtitle> subtitleArrayList = new ArrayList<>();
+                    for (int i = 0; i < subLineNodeList.getLength(); i++) {
+                        Node node = subLineNodeList.item(i);
+                        String start = node.getAttributes().getNamedItem("start").getNodeValue();
+                        String duration = node.getAttributes().getNamedItem("dur").getNodeValue();
+                        String text = node.getTextContent();
+                        subtitleArrayList.add(new Subtitle(start, duration, text));
+                    }
+                    subtitlesByLang.put(langCode, subtitleArrayList);
+                }
+                return subtitlesByLang;
+            } else {
+                LogI(TAG, "Subtitles not found");
+                return Collections.emptyMap();
+            }
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyMap();
     }
 
     private PlayerResponse extractAndPrepareVideoData(String videoId) throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
@@ -178,8 +193,9 @@ public class YoutubeJExtractor {
             matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
             if (matcher.find()) {
                 throw new ExtractionException(String.format("Cannot extract youtube player config, " +
-                                "videoId was: %s, reason: %s", videoId, matcher.group(1)));
-            } else throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
+                        "videoId was: %s, reason: %s", videoId, matcher.group(1)));
+            } else
+                throw new ExtractionException("Cannot extract youtube player config, videoId was: " + videoId);
         }
     }
 

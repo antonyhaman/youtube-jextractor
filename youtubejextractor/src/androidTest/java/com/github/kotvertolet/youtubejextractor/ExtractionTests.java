@@ -7,6 +7,7 @@ import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
 import com.github.kotvertolet.youtubejextractor.models.AdaptiveVideoStream;
+import com.github.kotvertolet.youtubejextractor.models.subtitles.Subtitle;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeNetwork;
@@ -16,6 +17,10 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -84,7 +89,7 @@ public class ExtractionTests extends TestCase {
         checkIfStreamsWork(videoData);
     }
 
-    @Test
+    //@Test
     public void checkLiveStreamWithoutAdaptiveStreams() throws YoutubeRequestException, ExtractionException {
         videoData = youtubeJExtractor.extract("up0fWFqgC6g");
         assertTrue(videoData.getVideoDetails().isLiveContent());
@@ -121,9 +126,18 @@ public class ExtractionTests extends TestCase {
     }
 
     @Test
-    public void testSubtitlesExtraction() throws YoutubeRequestException, ExtractionException {
-        youtubeJExtractor.extract("lT3vGaOLWqE");
-
+    public void testSubtitlesExtraction() {
+        Map<String, ArrayList<Subtitle>> subs = youtubeJExtractor.extractSubtitles("lT3vGaOLWqE");
+        assertEquals(8, subs.size());
+        assertTrue(subs.containsKey("en"));
+        List<Subtitle> englishSubs = subs.get("en");
+        assertEquals(208, englishSubs.size());
+        Subtitle actualFirstLine = englishSubs.get(0);
+        Subtitle expectedFirstLine = new Subtitle("0.78", "0.56", "Hi. Shh.");
+        Subtitle actualLasLine = englishSubs.get(207);
+        Subtitle expectedLastLine = new Subtitle("620.22", "1.28", "#{{beatboxing}}#");
+        assertEquals(expectedFirstLine, actualFirstLine);
+        assertEquals(expectedLastLine, actualLasLine);
     }
 
     private void checkIfStreamsWork(YoutubeVideoData videoData) {

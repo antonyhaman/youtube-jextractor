@@ -1,5 +1,11 @@
 apply plugin: 'com.android.library'
 
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 android {
     compileSdkVersion 29
     defaultConfig {

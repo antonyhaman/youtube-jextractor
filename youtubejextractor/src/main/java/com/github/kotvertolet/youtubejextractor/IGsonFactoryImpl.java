@@ -17,11 +17,12 @@ class IGsonFactoryImpl implements IGsonFactory {
     public Gson initGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         JsonDeserializer<Cipher> cipherDeserializer = (json, typeOfT, context) -> {
-            JsonObject jsonObject = json.getAsJsonObject();
-            String s = jsonObject.get("s").getAsString();
-            String sp = jsonObject.get("sp").getAsString();
-            String url = urlDecode(jsonObject.get("url").getAsString());
-            return new Cipher(s, sp, url);
+//            JsonObject jsonObject = json.getAsJsonObject();
+//            String s = jsonObject.get("s").getAsString();
+//            String sp = jsonObject.get("sp").getAsString();
+//            String url = urlDecode(jsonObject.get("url").getAsString());
+            String[] arr = json.getAsString().split("&");
+            return new Cipher(arr[0].replace("s=", ""), arr[1].replace("sp=", ""), urlDecode(arr[2].replace("url=", "")));
         };
         JsonDeserializer<PlayerResponse> playerResponseJsonDeserializer = (json, typeOfT, context) -> {
             Gson tempGson = new GsonBuilder().registerTypeAdapter(Cipher.class, cipherDeserializer).create();
