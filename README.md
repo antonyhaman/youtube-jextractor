@@ -43,7 +43,9 @@ Bug fixes
             }
         });
 ```
-
+<details>
+  <summary>Older versions</summary>
+ 
 ### v0.2.9
 Minor changes, increased stability and logging is slightly improved
 
@@ -57,6 +59,7 @@ Muxed streams are now supported! Thanks to @comptoost for enchancement request
 ### v0.2.4:
 1. Possibility to use YoutubeJExtractor with custom `OkHttpClient` instance via the following one argument constructor - `YoutubeJExtractor(OkHttpClient client)`. It could be usefull for region restricted video (via creating `OkHttpClient` instance with proxy).
 2. Implemented RequestExecutor class with `executeWithRetry(...)` method - now every http call will be executed up to 3 times before `YoutubeRequestException` throw, it will increase stability.
+</details>
 
 ## How to use
 
