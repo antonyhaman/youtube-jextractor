@@ -7,10 +7,10 @@ import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestExceptio
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.matchWithPatterns;
 import static java.util.Arrays.asList;
 
 public class ExtractionUtils {
@@ -69,10 +69,6 @@ public class ExtractionUtils {
         Pattern obsoletePattern3 = Pattern.compile("yt\\.akamaized\\.net/\\)\\s*\\|\\|\\s*.*?\\s*c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern obsoletePattern4 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
         Pattern obsoletePattern5 = Pattern.compile("\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*\\([^)]*\\)\\s*\\(\\s*(?<sig>[a-zA-Z0-9$]+)\\(");
-
-        String signatureDecryptFunctionName = null;
-        Matcher matcher;
-
         List<Pattern> patterns = asList(
                 newPattern1,
                 newPattern2,
@@ -84,16 +80,7 @@ public class ExtractionUtils {
                 obsoletePattern4,
                 obsoletePattern5
         );
-
-        Iterator<Pattern> iter = patterns.iterator();
-        while (signatureDecryptFunctionName == null && iter.hasNext()) {
-            matcher = iter.next().matcher(playerCode);
-            if (matcher.find()) {
-                // Restarting the search
-                matcher.find(0);
-                signatureDecryptFunctionName = matcher.group(1);
-            }
-        }
+        String signatureDecryptFunctionName = matchWithPatterns(patterns, playerCode);
         if (signatureDecryptFunctionName == null) {
             throw new ExtractionException("Cannot find required JS function in JS video player code");
         }

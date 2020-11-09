@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.matchWithPatterns;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
 
 public class YoutubeJExtractor {
@@ -82,7 +84,7 @@ public class YoutubeJExtractor {
             LogI(TAG, "Extracting video data from youtube page");
             PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
             return new YoutubeVideoData(playerResponse.getVideoDetails(),
-                            playerResponse.getRawStreamingData());
+                    playerResponse.getRawStreamingData());
         } catch (SignatureDecryptionException e) {
             throw new ExtractionException(e);
         }
@@ -182,15 +184,16 @@ public class YoutubeJExtractor {
     }
 
     private VideoPlayerConfig extractYoutubePlayerConfig(String videoId) throws ExtractionException {
-        Pattern playerConfigPattern = Pattern.compile("ytplayer\\.config\\s*=\\s*(\\{.+?\\})\\;ytplayer");
-        Matcher matcher = playerConfigPattern.matcher(videoPageHtml);
-        String rawPlayerConfig;
-        if (matcher.find()) {
-            rawPlayerConfig = matcher.group(1);
-            return gson.fromJson(rawPlayerConfig, VideoPlayerConfig.class);
+        List<Pattern> patterns = Arrays.asList(
+                Pattern.compile(";ytplayer\\.config\\s*=\\s*(\\{.+?\\});ytplayer"),
+                Pattern.compile(";ytplayer\\.config\\s*=\\s*(\\{.+?\\});")
+        );
+        String result = matchWithPatterns(patterns, videoPageHtml);
+        if (result != null) {
+            return gson.fromJson(result, VideoPlayerConfig.class);
         } else {
             Pattern videoIsUnavailableMessagePattern = Pattern.compile("<h1\\sid=\"unavailable-message\"\\sclass=\"message\">\\n\\s+(.+?)\\n\\s+<\\/h1>");
-            matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
+            Matcher matcher = videoIsUnavailableMessagePattern.matcher(videoPageHtml);
             if (matcher.find()) {
                 throw new ExtractionException(String.format("Cannot extract youtube player config, " +
                         "videoId was: %s, reason: %s", videoId, matcher.group(1)));
