@@ -1,13 +1,10 @@
 package com.github.kotvertolet.youtubejextractor;
 
-import android.util.Log;
-
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.Cipher;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.PlayerResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonObject;
 
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.urlDecode;
 

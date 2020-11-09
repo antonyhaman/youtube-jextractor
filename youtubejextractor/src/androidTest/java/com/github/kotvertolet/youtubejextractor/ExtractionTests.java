@@ -64,7 +64,7 @@ public class ExtractionTests extends TestCase {
 
     @Test
     public void checkVideoWithAgeCheck() throws ExtractionException, YoutubeRequestException {
-        videoData = youtubeJExtractor.extract("h3yFGoSkgk8");
+        videoData = youtubeJExtractor.extract("Pk0z3Aj3P5E");
         checkIfStreamsWork(videoData);
     }
 
@@ -168,8 +168,7 @@ public class ExtractionTests extends TestCase {
                     assertThat(String.format(streamErrorMask, muxedStream.toString()), responseBody.isSuccessful(), is(true));
                 }
             }
-        }
-        catch (YoutubeRequestException e) {
+        } catch (YoutubeRequestException e) {
             fail(e.getMessage());
         }
     }
