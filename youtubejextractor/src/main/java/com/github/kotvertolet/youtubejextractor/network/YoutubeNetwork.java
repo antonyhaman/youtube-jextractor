@@ -48,7 +48,7 @@ public class YoutubeNetwork {
     }
 
     public Response<ResponseBody> getYoutubeVideoPage(String videoId) throws YoutubeRequestException {
-        return new RequestExecutor().executeWithRetry(youtubeApi.getVideoPage(videoId, "US", 1, "9999999999"));
+        return new RequestExecutor().executeWithRetry(youtubeApi.getVideoPage(videoId, "US", 1, "9999999999", ExtractionUtils.loginCookie, ExtractionUtils.USER_AGENT));
     }
 
     public Response<ResponseBody> downloadWebpage(String url) throws YoutubeRequestException {
