@@ -24,8 +24,8 @@ public class CommonUtils {
             matcher = iter.next().matcher(inputString);
             if (matcher.find()) {
                 // Restarting the search
-                matcher.find(0);
-                outputString = matcher.group(1);
+                //matcher.find(0);
+                outputString = matcher.group();
             }
         }
         return outputString;
