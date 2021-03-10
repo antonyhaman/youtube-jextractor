@@ -185,8 +185,8 @@ public class YoutubeJExtractor {
 
     private VideoPlayerConfig extractYoutubePlayerConfig(String videoId) throws ExtractionException {
         List<Pattern> patterns = Arrays.asList(
-                Pattern.compile(";ytplayer\\.config\\s*=\\s*(\\{.+?\\});ytplayer"),
-                Pattern.compile(";ytplayer\\.config\\s*=\\s*(\\{.+?\\});")
+                 Pattern.compile("(?<=ytplayer.config\\s=).*?((\\}(\n|)\\}(\n|))|(\\}))(?=;)", java.util.regex.Pattern.DOTALL),
+                Pattern.compile("(?<=ytInitialPlayerResponse\\s=).*?(\\}(\\]|\\})\\})(?=;)", java.util.regex.Pattern.DOTALL)
         );
         String result = matchWithPatterns(patterns, videoPageHtml);
         if (result != null) {
