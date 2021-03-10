@@ -18,7 +18,7 @@ public interface IYoutubeApi {
 
     @GET("watch")
     Call<ResponseBody> getVideoPage(@Query("v") String videoId, @Query("gl") String locale,
-                                    @Query("has_verified") int hasVerified, @Query("bpctr") String bpctr);
+                                    @Query("has_verified") int hasVerified, @Query("bpctr") String bpctr,@Header("Cookie") String header,@Header("User-Agent") String userAgent);
 
     @GET
     Call<ResponseBody> getWebPage(@Url String url);
