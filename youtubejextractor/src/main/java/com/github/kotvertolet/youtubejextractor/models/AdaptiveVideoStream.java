@@ -2,7 +2,7 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcel;
 
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
+import com.github.kotvertolet.youtubejextractor.models.newModels.AdaptiveFormatsItem;
 
 public class AdaptiveVideoStream extends StreamItem {
 
@@ -43,11 +43,12 @@ public class AdaptiveVideoStream extends StreamItem {
         this.projectionType = projectionType;
     }
 
-    public AdaptiveVideoStream(AdaptiveStream adaptiveFormat) {
+    public AdaptiveVideoStream(AdaptiveFormatsItem adaptiveFormat) {
         super(adaptiveFormat);
         fps = adaptiveFormat.getFps();
         qualityLabel = adaptiveFormat.getQualityLabel();
         projectionType = adaptiveFormat.getProjectionType();
+        //url += adaptiveFormat.getCipher().getUrl() + "&" + adaptiveFormat.getCipher().getSp() + adaptiveFormat.getCipher().getS();
     }
 
     public int getFps() {

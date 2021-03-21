@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
+import com.github.kotvertolet.youtubejextractor.exception.VideoIsUnavailable;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
 import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
 import com.github.kotvertolet.youtubejextractor.models.AdaptiveVideoStream;
+import com.github.kotvertolet.youtubejextractor.models.newModels.VideoPlayerConfig;
 import com.github.kotvertolet.youtubejextractor.models.subtitles.Subtitle;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
@@ -34,15 +36,15 @@ import static org.junit.Assert.assertThat;
 public class ExtractionTests extends TestCase {
     private YoutubeJExtractor youtubeJExtractor = new YoutubeJExtractor();
     private YoutubeNetwork youtubeNetwork = new YoutubeNetwork(new GsonBuilder().create());
-    private YoutubeVideoData videoData;
+    private VideoPlayerConfig videoData;
 
-    @Test(expected = ExtractionException.class)
-    public void checkInvalidVideoId() throws YoutubeRequestException, ExtractionException {
+    @Test(expected = VideoIsUnavailable.class)
+    public void checkInvalidVideoId() throws YoutubeRequestException, ExtractionException, VideoIsUnavailable {
         youtubeJExtractor.extract("invalid_id");
     }
 
     @Test
-    public void checkVideoDataParcel() throws YoutubeRequestException, ExtractionException {
+    public void checkVideoDataParcel() throws YoutubeRequestException, ExtractionException, VideoIsUnavailable {
         String parcelKey = "parcel_key1";
         videoData = youtubeJExtractor.extract("rkas-NHQnsI");
         Bundle bundle = new Bundle();
@@ -51,37 +53,38 @@ public class ExtractionTests extends TestCase {
     }
 
     @Test
-    public void checkVideoWithEncryptedSignature() throws ExtractionException, YoutubeRequestException {
-        videoData = youtubeJExtractor.extract("xRioA3a6qgg");
+    public void checkVideoWithEncryptedSignature() throws ExtractionException, YoutubeRequestException, VideoIsUnavailable {
+        //videoData = youtubeJExtractor.extract("07FYdnEawAQ"); // age restricted
+        videoData = youtubeJExtractor.extract("kcoisguyvEA");
         checkIfStreamsWork(videoData);
     }
 
     @Test
-    public void checkVideoWithoutEncryptedSignature() throws ExtractionException, YoutubeRequestException {
+    public void checkVideoWithoutEncryptedSignature() throws ExtractionException, YoutubeRequestException, VideoIsUnavailable {
         videoData = youtubeJExtractor.extract("jNQXAC9IVRw");
         checkIfStreamsWork(videoData);
     }
 
     @Test
-    public void checkVideoWithAgeCheck() throws ExtractionException, YoutubeRequestException {
-        videoData = youtubeJExtractor.extract("Pk0z3Aj3P5E");
+    public void checkVideoWithAgeCheck() throws ExtractionException, YoutubeRequestException, VideoIsUnavailable {
+        videoData = youtubeJExtractor.extract("upvickWORPM");
         checkIfStreamsWork(videoData);
     }
 
     @Test
-    public void checkVeryLongVideo() throws ExtractionException, YoutubeRequestException {
+    public void checkVeryLongVideo() throws ExtractionException, YoutubeRequestException, VideoIsUnavailable {
         videoData = youtubeJExtractor.extract("85bkCmaOh4o");
         checkIfStreamsWork(videoData);
     }
 
     @Test
-    public void checkVideoWithRestrictedEmbedding() throws ExtractionException, YoutubeRequestException {
+    public void checkVideoWithRestrictedEmbedding() throws ExtractionException, YoutubeRequestException, VideoIsUnavailable {
         videoData = youtubeJExtractor.extract("XcicOBS9mBU");
         checkIfStreamsWork(videoData);
     }
 
     @Test
-    public void checkLiveStream() throws YoutubeRequestException, ExtractionException {
+    public void checkLiveStream() throws YoutubeRequestException, ExtractionException, VideoIsUnavailable {
         videoData = youtubeJExtractor.extract("5qap5aO4i9A");
         assertTrue(videoData.getVideoDetails().isLiveContent());
         assertNotNull(videoData.getStreamingData().getDashManifestUrl());
@@ -89,18 +92,18 @@ public class ExtractionTests extends TestCase {
         checkIfStreamsWork(videoData);
     }
 
-    //@Test
-    public void checkLiveStreamWithoutAdaptiveStreams() throws YoutubeRequestException, ExtractionException {
-        videoData = youtubeJExtractor.extract("up0fWFqgC6g");
-        assertTrue(videoData.getVideoDetails().isLiveContent());
-        assertNotNull(videoData.getStreamingData().getDashManifestUrl());
-        assertNotNull(videoData.getStreamingData().getHlsManifestUrl());
-        assertEquals(0, videoData.getStreamingData().getAdaptiveAudioStreams().size());
-        assertEquals(0, videoData.getStreamingData().getAdaptiveVideoStreams().size());
-    }
+//    @Test
+//    public void checkLiveStreamWithoutAdaptiveStreams() throws YoutubeRequestException, ExtractionException, VideoIsUnavailable {
+//        videoData = youtubeJExtractor.extract("up0fWFqgC6g");
+//        assertTrue(videoData.getVideoDetails().isLiveContent());
+//        assertNotNull(videoData.getStreamingData().getDashManifestUrl());
+//        assertNotNull(videoData.getStreamingData().getHlsManifestUrl());
+//        assertEquals(0, videoData.getStreamingData().getAdaptiveAudioStreams().size());
+//        assertEquals(0, videoData.getStreamingData().getAdaptiveVideoStreams().size());
+//    }
 
     @Test
-    public void checkMuxedStreamNonEncrypted() throws YoutubeRequestException, ExtractionException {
+    public void checkMuxedStreamNonEncrypted() throws YoutubeRequestException, ExtractionException, VideoIsUnavailable {
         videoData = youtubeJExtractor.extract("8QyDmvuts9s");
         checkIfStreamsWork(videoData);
     }
@@ -109,7 +112,7 @@ public class ExtractionTests extends TestCase {
     public void checkCallbackBasedExtractionSuccessful() {
         youtubeJExtractor.extract("iIKxyDRjecU", new JExtractorCallback() {
             @Override
-            public void onSuccess(YoutubeVideoData videoData) {
+            public void onSuccess(VideoPlayerConfig videoData) {
                 checkIfStreamsWork(videoData);
             }
 
@@ -140,7 +143,7 @@ public class ExtractionTests extends TestCase {
         assertEquals(expectedLastLine, actualLasLine);
     }
 
-    private void checkIfStreamsWork(YoutubeVideoData videoData) {
+    private void checkIfStreamsWork(VideoPlayerConfig videoData) {
         String streamErrorMask = "Stream wasn't processed correctly, stream details:\\n %s";
         Response<ResponseBody> responseBody;
         try {

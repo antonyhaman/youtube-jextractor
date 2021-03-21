@@ -4,14 +4,16 @@ import android.util.Log;
 
 import com.github.kotvertolet.youtubejextractor.exception.ExtractionException;
 import com.github.kotvertolet.youtubejextractor.exception.SignatureDecryptionException;
+import com.github.kotvertolet.youtubejextractor.exception.VideoIsUnavailable;
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
+import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
+import com.github.kotvertolet.youtubejextractor.models.AdaptiveVideoStream;
+import com.github.kotvertolet.youtubejextractor.models.newModels.AdaptiveFormatsItem;
+import com.github.kotvertolet.youtubejextractor.models.newModels.PlayabilityStatus;
+import com.github.kotvertolet.youtubejextractor.models.newModels.VideoPlayerConfig;
 import com.github.kotvertolet.youtubejextractor.models.subtitles.Subtitle;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerConfig.VideoPlayerConfig;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.PlayerResponse;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
-import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
+import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.StreamingData;
 import com.github.kotvertolet.youtubejextractor.network.GoogleVideoNetwork;
 import com.github.kotvertolet.youtubejextractor.network.YoutubeNetwork;
 import com.github.kotvertolet.youtubejextractor.utils.DecryptionUtils;
@@ -43,9 +45,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
+import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogE;
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.LogI;
 import static com.github.kotvertolet.youtubejextractor.utils.CommonUtils.matchWithPatterns;
 import static com.github.kotvertolet.youtubejextractor.utils.StringUtils.splitUrlParams;
+
 
 public class YoutubeJExtractor {
 
@@ -79,23 +83,62 @@ public class YoutubeJExtractor {
         extractionUtils = new ExtractionUtils(youtubePlayerUtils);
     }
 
-    public YoutubeVideoData extract(String videoId) throws ExtractionException, YoutubeRequestException {
+    public VideoPlayerConfig extract(String videoId) throws ExtractionException, YoutubeRequestException, VideoIsUnavailable {
+        VideoPlayerConfig videoPlayerConfig;
         try {
             LogI(TAG, "Extracting video data from youtube page");
-            PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
-            return new YoutubeVideoData(playerResponse.getVideoDetails(),
-                    playerResponse.getRawStreamingData());
+            videoPlayerConfig = extractVideoData(videoId);
+            if (isVideoUnavailable(videoPlayerConfig)) {
+                String reason = videoPlayerConfig.getPlayabilityStatus().getErrorScreen()
+                        .getPlayerErrorMessageRenderer().getReason().getSimpleText();
+                throw new VideoIsUnavailable("This video is unavailable, reason: " + reason);
+            }
+            if (streamsAreCiphered(videoPlayerConfig)) {
+                LogI(TAG, "Streams are ciphered, decrypting");
+                decryptYoutubeStreams(videoPlayerConfig);
+            } else LogI(TAG, "Streams are not encrypted");
+            sortAdaptiveStreamsByType(videoPlayerConfig.getStreamingData());
         } catch (SignatureDecryptionException e) {
             throw new ExtractionException(e);
         }
+        return videoPlayerConfig;
+    }
+
+    private boolean isVideoUnavailable(VideoPlayerConfig videoPlayerConfig) {
+        PlayabilityStatus playabilityStatus = videoPlayerConfig.getPlayabilityStatus();
+        if (playabilityStatus.getReason() != null) {
+            return playabilityStatus.getStatus().equals("ERROR")
+                    || playabilityStatus.getReason().equals("Video unavailable");
+        }
+        else return false;
+    }
+
+
+    public void sortAdaptiveStreamsByType(StreamingData streamingData) {
+        List<AdaptiveVideoStream> adaptiveVideoStreams = new ArrayList<>();
+        List<AdaptiveAudioStream> adaptiveAudioStreams = new ArrayList<>();
+
+        for (AdaptiveFormatsItem adaptiveFormat : streamingData.getAdaptiveFormats()) {
+            String mimeType = adaptiveFormat.getMimeType();
+            if (adaptiveFormat.getApproxDurationMs() == null) {
+                continue;
+            }
+            if (mimeType.contains("audio")) {
+                adaptiveAudioStreams.add(new AdaptiveAudioStream(adaptiveFormat));
+            } else if (mimeType.contains("video")) {
+                adaptiveVideoStreams.add(new AdaptiveVideoStream(adaptiveFormat));
+            } else {
+                LogE(getClass().getSimpleName(), "Unknown stream type found: " + mimeType);
+            }
+        }
+        streamingData.setAdaptiveAudioStreams(adaptiveAudioStreams);
+        streamingData.setAdaptiveVideoStreams(adaptiveVideoStreams);
     }
 
     public void extract(String videoId, JExtractorCallback callback) {
         try {
-            PlayerResponse playerResponse = extractAndPrepareVideoData(videoId);
-            YoutubeVideoData youtubeVideoData = new YoutubeVideoData(playerResponse.getVideoDetails(),
-                    playerResponse.getRawStreamingData());
-            callback.onSuccess(youtubeVideoData);
+            VideoPlayerConfig playerResponse = extractVideoData(videoId);
+            callback.onSuccess(playerResponse);
         } catch (SignatureDecryptionException | ExtractionException e) {
             callback.onError(e);
         } catch (YoutubeRequestException e) {
@@ -144,19 +187,13 @@ public class YoutubeJExtractor {
         return Collections.emptyMap();
     }
 
-    private PlayerResponse extractAndPrepareVideoData(String videoId) throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
+    private VideoPlayerConfig extractVideoData(String videoId) throws ExtractionException, YoutubeRequestException, SignatureDecryptionException {
         LogI(TAG, "Extracting video data from youtube page");
-        PlayerResponse playerResponse = extractYoutubeVideoData(videoId);
-        if (checkIfStreamsAreCiphered(playerResponse)) {
-            LogI(TAG, "Streams are ciphered, decrypting");
-            decryptYoutubeStreams(playerResponse);
-        } else LogI(TAG, "Streams are not encrypted");
-        return playerResponse;
+        return extractYoutubeVideoData(videoId);
     }
 
-
-    private PlayerResponse extractYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
-        PlayerResponse playerResponse;
+    private VideoPlayerConfig extractYoutubeVideoData(String videoId) throws ExtractionException, YoutubeRequestException {
+        VideoPlayerConfig playerResponse;
         try {
             URL url;
             videoPageHtml = youtubeNetwork.getYoutubeVideoPage(videoId).body().string();
@@ -171,11 +208,12 @@ public class YoutubeJExtractor {
                 if (rawPlayerResponse == null || rawPlayerResponse.isEmpty()) {
                     throw new ExtractionException("Player response extracted from video info was null or empty");
                 }
-                playerResponse = gson.fromJson(gson.toJson(videoInfoMap.get("player_response")), PlayerResponse.class);
 
+                //TODO: Check if this works
+                playerResponse = gson.fromJson(rawPlayerResponse, VideoPlayerConfig.class);
             } else {
                 LogI(TAG, "Video is not age restricted, extracting youtube video player config");
-                playerResponse = extractYoutubePlayerConfig(videoId).getArgs().getPlayerResponse();
+                playerResponse = extractYoutubePlayerConfig(videoId);
             }
         } catch (IOException e) {
             throw new ExtractionException(e);
@@ -185,6 +223,7 @@ public class YoutubeJExtractor {
 
     private VideoPlayerConfig extractYoutubePlayerConfig(String videoId) throws ExtractionException {
         List<Pattern> patterns = Arrays.asList(
+                Pattern.compile("ytInitialPlayerResponse\\s*=\\s*(\\{.+?\\})\\s*;"),
                 Pattern.compile(";ytplayer\\.config\\s*=\\s*(\\{.+?\\});ytplayer"),
                 Pattern.compile(";ytplayer\\.config\\s*=\\s*(\\{.+?\\});")
         );
@@ -221,12 +260,12 @@ public class YoutubeJExtractor {
         }
     }
 
-    private boolean checkIfStreamsAreCiphered(PlayerResponse playerResponse) throws ExtractionException {
+    private boolean streamsAreCiphered(VideoPlayerConfig videoPlayerConfig) throws ExtractionException {
         // Even if a single stream is encrypted it means they all are
-        RawStreamingData rawStreamingData = playerResponse.getRawStreamingData();
-        if (rawStreamingData != null) {
-            List<AdaptiveStream> formatItems = rawStreamingData.getAdaptiveStreams();
-            if (playerResponse.getVideoDetails().isLiveContent()) {
+        StreamingData streamingData = videoPlayerConfig.getStreamingData();
+        if (streamingData != null) {
+            List<AdaptiveFormatsItem> formatItems = streamingData.getAdaptiveFormats();
+            if (videoPlayerConfig.getVideoDetails().isLiveContent()) {
                 Log.i(TAG, "Requested content is live stream");
                 if (formatItems == null || formatItems.size() == 0) {
                     Log.i(TAG, "Requested content is a live stream and doesn't contain adaptive streams, " +
@@ -242,23 +281,25 @@ public class YoutubeJExtractor {
         } else throw new ExtractionException("RawStreamingData object was null");
     }
 
-    private void decryptYoutubeStreams(PlayerResponse youtubeVideoData) throws ExtractionException, SignatureDecryptionException, YoutubeRequestException {
-        List<AdaptiveStream> adaptiveStreams = youtubeVideoData.getRawStreamingData().getAdaptiveStreams();
-        List<MuxedStream> muxedStreams = youtubeVideoData.getRawStreamingData().getMuxedStreams();
+    private void decryptYoutubeStreams(VideoPlayerConfig playerConfig) throws ExtractionException, SignatureDecryptionException, YoutubeRequestException {
+        List<AdaptiveFormatsItem> adaptiveStreams = playerConfig.getStreamingData().getAdaptiveFormats();
+        List<MuxedStream> muxedStreams = playerConfig.getStreamingData().getMuxedStreams();
 
         String playerUrl = youtubePlayerUtils.getJsPlayerUrl(videoPageHtml);
         String youtubeVideoPlayerCode = extractionUtils.extractYoutubeVideoPlayerCode(playerUrl);
         String decryptFunctionName = extractionUtils.extractDecryptFunctionName(youtubeVideoPlayerCode);
         DecryptionUtils decryptionUtils = new DecryptionUtils(youtubeVideoPlayerCode, decryptFunctionName);
         for (int i = 0; i < adaptiveStreams.size(); i++) {
-            String encryptedSignature = adaptiveStreams.get(i).getCipher().getS();
+            AdaptiveFormatsItem adaptiveStream = adaptiveStreams.get(i);
+            String encryptedSignature = adaptiveStream.getCipher().getS();
             String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
-            adaptiveStreams.get(i).getCipher().setS(decryptedSignature);
+            adaptiveStream.getCipher().setS(decryptedSignature);
         }
         for (int i = 0; i < muxedStreams.size(); i++) {
-            String encryptedSignature = muxedStreams.get(i).getCipher().getS();
+            MuxedStream muxedStream = muxedStreams.get(i);
+            String encryptedSignature = muxedStream.getCipher().getS();
             String decryptedSignature = decryptionUtils.decryptSignature(encryptedSignature);
-            muxedStreams.get(i).getCipher().setS(decryptedSignature);
+            muxedStream.getCipher().setS(decryptedSignature);
         }
     }
 }
