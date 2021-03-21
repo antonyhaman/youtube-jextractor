@@ -3,6 +3,7 @@ package com.github.kotvertolet.youtubejextractor.network;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Streaming;
@@ -16,6 +17,7 @@ public interface IYoutubeApi {
     @GET("embed/{videoId}")
     Call<ResponseBody> getEmbeddedVideoPage(@Path("videoId") String videoId);
 
+    @Headers({"accept-language: en-US"})
     @GET("watch")
     Call<ResponseBody> getVideoPage(@Query("v") String videoId, @Query("gl") String locale,
                                     @Query("has_verified") int hasVerified, @Query("bpctr") String bpctr);

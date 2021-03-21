@@ -2,7 +2,8 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcelable;
 
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
+import com.github.kotvertolet.youtubejextractor.models.newModels.AdaptiveFormatsItem;
+import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.Cipher;
 
 import java.io.Serializable;
 
@@ -15,6 +16,7 @@ public abstract class StreamItem implements Parcelable, Serializable {
     protected String url;
     protected int averageBitrate;
     protected Integer approxDurationMs;
+    protected Cipher cipher;
 
     protected StreamItem(String extension, String codec, int bitrate, int iTag, String url, int averageBitrate, int approxDurationMs) {
         this.extension = extension;
@@ -26,7 +28,7 @@ public abstract class StreamItem implements Parcelable, Serializable {
         this.approxDurationMs = approxDurationMs;
     }
 
-    protected StreamItem(AdaptiveStream adaptiveStream) {
+    protected StreamItem(AdaptiveFormatsItem adaptiveStream) {
         String[] mimeTypeArr = adaptiveStream.getMimeType().split("[/;]");
         extension = mimeTypeArr[1];
         codec = mimeTypeArr[2].split("=")[1].replaceAll("\"", "");
@@ -36,6 +38,7 @@ public abstract class StreamItem implements Parcelable, Serializable {
         averageBitrate = adaptiveStream.getAverageBitrate();
         String rawDuration = adaptiveStream.getApproxDurationMs();
         approxDurationMs = rawDuration == null ? 0 : Integer.valueOf(rawDuration);
+        cipher = adaptiveStream.getCipher();
     }
 
     public String getExtension() {
@@ -79,6 +82,9 @@ public abstract class StreamItem implements Parcelable, Serializable {
     }
 
     public String getUrl() {
+        if (url == null && getCipher() != null) {
+            url = String.format("%s&%s=%s", getCipher().getUrl(), getCipher().getSp(), getCipher().getS());
+        }
         return url;
     }
 
@@ -92,6 +98,10 @@ public abstract class StreamItem implements Parcelable, Serializable {
 
     public void setApproxDurationMs(int approxDurationMs) {
         this.approxDurationMs = approxDurationMs;
+    }
+
+    public Cipher getCipher() {
+        return cipher;
     }
 
     @Override

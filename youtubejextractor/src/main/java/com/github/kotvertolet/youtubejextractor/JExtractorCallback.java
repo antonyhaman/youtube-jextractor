@@ -1,11 +1,11 @@
 package com.github.kotvertolet.youtubejextractor;
 
 import com.github.kotvertolet.youtubejextractor.exception.YoutubeRequestException;
-import com.github.kotvertolet.youtubejextractor.models.youtube.videoData.YoutubeVideoData;
+import com.github.kotvertolet.youtubejextractor.models.newModels.VideoPlayerConfig;
 
 public interface JExtractorCallback {
 
-    void onSuccess(YoutubeVideoData videoData);
+    void onSuccess(VideoPlayerConfig videoData);
 
     void onNetworkException(YoutubeRequestException e);
 

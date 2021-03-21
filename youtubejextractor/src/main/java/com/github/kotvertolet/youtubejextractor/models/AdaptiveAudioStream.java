@@ -2,7 +2,7 @@ package com.github.kotvertolet.youtubejextractor.models;
 
 import android.os.Parcel;
 
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
+import com.github.kotvertolet.youtubejextractor.models.newModels.AdaptiveFormatsItem;
 
 public class AdaptiveAudioStream extends StreamItem {
 
@@ -38,10 +38,11 @@ public class AdaptiveAudioStream extends StreamItem {
         this.audioSampleRate = audioSampleRate;
     }
 
-    public AdaptiveAudioStream(AdaptiveStream adaptiveStream) {
+    public AdaptiveAudioStream(AdaptiveFormatsItem adaptiveStream) {
         super(adaptiveStream);
         audioChannels = adaptiveStream.getAudioChannels();
         audioSampleRate = Integer.valueOf(adaptiveStream.getAudioSampleRate());
+        //url = adaptiveStream.getCipher().getUrl() + "&" + adaptiveStream.getCipher().getSp() + adaptiveStream.getCipher().getS();
     }
 
     public int getAudioChannels() {

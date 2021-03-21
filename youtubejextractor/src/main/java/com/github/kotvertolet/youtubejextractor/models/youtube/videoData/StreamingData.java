@@ -5,9 +5,8 @@ import android.os.Parcelable;
 
 import com.github.kotvertolet.youtubejextractor.models.AdaptiveAudioStream;
 import com.github.kotvertolet.youtubejextractor.models.AdaptiveVideoStream;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.AdaptiveStream;
+import com.github.kotvertolet.youtubejextractor.models.newModels.AdaptiveFormatsItem;
 import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.MuxedStream;
-import com.github.kotvertolet.youtubejextractor.models.youtube.playerResponse.RawStreamingData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -36,10 +35,10 @@ public class StreamingData implements Parcelable, Serializable {
     private String dashManifestUrl;
     @SerializedName("hlsManifestUrl")
     private String hlsManifestUrl;
+    @SerializedName("adaptiveFormats")
+    private List<AdaptiveFormatsItem> adaptiveFormats;
     @SerializedName("formats")
     private List<MuxedStream> muxedStreams;
-    @SerializedName("probeUrl")
-    private String probeUrl;
     @Expose
     private List<AdaptiveAudioStream> adaptiveAudioStreams = new ArrayList<>();
     @Expose
@@ -48,25 +47,25 @@ public class StreamingData implements Parcelable, Serializable {
     public StreamingData() {
     }
 
-    public StreamingData(RawStreamingData rawStreamingData) {
-        this.expiresInSeconds = rawStreamingData.getExpiresInSeconds();
-        this.dashManifestUrl = rawStreamingData.getDashManifestUrl();
-        this.hlsManifestUrl = rawStreamingData.getHlsManifestUrl();
-        this.probeUrl = rawStreamingData.getProbeUrl();
-        this.muxedStreams = rawStreamingData.getMuxedStreams();
-        List<AdaptiveStream> adaptiveStreams = rawStreamingData.getAdaptiveStreams();
-        if (adaptiveStreams != null && adaptiveStreams.size() > 0) {
-            sortAdaptiveStreamsByType(adaptiveStreams);
-        }
-    }
-
-    public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AdaptiveAudioStream> adaptiveAudioStreams, List<AdaptiveVideoStream> adaptiveVideoStreams) {
-        this.expiresInSeconds = expiresInSeconds;
-        this.dashManifestUrl = dashManifestUrl;
-        this.hlsManifestUrl = hlsManifestUrl;
-        this.adaptiveAudioStreams = adaptiveAudioStreams;
-        this.adaptiveVideoStreams = adaptiveVideoStreams;
-    }
+//    public StreamingData(RawStreamingData rawStreamingData) {
+//        this.expiresInSeconds = rawStreamingData.getExpiresInSeconds();
+//        this.dashManifestUrl = rawStreamingData.getDashManifestUrl();
+//        this.hlsManifestUrl = rawStreamingData.getHlsManifestUrl();
+//        this.probeUrl = rawStreamingData.getProbeUrl();
+//        this.muxedStreams = rawStreamingData.getMuxedStreams();
+//        List<AdaptiveStream> adaptiveStreams = rawStreamingData.getAdaptiveStreams();
+//        if (adaptiveStreams != null && adaptiveStreams.size() > 0) {
+//            sortAdaptiveStreamsByType(adaptiveStreams);
+//        }
+//    }
+//
+//    public StreamingData(String expiresInSeconds, String dashManifestUrl, String hlsManifestUrl, List<AdaptiveAudioStream> adaptiveAudioStreams, List<AdaptiveVideoStream> adaptiveVideoStreams) {
+//        this.expiresInSeconds = expiresInSeconds;
+//        this.dashManifestUrl = dashManifestUrl;
+//        this.hlsManifestUrl = hlsManifestUrl;
+//        this.adaptiveAudioStreams = adaptiveAudioStreams;
+//        this.adaptiveVideoStreams = adaptiveVideoStreams;
+//    }
 
     protected StreamingData(Parcel in) {
         expiresInSeconds = in.readString();
@@ -100,20 +99,20 @@ public class StreamingData implements Parcelable, Serializable {
         this.hlsManifestUrl = hlsManifestUrl;
     }
 
+    public List<AdaptiveFormatsItem> getAdaptiveFormats() {
+        return adaptiveFormats;
+    }
+
+    public void setAdaptiveFormats(List<AdaptiveFormatsItem> adaptiveFormats) {
+        this.adaptiveFormats = adaptiveFormats;
+    }
+
     public List<MuxedStream> getMuxedStreams() {
         return muxedStreams;
     }
 
     public void setMuxedStreams(List<MuxedStream> muxedStreams) {
         this.muxedStreams = muxedStreams;
-    }
-
-    public String getProbeUrl() {
-        return probeUrl;
-    }
-
-    public void setProbeUrl(String probeUrl) {
-        this.probeUrl = probeUrl;
     }
 
     public List<AdaptiveAudioStream> getAdaptiveAudioStreams() {
@@ -183,23 +182,5 @@ public class StreamingData implements Parcelable, Serializable {
                 ", audioStreamItems=" + adaptiveAudioStreams +
                 ", videoStreamItems=" + adaptiveVideoStreams +
                 '}';
-    }
-
-    private void sortAdaptiveStreamsByType(List<AdaptiveStream> adaptiveStreams) {
-        List<AdaptiveVideoStream> adaptiveVideoStreams = new ArrayList<>();
-        List<AdaptiveAudioStream> adaptiveAudioStreams = new ArrayList<>();
-
-        for (AdaptiveStream adaptiveFormat : adaptiveStreams) {
-            String mimeType = adaptiveFormat.getMimeType();
-            if (mimeType.contains("audio")) {
-                adaptiveAudioStreams.add(new AdaptiveAudioStream(adaptiveFormat));
-            } else if (mimeType.contains("video")) {
-                adaptiveVideoStreams.add(new AdaptiveVideoStream(adaptiveFormat));
-            } else {
-                LogE(getClass().getSimpleName(), "Unknown stream type found: " + mimeType);
-            }
-        }
-        this.adaptiveAudioStreams = adaptiveAudioStreams;
-        this.adaptiveVideoStreams = adaptiveVideoStreams;
     }
 }

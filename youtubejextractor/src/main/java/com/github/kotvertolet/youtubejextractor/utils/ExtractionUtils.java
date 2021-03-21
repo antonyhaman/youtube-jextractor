@@ -22,7 +22,8 @@ public class ExtractionUtils {
     }
 
     public boolean isVideoAgeRestricted(String videoPageHtml) {
-        return videoPageHtml.contains("LOGIN_REQUIRED");
+        Pattern ageGatePattern = Pattern.compile("[\"\\']status[\"\\']\\s*:\\s*[\"\\']LOGIN_REQUIRED");
+        return ageGatePattern.matcher(videoPageHtml).find() || videoPageHtml.contains("LOGIN_REQUIRED");
     }
 
     public String extractStsFromVideoPageHtml(String embeddedVideoPageHtml) {
